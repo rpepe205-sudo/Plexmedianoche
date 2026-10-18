@@ -1,4 +1,3 @@
-YAML
 
 name: Plex Media Noche - Android Build
 
@@ -15,6 +14,7 @@ jobs:
   prepare:
     name: Validate skin and prepare package
     runs-on: ubuntu-latest
+
     steps:
       - name: Download repository
         uses: actions/checkout@v4
@@ -23,53 +23,93 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip zip python3
+
       - name: Extract project ZIP
+        shell: bash
         run: |
-          mkdir -p work/skin
-          ZIP_FILE="$(find . -maxdepth 2 -type f -iname '*KIT.zip' | head -n 1)"
+          set -euo pipefail
+
+          mkdir -p work/skin output
+
+          ZIP_FILE="$(find . -maxdepth 3 -type f -iname '*KIT.zip' \
+            -not -path './work/*' | head -n 1)"
+
           if [ -z "$ZIP_FILE" ]; then
-            ZIP_FILE="$(find . -maxdepth 2 -type f -iname '*.zip' | head -n 1)"
+            ZIP_FILE="$(find . -maxdepth 3 -type f -iname '*.zip' \
+              -not -path './work/*' | head -n 1)"
           fi
+
           if [ -z "$ZIP_FILE" ]; then
-            echo "ERROR: No project ZIP found"
+            echo "ERROR: No project ZIP found in repository."
             exit 1
           fi
-          echo "Using $ZIP_FILE"
+
+          echo "Using project: $ZIP_FILE"
           unzip -q "$ZIP_FILE" -d work/skin
-          find work/skin -name addon.xml -print
+
+          echo "Project contents:"
+          find work/skin -maxdepth 3 -type f | head -n 100
+
       - name: Check XML files
         run: |
           python3 - <<'PY'
-          import pathlib, xml.etree.ElementTree as ET, sys
+          import pathlib
+          import sys
+          import xml.etree.ElementTree as ET
+
           root = pathlib.Path("work/skin")
           files = list(root.rglob("*.xml"))
           errors = []
-          for f in files:
+
+          for file in files:
               try:
-                  ET.parse(f)
-              except Exception as e:
-                  errors.append(f"{f}: {e}")
+                  ET.parse(file)
+              except Exception as exc:
+                  errors.append(f"{file}: {exc}")
+
           print(f"XML files checked: {len(files)}")
+
+          if not files:
+              print("ERROR: No XML files found.")
+              sys.exit(1)
+
           if errors:
               print("\n".join(errors))
               sys.exit(1)
-          print("XML syntax validation passed")
+
+          print("XML syntax validation passed.")
           PY
+
       - name: Create installable skin ZIP
+        shell: bash
         run: |
-          ADDON="$(find work/skin -name addon.xml -print -quit)"
+          set -euo pipefail
+
+          ADDON="$(find work/skin -name addon.xml -type f -print -quit)"
+
           if [ -z "$ADDON" ]; then
-            echo "ERROR: addon.xml not found; ZIP structure needs repair"
+            echo "ERROR: addon.xml not found."
             exit 1
           fi
+
           DIR="$(dirname "$ADDON")"
+          ADDON_DIR="$(basename "$DIR")"
+
           mkdir -p output
+
           cd "$DIR/.."
-          zip -qr "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip" "$(basename "$DIR")"
-      - name: Upload validation package
+
+          zip -qr \
+            "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip" \
+            "$ADDON_DIR"
+
+          echo "Skin ZIP created successfully."
+
+      - name: Upload skin package
         uses: actions/upload-artifact@v4
         with:
-          name: Plex-Media-Noche-skin-validation
+          name: Plex-Media-Noche-skin
           path: output/PlexMediaNoche-skin.zip
           if-no-files-found: error
+          retention-days: 14
           
