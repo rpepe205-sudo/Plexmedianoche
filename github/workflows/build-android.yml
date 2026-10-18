@@ -1,1 +1,75 @@
+YAML
 
+name: Plex Media Noche - Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Validate skin and prepare package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip zip python3
+      - name: Extract project ZIP
+        run: |
+          mkdir -p work/skin
+          ZIP_FILE="$(find . -maxdepth 2 -type f -iname '*KIT.zip' | head -n 1)"
+          if [ -z "$ZIP_FILE" ]; then
+            ZIP_FILE="$(find . -maxdepth 2 -type f -iname '*.zip' | head -n 1)"
+          fi
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: No project ZIP found"
+            exit 1
+          fi
+          echo "Using $ZIP_FILE"
+          unzip -q "$ZIP_FILE" -d work/skin
+          find work/skin -name addon.xml -print
+      - name: Check XML files
+        run: |
+          python3 - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET, sys
+          root = pathlib.Path("work/skin")
+          files = list(root.rglob("*.xml"))
+          errors = []
+          for f in files:
+              try:
+                  ET.parse(f)
+              except Exception as e:
+                  errors.append(f"{f}: {e}")
+          print(f"XML files checked: {len(files)}")
+          if errors:
+              print("\n".join(errors))
+              sys.exit(1)
+          print("XML syntax validation passed")
+          PY
+      - name: Create installable skin ZIP
+        run: |
+          ADDON="$(find work/skin -name addon.xml -print -quit)"
+          if [ -z "$ADDON" ]; then
+            echo "ERROR: addon.xml not found; ZIP structure needs repair"
+            exit 1
+          fi
+          DIR="$(dirname "$ADDON")"
+          mkdir -p output
+          cd "$DIR/.."
+          zip -qr "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip" "$(basename "$DIR")"
+      - name: Upload validation package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plex-Media-Noche-skin-validation
+          path: output/PlexMediaNoche-skin.zip
+          if-no-files-found: error
+          
