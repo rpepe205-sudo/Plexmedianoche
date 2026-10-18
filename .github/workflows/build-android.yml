@@ -15,19 +15,19 @@ permissions:
 
 jobs:
   build:
-    name: Compilar Kodi para Android ARM64
+    name: Compilar Plex Media Noche para Android ARM64
     runs-on: ubuntu-22.04
     timeout-minutes: 360
 
     steps:
-      - name: Descargar Plex Media Noche
+      - name: Descargar el repositorio
         uses: actions/checkout@v4
 
       - name: Comprobar ZIP del skin
         run: |
           set -e
           test -f Plex_de_Media_Noche_0.4.0_KIT.zip
-          echo "ZIP del proyecto encontrado"
+          unzip -t Plex_de_Media_Noche_0.4.0_KIT.zip
 
       - name: Instalar dependencias
         run: |
@@ -48,7 +48,7 @@ jobs:
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Instalar SDK y NDK
+      - name: Instalar herramientas Android
         run: |
           sdkmanager --install \
             "platform-tools" \
@@ -57,65 +57,41 @@ jobs:
             "ndk;28.2.13676358"
           yes | sdkmanager --licenses
 
-      - name: Descargar código fuente de Kodi
+      - name: Descargar Kodi
         run: |
           git clone --depth 1 \
             https://github.com/xbmc/xbmc.git kodi
 
-      - name: Validar e integrar el skin
+      - name: Preparar el skin
         run: |
           set -e
-          mkdir -p "$RUNNER_TEMP/skin-kit"
+          mkdir -p "$RUNNER_TEMP/skin"
           unzip -q Plex_de_Media_Noche_0.4.0_KIT.zip \
-            -d "$RUNNER_TEMP/skin-kit"
+            -d "$RUNNER_TEMP/skin"
 
-          ADDON_XML="$(find "$RUNNER_TEMP/skin-kit" \
+          ADDON_XML="$(find "$RUNNER_TEMP/skin" \
             -type f -name addon.xml -print -quit)"
 
-          if [ -z "$ADDON_XML" ]; then
-            echo "::error::El ZIP no contiene addon.xml. No se puede identificar el skin."
-            exit 1
-          fi
+          test -n "$ADDON_XML"
 
-          python3 - "$ADDON_XML" <<'PY'
+          ADDON_ID="$(python3 - "$ADDON_XML" <<'PY'
           import sys
           import xml.etree.ElementTree as ET
           root = ET.parse(sys.argv[1]).getroot()
           addon_id = root.get("id", "")
           if not addon_id.startswith("skin."):
-              raise SystemExit("Error: addon.xml no identifica un skin Kodi (skin.*)")
-          print("Skin detectado:", addon_id)
-          PY
-
-          ADDON_ID="$(python3 - "$ADDON_XML" <<'PY'
-          import sys
-          import xml.etree.ElementTree as ET
-          print(ET.parse(sys.argv[1]).getroot().get("id", ""))
+              raise SystemExit("El ZIP no contiene un skin Kodi válido")
+          print(addon_id)
           PY
           )"
 
-          ADDON_DIR="$(dirname "$ADDON_XML")"
           mkdir -p kodi/addons
-          rm -rf "kodi/addons/$ADDON_ID"
-          cp -a "$ADDON_DIR" "kodi/addons/$ADDON_ID"
+          cp -a "$(dirname "$ADDON_XML")" \
+            "kodi/addons/$ADDON_ID"
 
-          echo "Skin integrado: $ADDON_ID"
-          test -f "kodi/addons/$ADDON_ID/addon.xml"
+          echo "Skin identificado: $ADDON_ID"
 
-      - name: Preparar compilación Android
-        run: |
-          mkdir -p "$HOME/.android"
-          if [ ! -f "$HOME/.android/debug.keystore" ]; then
-            keytool -genkeypair \
-              -keystore "$HOME/.android/debug.keystore" \
-              -storepass android \
-              -keypass android \
-              -alias androiddebugkey \
-              -dname "CN=Android Debug,O=Android,C=US" \
-              -keyalg RSA -keysize 2048 -validity 10000
-          fi
-
-      - name: Compilar dependencias de Kodi
+      - name: Preparar dependencias de Kodi
         run: |
           set -e
           cd kodi/tools/depends
@@ -127,31 +103,35 @@ jobs:
             --prefix="$HOME/android-tools/xbmc-depends"
           make -j2
 
-      - name: Preparar sistema de compilación
+      - name: Generar sistema de compilación
         run: |
           set -e
           cd kodi
-          make -C tools/depends/target/cmakebuildsys
+          make -C tools/depends/target/cmakebuildsys \
+            BUILD_DIR="$GITHUB_WORKSPACE/kodi-build"
 
-      - name: Compilar Kodi y crear APK
+      - name: Compilar Kodi
         run: |
           set -e
-          cd kodi-build 2>/dev/null || cd kodi
+          cd "$GITHUB_WORKSPACE/kodi-build"
           make -j2
+
+      - name: Crear APK Android
+        run: |
+          set -e
+          cd "$GITHUB_WORKSPACE/kodi-build"
           make apk
 
-      - name: Localizar APK generada
+      - name: Localizar APK
         run: |
           set -e
           mkdir -p dist
           APK="$(find "$GITHUB_WORKSPACE/kodi" \
             -type f -name '*.apk' -print -quit)"
-
           if [ -z "$APK" ]; then
-            echo "::error::La compilación terminó sin encontrar ninguna APK."
+            echo "::error::No se ha encontrado ninguna APK"
             exit 1
           fi
-
           cp "$APK" dist/Plex-Media-Noche-arm64.apk
           ls -lh dist/
 
