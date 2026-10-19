@@ -50,6 +50,12 @@ jobs:
         with:
           packages: platform-tools
 
+      - name: Reutilizar la clave de firma de prueba
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: plexmedianoche-debug-keystore-v1
+
       - name: Instalar herramientas Android
         run: |
           sdkmanager --install \
@@ -79,6 +85,13 @@ jobs:
         run: |
           git clone --depth 1 \
             https://github.com/xbmc/xbmc.git kodi
+
+      - name: Identificar la aplicación como Plex Media Noche
+        run: |
+          set -e
+          sed -i 's/^APP_PACKAGE org\\.xbmc\\.kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
+          grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
+          echo "Identificador: com.plexmedianoche.kodi"
 
       - name: Preparar el skin
         run: |
