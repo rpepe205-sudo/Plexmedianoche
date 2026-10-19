@@ -11,6 +11,10 @@ on:
       - 'skin/**'
       - 'addons/**'
 
+concurrency:
+  group: plexmedianoche-android-build
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -300,9 +304,8 @@ jobs:
           addition = (
               marker
               + "\tmkdir -p ./assets/addons\n"
-              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/skin.pepe.plexmedianoche ./assets/addons/\n"
-              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/service.plexmedianoche.maintenance ./assets/addons/\n"
-              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/* ./assets/addons/\n"
+              + "\tcp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+              + "\tcp -rfp $GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
           )
           if "skin.pepe.plexmedianoche ./assets/addons/" in data:
               print("La regla de empaquetado ya contiene la integración")
