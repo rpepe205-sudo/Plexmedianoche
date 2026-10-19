@@ -259,6 +259,96 @@ jobs:
           test -s "$MEDIA_DIR/panel.png"
           test -s "$MEDIA_DIR/tile_7.jpg"
 
+      - name: Integrar PlexKodiConnect y resolver sus dependencias
+        run: |
+          set -e
+          BASE="$GITHUB_WORKSPACE/addons"
+          TMP="$RUNNER_TEMP/plexkodiconnect"
+          mkdir -p "$TMP" "$BASE"
+          git clone --depth 1 --branch python3-beta https://github.com/croneter/PlexKodiConnect.git "$TMP/main"
+          git clone --depth 1 --branch python3 https://github.com/croneter/plugin.video.plexkodiconnect.movies.git "$TMP/movies"
+          git clone --depth 1 --branch python3 https://github.com/croneter/plugin.video.plexkodiconnect.tvshows.git "$TMP/tvshows"
+          mkdir -p "$BASE/plugin.video.plexkodiconnect" "$BASE/plugin.video.plexkodiconnect.movies" "$BASE/plugin.video.plexkodiconnect.tvshows"
+          cp -a "$TMP/main/." "$BASE/plugin.video.plexkodiconnect/"
+          cp -a "$TMP/movies/." "$BASE/plugin.video.plexkodiconnect.movies/"
+          cp -a "$TMP/tvshows/." "$BASE/plugin.video.plexkodiconnect.tvshows/"
+          curl -fL --retry 3 --retry-delay 2 https://mirrors.kodi.tv/addons/piers/addons.xml.gz -o "$TMP/addons.xml.gz"
+          python3 - "$TMP/addons.xml.gz" "$BASE" "$GITHUB_WORKSPACE/kodi/addons" "$TMP" <<'PY'
+          import gzip, os, re, shutil, sys, tempfile, urllib.request, zipfile
+          import xml.etree.ElementTree as ET
+          index_path, custom_dir, kodi_dir, tmp = sys.argv[1:]
+          with gzip.open(index_path, "rb") as f:
+              root = ET.fromstring(f.read())
+          catalog = {a.get("id"): a for a in root.findall("addon") if a.get("id")}
+          def version_key(v):
+              return tuple(int(x) for x in re.findall(r"\d+", v or "0"))
+          def addon_at(base, addon_id):
+              path = os.path.join(base, addon_id, "addon.xml")
+              if not os.path.isfile(path):
+                  return None
+              try:
+                  return ET.parse(path).getroot()
+              except ET.ParseError:
+                  return None
+          def installed(addon_id):
+              return addon_at(custom_dir, addon_id) or addon_at(kodi_dir, addon_id)
+          def resolve(addon_id, minimum="0"):
+              if addon_id.startswith(("xbmc.", "kodi.")):
+                  return
+              current = installed(addon_id)
+              if current is not None and version_key(current.get("version")) >= version_key(minimum):
+                  return
+              meta = catalog.get(addon_id)
+              if meta is None or version_key(meta.get("version")) < version_key(minimum):
+                  raise SystemExit(f"No hay versión compatible en Kodi Piers para {addon_id}>={minimum}")
+              version = meta.get("version")
+              url = f"https://mirrors.kodi.tv/addons/piers/{addon_id}/{addon_id}-{version}.zip"
+              archive = os.path.join(tmp, f"{addon_id}.zip")
+              print(f"Descargando dependencia {addon_id} {version}")
+              urllib.request.urlretrieve(url, archive)
+              unpack = tempfile.mkdtemp(prefix="addon-", dir=tmp)
+              with zipfile.ZipFile(archive) as z:
+                  z.extractall(unpack)
+              candidate = None
+              for base, dirs, files in os.walk(unpack):
+                  if "addon.xml" in files:
+                      try:
+                          parsed = ET.parse(os.path.join(base, "addon.xml")).getroot()
+                          if parsed.get("id") == addon_id:
+                              candidate = base
+                              break
+                      except ET.ParseError:
+                          pass
+              if candidate is None:
+                  raise SystemExit(f"El ZIP de {addon_id} no contiene el complemento esperado")
+              target = os.path.join(custom_dir, addon_id)
+              if os.path.exists(target):
+                  shutil.rmtree(target)
+              shutil.copytree(candidate, target)
+              addon = ET.parse(os.path.join(target, "addon.xml")).getroot()
+              for imp in addon.findall("./requires/import"):
+                  if imp.get("optional") != "true":
+                      resolve(imp.get("addon", ""), imp.get("version", "0"))
+          for addon_id, minimum in (
+              ("plugin.video.plexkodiconnect", "3.12.6"),
+              ("plugin.video.plexkodiconnect.movies", "3.0.2"),
+              ("plugin.video.plexkodiconnect.tvshows", "3.0.2"),
+          ):
+              addon = addon_at(custom_dir, addon_id)
+              if addon is None or version_key(addon.get("version")) < version_key(minimum):
+                  raise SystemExit(f"Versión de PKC o dependencia auxiliar incorrecta: {addon_id}")
+              for imp in addon.findall("./requires/import"):
+                  if imp.get("optional") != "true":
+                      resolve(imp.get("addon", ""), imp.get("version", "0"))
+          for addon_id in ("plugin.video.plexkodiconnect", "plugin.video.plexkodiconnect.movies", "plugin.video.plexkodiconnect.tvshows"):
+              addon = addon_at(custom_dir, addon_id)
+              for imp in addon.findall("./requires/import"):
+                  dep = imp.get("addon", "")
+                  if imp.get("optional") != "true" and not installed(dep) and not dep.startswith(("xbmc.", "kodi.")):
+                      raise SystemExit(f"Dependencia sin incluir: {dep}")
+          print("PlexKodiConnect y dependencias obligatorias verificadas")
+          PY
+
       - name: Integrar mantenimiento diario y semanal de biblioteca
         run: |
           set -e
@@ -297,6 +387,7 @@ jobs:
               + "\tmkdir -p ./assets/addons\n"
               + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/skin.pepe.plexmedianoche ./assets/addons/\n"
               + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+              + "\tfor addon in $(CMAKE_SOURCE_DIR)/../addons/*; do cp -rfp \"$addon\" ./assets/addons/; done\n"
           )
           if "skin.pepe.plexmedianoche ./assets/addons/" in data:
               print("La regla de empaquetado ya contiene la integración")
@@ -359,6 +450,10 @@ jobs:
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/background.jpg'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/panel.png'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/tile_7.jpg'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect/addon.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect.movies/addon.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect.tvshows/addon.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/script.module.requests/addon.xml'
           ls -lh dist/
 
       - name: Publicar APK descargable
