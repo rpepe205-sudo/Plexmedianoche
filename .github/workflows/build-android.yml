@@ -359,7 +359,7 @@ jobs:
           cd kodi
           make -C tools/depends/target/cmakebuildsys \
             BUILD_DIR="$GITHUB_WORKSPACE/kodi-build" \
-            CMAKE_EXTRA_ARGUMENTS="-DENABLE_INTERNAL_BLURAY=OFF -DENABLE_INTERNAL_UDFREAD=OFF"
+            CMAKE_EXTRA_ARGUMENTS="-DENABLE_INTERNAL_BLURAY=OFF -DENABLE_INTERNAL_UDFREAD=OFF -DENABLE_SMBCLIENT=OFF"
 
       - name: Compilar Kodi
         run: |
