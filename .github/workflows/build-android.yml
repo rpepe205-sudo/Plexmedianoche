@@ -313,11 +313,22 @@ jobs:
               + "\ttest -s ./assets/addons/skin.pepe.plexmedianoche/media/tile_7.jpg\n"
               + "\tcp -rfp $GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
           )
-          if "skin.pepe.plexmedianoche ./assets/addons/" in data:
-              print("La regla de empaquetado ya contiene la integración")
+          media_copy = "cp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media/."
+          if media_copy in data:
+              print("La regla de empaquetado ya copia las texturas del skin")
           elif marker in data:
-              path.write_text(data.replace(marker, addition, 1), encoding="utf-8")
-              print("Reglas de empaquetado actualizadas")
+              old_integration = (
+                  marker
+                  + "\tmkdir -p ./assets/addons\n"
+                  + "\tcp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+                  + "\tcp -rfp $GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+              )
+              if old_integration in data:
+                  data = data.replace(old_integration, addition, 1)
+              else:
+                  data = data.replace(marker, addition, 1)
+              path.write_text(data, encoding="utf-8")
+              print("Reglas de empaquetado actualizadas para copiar las texturas del skin")
           else:
               raise SystemExit("No se encontró el punto de integración del empaquetado Android")
           PY
