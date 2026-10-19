@@ -39,7 +39,7 @@ jobs:
             flex gawk git gperf unzip zip \
             lib32stdc++6 lib32z1 lib32z1-dev \
             libcurl4-openssl-dev zlib1g-dev \
-            python3 cmake ninja-build
+            python3 python3-pil cmake ninja-build
 
       - name: Configurar Java
         uses: actions/setup-java@v4
@@ -187,6 +187,77 @@ jobs:
           grep -Fq '<default>skin.pepe.plexmedianoche</default>' kodi/system/settings/settings.xml
           echo "Skin configurado como pantalla inicial de Kodi"
 
+      - name: Generar texturas del skin Plex de Media Noche
+        run: |
+          set -e
+          MEDIA_DIR="$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
+          mkdir -p "$MEDIA_DIR"
+          python3 - "$MEDIA_DIR" <<'PY'
+          from PIL import Image, ImageDraw, ImageFilter, ImageFont
+          import math, os, sys
+          out = sys.argv[1]
+          os.makedirs(out, exist_ok=True)
+
+          # Fondo cinematográfico 16:9 en azul medianoche, con luz azul y dorada.
+          w, h = 1920, 1080
+          bg = Image.new("RGB", (w, h))
+          px = bg.load()
+          for y in range(h):
+              for x in range(w):
+                  glow = max(0.0, 1.0 - math.sqrt(((x-1370)/1050)**2 + ((y-300)/760)**2))
+                  blue = max(0.0, 1.0 - math.sqrt(((x-350)/850)**2 + ((y-620)/720)**2))
+                  px[x,y] = (int(5 + 7*glow), int(11 + 15*glow + 4*blue), int(23 + 27*glow + 25*blue))
+          bg = bg.convert("RGBA")
+          glow = Image.new("RGBA", (w,h), (0,0,0,0))
+          gd = ImageDraw.Draw(glow)
+          gd.ellipse((920,-250,1960,720), fill=(27,106,174,46))
+          gd.ellipse((-350,360,760,1360), fill=(18,66,116,34))
+          glow = glow.filter(ImageFilter.GaussianBlur(100))
+          bg = Image.alpha_composite(bg, glow)
+          d = ImageDraw.Draw(bg)
+          # Horizonte y silueta urbana discreta para dar profundidad sin competir con carátulas.
+          skyline = [(0,850),(85,850),(85,760),(125,760),(125,815),(190,815),(190,700),(245,700),(245,835),(315,835),(315,780),(360,780),(360,730),(405,730),(405,840),(490,840),(490,690),(550,690),(550,820),(625,820),(625,750),(680,750),(680,855),(780,855),(780,790),(830,790),(830,850),(960,850),(960,720),(1015,720),(1015,835),(1100,835),(1100,760),(1150,760),(1150,850),(1280,850),(1280,680),(1340,680),(1340,830),(1430,830),(1430,755),(1495,755),(1495,850),(1600,850),(1600,720),(1660,720),(1660,835),(1740,835),(1740,775),(1800,775),(1800,850),(1920,850),(1920,1080),(0,1080)]
+          d.polygon(skyline, fill=(4,8,16,150))
+          d.line((0,852,1920,852), fill=(213,165,74,125), width=2)
+          # Filetes finos dorado/azul.
+          d.line((48,930,1872,930), fill=(67,139,202,70), width=2)
+          d.line((48,934,670,934), fill=(237,188,91,120), width=2)
+          bg.convert("RGB").save(os.path.join(out,"background.jpg"), quality=91, optimize=True)
+
+          # Panel translúcido para superponer texto y botones.
+          panel = Image.new("RGBA",(512,256),(5,12,24,225))
+          pd = ImageDraw.Draw(panel)
+          pd.rectangle((1,1,510,254), outline=(61,112,159,180), width=2)
+          pd.line((2,2,180,2), fill=(244,190,86,230), width=3)
+          pd.line((2,253,510,253), fill=(41,101,153,110), width=1)
+          panel.save(os.path.join(out,"panel.png"), optimize=True)
+
+          labels = ["FAVORITOS","ESTRENOS SERIES","SERIES","CINE","ESTRENOS CINE","TV","AJUSTES","SALIR"]
+          try:
+              font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 25)
+          except OSError:
+              font = ImageFont.load_default()
+          for i, label in enumerate(labels):
+              tile = Image.new("RGB",(640,180),(6,14,28))
+              td = ImageDraw.Draw(tile)
+              # bandas diagonales azul noche y reflejo dorado.
+              td.polygon([(0,0),(270,0),(150,180),(0,180)], fill=(9,27,49))
+              td.polygon([(430,0),(640,0),(640,180),(535,180)], fill=(10,36,60))
+              td.line((0,174,640,174), fill=(47,110,162), width=2)
+              td.line((0,170,180,170), fill=(239,188,91), width=3)
+              td.ellipse((470,-85,665,110), outline=(63,132,184), width=3)
+              td.ellipse((493,-62,640,85), outline=(210,166,85), width=1)
+              bbox=td.textbbox((0,0),label,font=font)
+              tw=bbox[2]-bbox[0]
+              td.text(((640-tw)//2,70),label,font=font,fill=(244,247,252))
+              tile.save(os.path.join(out,f"tile_{i}.jpg"),quality=90,optimize=True)
+          print("Texturas generadas:", ", ".join(sorted(os.listdir(out))))
+          PY
+          cp -a "$MEDIA_DIR/." "$GITHUB_WORKSPACE/kodi/addons/skin.pepe.plexmedianoche/media/"
+          test -s "$MEDIA_DIR/background.jpg"
+          test -s "$MEDIA_DIR/panel.png"
+          test -s "$MEDIA_DIR/tile_7.jpg"
+
       - name: Integrar mantenimiento diario y semanal de biblioteca
         run: |
           set -e
@@ -284,6 +355,9 @@ jobs:
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/addon.xml'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/1080i/Home.xml'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/service.plexmedianoche.maintenance/addon.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/background.jpg'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/panel.png'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/tile_7.jpg'
           ls -lh dist/
 
       - name: Publicar APK descargable
