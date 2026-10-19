@@ -100,7 +100,7 @@ jobs:
           path = pathlib.Path(sys.argv[1])
           data = path.read_text(encoding="utf-8")
           marker = "add_custom_target(${APP_NAME_LC}-libraries)"
-          fix = "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake\\n" + marker
+          fix = "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake\n" + marker
           if "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake" not in data:
               if marker not in data:
                   raise SystemExit("No se encontró el objetivo de bibliotecas de Kodi para corregir el nombre interno")
