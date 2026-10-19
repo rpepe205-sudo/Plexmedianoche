@@ -91,8 +91,12 @@ jobs:
       - name: Identificar la aplicación como Plex de Media Noche
         run: |
           set -e
-          sed -i 's/^APP_NAME Kodi$/APP_NAME Plex de Media Noche/' kodi/version.txt
-          grep -Fqx 'APP_NAME Plex de Media Noche' kodi/version.txt
+          sed -i 's/^APP_NAME Kodi$/APP_NAME PlexMediaNoche/' kodi/version.txt
+          grep -Fqx 'APP_NAME PlexMediaNoche' kodi/version.txt
+          sed -i 's#@APP_NAME@#Plex de Media Noche#g' kodi/tools/android/packaging/xbmc/strings.xml.in
+          grep -Fq '<string name="app_name">Plex de Media Noche</string>' kodi/tools/android/packaging/xbmc/strings.xml.in
+          echo "Nombre interno: PlexMediaNoche"
+          echo "Nombre visible en Android: Plex de Media Noche"
           sed -i 's/^APP_PACKAGE org[.]xbmc[.]kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
           grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
           echo "Nombre visible: Plex de Media Noche"
