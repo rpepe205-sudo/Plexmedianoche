@@ -124,6 +124,12 @@ jobs:
 
           echo "Skin identificado: $ADDON_ID"
 
+          test "$ADDON_ID" = "skin.pepe.plexmedianoche"
+          grep -Fq '<default>skin.estuary</default>' kodi/system/settings/settings.xml
+          sed -i 's#<default>skin.estuary</default>#<default>skin.pepe.plexmedianoche</default>#' kodi/system/settings/settings.xml
+          grep -Fq '<default>skin.pepe.plexmedianoche</default>' kodi/system/settings/settings.xml
+          echo "Skin configurado como pantalla inicial de Kodi"
+
       - name: Preparar dependencias de Kodi
         run: |
           set -e
