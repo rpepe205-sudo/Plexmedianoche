@@ -253,6 +253,7 @@ jobs:
               tile.save(os.path.join(out,f"tile_{i}.jpg"),quality=90,optimize=True)
           print("Texturas generadas:", ", ".join(sorted(os.listdir(out))))
           PY
+          mkdir -p "$GITHUB_WORKSPACE/kodi/addons/skin.pepe.plexmedianoche/media"
           cp -a "$MEDIA_DIR/." "$GITHUB_WORKSPACE/kodi/addons/skin.pepe.plexmedianoche/media/"
           test -s "$MEDIA_DIR/background.jpg"
           test -s "$MEDIA_DIR/panel.png"
