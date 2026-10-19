@@ -35,6 +35,12 @@ jobs:
           mkdir -p work/skin.pepe.plexmedianoche
           cp -a "$(dirname "$BASE")/." work/skin.pepe.plexmedianoche/
 
+      - name: Instalar herramientas para los recursos visuales
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y python3-pil
+
       - name: Adaptar el identificador y aplicar nuestra pantalla de inicio
         run: |
           set -euo pipefail
@@ -61,8 +67,6 @@ jobs:
 
           # Recursos de reserva para que la pantalla nunca dependa de ficheros inexistentes.
           # Las carátulas y fanart reales se obtienen de la biblioteca de Kodi.
-          import subprocess
-          subprocess.run(["python3", "-m", "pip", "install", "--quiet", "Pillow"], check=True)
           from PIL import Image, ImageDraw
           import math
           media = root / "media"
