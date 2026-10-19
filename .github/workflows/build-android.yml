@@ -194,7 +194,7 @@ jobs:
       - name: Generar texturas del skin Plex de Media Noche
         run: |
           set -e
-          MEDIA_DIR="$$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
+          MEDIA_DIR="$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
           mkdir -p "$MEDIA_DIR"
           python3 - "$MEDIA_DIR" <<'PY'
           from PIL import Image, ImageDraw, ImageFilter, ImageFont
