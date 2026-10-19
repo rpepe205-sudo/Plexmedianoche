@@ -20,5 +20,6 @@ El flujo **Validar skin de Plex Media Noche** se ejecuta cuando cambia el paquet
 
 ## Requisitos para la siguiente fase
 
-- Configurar complementos de subtítulos y tráileres para películas y series, accesibles desde el contenido correspondiente y sin añadir accesos al menú principal.
+- Seguir la referencia visual compartida: estética cinematográfica oscura, título destacado, información de novedades y sincronización, y carruseles separados para series y películas.
+- Configurar complementos de subtítulos y tráileres para películas y series, accesibles desde el contenido correspondiente y sin accesos globales en el menú principal.
 - Sincronizar diariamente las novedades de PlexKodiConnect y hacer una actualización completa de la biblioteca cada martes para mantenerla actualizada y reorganizada, conservando la configuración existente.
