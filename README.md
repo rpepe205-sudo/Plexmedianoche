@@ -12,7 +12,7 @@ Kodi personalizado para Android con interfaz cinematográfica y PlexKodiConnect.
 
 En GitHub, abre **Actions**, selecciona **Crear APK de Plex Media Noche** y descarga el artefacto **Plex-Media-Noche-APK-arm32** de la ejecución más reciente que haya terminado correctamente. El artefacto es un ZIP; extráelo para obtener `Plex-Media-Noche-arm32.apk`.
 
-La APK usa el identificador independiente `com.plexmedianoche.kodi`, para instalar Plex Media Noche junto a Kodi sin sustituirlo ni borrar sus datos. La compilación ARM32 está dirigida a dispositivos Android con ABI armeabi-v7a; el TV Box puede tener procesador de 64 bits y aun así ejecutar aplicaciones de 32 bits. La clave de prueba se reutiliza para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
+La APK aparece en Android como **Plex de Media Noche** y usa el identificador independiente `com.plexmedianoche.kodi`, para instalar Plex Media Noche junto a Kodi sin sustituirlo ni borrar sus datos. La compilación ARM32 está dirigida a dispositivos Android con ABI armeabi-v7a; el TV Box puede tener procesador de 64 bits y aun así ejecutar aplicaciones de 32 bits. La clave de prueba se reutiliza para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
 
 ## Validar el skin
 
