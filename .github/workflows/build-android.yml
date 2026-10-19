@@ -3,11 +3,6 @@ name: Crear APK de Plex Media Noche
 # Solo ejecución manual: evita compilaciones automáticas en cada cambio.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/build-android.yml'
 
 concurrency:
   group: plexmedianoche-android-build
