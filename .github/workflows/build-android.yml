@@ -188,7 +188,7 @@ jobs:
       - name: Generar texturas del skin Plex de Media Noche
         run: |
           set -e
-          MEDIA_DIR="$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
+          MEDIA_DIR="$$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
           mkdir -p "$MEDIA_DIR"
           python3 - "$MEDIA_DIR" <<'PY'
           from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -293,23 +293,23 @@ jobs:
           addition = (
               marker
               + "\tmkdir -p ./assets/addons\n"
-              + "\tcp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+              + "\tcp -rfp $$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
               + "\tmkdir -p ./assets/addons/skin.pepe.plexmedianoche/media\n"
-              + "\tcp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media/. ./assets/addons/skin.pepe.plexmedianoche/media/\n"
+              + "\tcp -rfp $$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media/. ./assets/addons/skin.pepe.plexmedianoche/media/\n"
               + "\ttest -s ./assets/addons/skin.pepe.plexmedianoche/media/background.jpg\n"
               + "\ttest -s ./assets/addons/skin.pepe.plexmedianoche/media/panel.png\n"
               + "\ttest -s ./assets/addons/skin.pepe.plexmedianoche/media/tile_7.jpg\n"
-              + "\tcp -rfp $GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+              + "\tcp -rfp $$GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
           )
-          media_copy = "cp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media/."
+          media_copy = "cp -rfp $$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media/."
           if media_copy in data:
               print("La regla de empaquetado ya copia las texturas del skin")
           elif marker in data:
               old_integration = (
                   marker
                   + "\tmkdir -p ./assets/addons\n"
-                  + "\tcp -rfp $GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
-                  + "\tcp -rfp $GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+                  + "\tcp -rfp $$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+                  + "\tcp -rfp $$GITHUB_WORKSPACE/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
               )
               if old_integration in data:
                   data = data.replace(old_integration, addition, 1)
