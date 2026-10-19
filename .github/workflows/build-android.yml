@@ -1,4 +1,3 @@
-
 name: Crear APK de Plex Media Noche
 
 on:
@@ -86,11 +85,14 @@ jobs:
           git clone --depth 1 \
             https://github.com/xbmc/xbmc.git kodi
 
-      - name: Identificar la aplicación como Plex Media Noche
+      - name: Identificar la aplicación como Plex de Media Noche
         run: |
           set -e
+          sed -i 's/^APP_NAME Kodi$/APP_NAME Plex de Media Noche/' kodi/version.txt
+          grep -Fqx 'APP_NAME Plex de Media Noche' kodi/version.txt
           sed -i 's/^APP_PACKAGE org[.]xbmc[.]kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
           grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
+          echo "Nombre visible: Plex de Media Noche"
           echo "Identificador: com.plexmedianoche.kodi"
 
       - name: Preparar el skin
