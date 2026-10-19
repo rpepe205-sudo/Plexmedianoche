@@ -1,25 +1,27 @@
-# Plex Media Noche
+# Plex de Media Noche
 
-Kodi personalizado para Android con interfaz cinematográfica y PlexKodiConnect.
+Compilación privada de Kodi para Android ARM32, con nombre de aplicación, skin y mantenimiento de biblioteca propios.
 
-## Qué hay en el repositorio
+## Componentes
 
-- `Plex_de_Media_Noche_0.4.0_KIT.zip`: paquete del skin y archivos de configuración del proyecto.
-- `.github/workflows/build-android.yml`: compila Kodi para Android ARM32 (armeabi-v7a), compatible con la Xiaomi TV Box S de 3.ª generación, incorpora el skin y lo establece como interfaz inicial.
-- `.github/workflows/validate-skin.yml`: comprueba los XML del skin y genera un ZIP instalable.
+- `Plex_de_Media_Noche_0.4.0_KIT.zip`: paquete base de recursos del skin.
+- `skin/1080i/Home.xml`: inicio con cabecera destacada y carruseles de series, películas y novedades; usa los datos de la biblioteca local de Kodi.
+- `addons/service.plexmedianoche.maintenance`: actualiza la biblioteca de vídeo cada día y, los martes, realiza una limpieza de registros que apunten a archivos que ya no existen.
+- `.github/workflows/build-android.yml`: prepara la aplicación **Plex de Media Noche**, identificador independiente `com.plexmedianoche.kodi`, para dispositivos ARM32 (`armeabi-v7a`).
+- `.github/workflows/validate-skin.yml`: valida los XML y el servicio, y publica un ZIP instalable del skin.
 
-## Obtener e instalar la APK de prueba
+## Biblioteca y sincronización
 
-En GitHub, abre **Actions**, selecciona **Crear APK de Plex Media Noche** y descarga el artefacto **Plex-Media-Noche-APK-arm32** de la ejecución más reciente que haya terminado correctamente. El artefacto es un ZIP; extráelo para obtener `Plex-Media-Noche-arm32.apk`.
+Añade las fuentes de vídeo desde Kodi en **Vídeos > Archivos** y configúralas como películas o series. Cuando Kodi las indexe, sus carátulas y novedades llenarán los carruseles. No es necesario compartir acceso ni contraseña de PlexKodiConnect.
 
-La APK aparece en Android como **Plex de Media Noche** y usa el identificador independiente `com.plexmedianoche.kodi`, para instalarla junto a Kodi sin sustituirlo ni borrar sus datos. Al primer inicio debe abrir el skin Plex de Media Noche. Las secciones de Cine y Series mostrarán contenido cuando PlexKodiConnect esté conectado y haya sincronizado la biblioteca. La compilación ARM32 está dirigida a dispositivos Android con ABI armeabi-v7a; el TV Box puede tener procesador de 64 bits y aun así ejecutar aplicaciones de 32 bits. La clave de prueba se reutiliza para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
+El servicio intenta actualizar la biblioteca una vez al día mientras Kodi está abierto. Los martes, después de la actualización, limpia de la base de datos las referencias a archivos desaparecidos; no borra archivos multimedia. Si el TV Box está apagado, el trabajo se ejecutará cuando Kodi vuelva a abrirse.
 
-## Validar el skin
+## Tráileres y subtítulos
 
-El flujo **Validar skin de Plex Media Noche** se ejecuta cuando cambia el paquete del proyecto o su propio archivo de flujo. También se puede iniciar manualmente desde **Actions**. Si termina correctamente, publica el artefacto **Plex-Media-Noche-skin**.
+Los tráileres dependen de que la ficha del título tenga esa información. Kodi ofrece los subtítulos durante la reproducción; para buscar y descargar subtítulos hace falta instalar y configurar un proveedor desde **Complementos**. Estos accesos se mantienen dentro de las fichas y del reproductor, no en el menú principal.
 
-## Requisitos para la siguiente fase
+## Compilación e instalación
 
-- Seguir la referencia visual compartida: estética cinematográfica oscura, título destacado, información de novedades y sincronización, y carruseles separados para series y películas.
-- Configurar complementos de subtítulos y tráileres para películas y series, accesibles desde el contenido correspondiente y sin accesos globales en el menú principal.
-- Sincronizar diariamente las novedades de PlexKodiConnect y hacer una actualización completa de la biblioteca cada martes para mantenerla actualizada y reorganizada, conservando la configuración existente.
+En GitHub, abre **Actions**, elige **Crear APK de Plex Media Noche** y descarga el artefacto **Plex-Media-Noche-APK-arm32** de la ejecución más reciente que haya terminado correctamente. Extrae el ZIP y, en el TV Box, instala `Plex-Media-Noche-arm32.apk`.
+
+La APK aparece como **Plex de Media Noche** y puede instalarse junto a Kodi porque usa un identificador independiente. La clave de prueba se reutiliza para permitir actualizaciones de esta APK de desarrollo; no es una firma de publicación. Los artefactos de APK se conservan durante 7 días.
