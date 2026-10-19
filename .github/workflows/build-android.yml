@@ -318,6 +318,14 @@ jobs:
           grep -Fq 'skin.pepe.plexmedianoche ./assets/addons/' "$MAKEFILE"
           grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
 
+      - name: Cachear archivos descargados de dependencias Kodi
+        uses: actions/cache@v4
+        with:
+          path: ~/android-tools/xbmc-tarballs
+          key: kodi-dep-tarballs-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            kodi-dep-tarballs-${{ runner.os }}-
+
       - name: Preparar dependencias de Kodi
         run: |
           set -e
@@ -328,7 +336,7 @@ jobs:
             --host=arm-linux-androideabi \
             --with-sdk-path="$ANDROID_SDK_ROOT" \
             --prefix="$HOME/android-tools/xbmc-depends"
-          make -j2
+          make -j"$(nproc)"
 
       - name: Generar sistema de compilación
         run: |
@@ -342,7 +350,7 @@ jobs:
         run: |
           set -e
           cd "$GITHUB_WORKSPACE/kodi-build"
-          make -j2
+          make -j"$(nproc)"
 
       - name: Crear APK Android
         run: |
