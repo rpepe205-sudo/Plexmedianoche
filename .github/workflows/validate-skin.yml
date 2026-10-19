@@ -1,0 +1,98 @@
+name: Validar skin de Plex Media Noche
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/validate-skin.yml'
+      - 'Plex_de_Media_Noche_0.4.0_KIT.zip'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validar skin y preparar ZIP instalable
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar herramientas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip zip python3
+
+      - name: Extraer el paquete del proyecto
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/skin output
+
+          ZIP_FILE="$(find . -maxdepth 3 -type f -iname '*KIT.zip' \
+            -not -path './work/*' -print -quit)"
+          if [ -z "$ZIP_FILE" ]; then
+            ZIP_FILE="$(find . -maxdepth 3 -type f -iname '*.zip' \
+              -not -path './work/*' -print -quit)"
+          fi
+          if [ -z "$ZIP_FILE" ]; then
+            echo "::error::No se encontró el ZIP del proyecto."
+            exit 1
+          fi
+
+          echo "Comprobando: $ZIP_FILE"
+          unzip -t "$ZIP_FILE"
+          unzip -q "$ZIP_FILE" -d work/skin
+          find work/skin -maxdepth 3 -type f | head -n 100
+
+      - name: Validar XML del skin
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import sys
+          import xml.etree.ElementTree as ET
+
+          files = list(pathlib.Path("work/skin").rglob("*.xml"))
+          errors = []
+          for file in files:
+              try:
+                  ET.parse(file)
+              except Exception as exc:
+                  errors.append(f"{file}: {exc}")
+
+          print(f"Archivos XML comprobados: {len(files)}")
+          if not files:
+              print("::error::No se encontraron archivos XML.")
+              sys.exit(1)
+          if errors:
+              print("\n".join(errors))
+              sys.exit(1)
+          print("La validación XML terminó correctamente.")
+          PY
+
+      - name: Crear ZIP instalable del skin
+        shell: bash
+        run: |
+          set -euo pipefail
+          ADDON="$(find work/skin -name addon.xml -type f -print -quit)"
+          if [ -z "$ADDON" ]; then
+            echo "::error::No se encontró addon.xml."
+            exit 1
+          fi
+
+          DIR="$(dirname "$ADDON")"
+          ADDON_DIR="$(basename "$DIR")"
+          cd "$DIR/.."
+          zip -qr "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip" "$ADDON_DIR"
+          test -s "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip"
+          echo "ZIP instalable creado correctamente."
+
+      - name: Publicar ZIP instalable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plex-Media-Noche-skin
+          path: output/PlexMediaNoche-skin.zip
+          if-no-files-found: error
+          retention-days: 14
