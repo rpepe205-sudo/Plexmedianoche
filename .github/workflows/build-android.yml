@@ -318,13 +318,16 @@ jobs:
           grep -Fq 'skin.pepe.plexmedianoche ./assets/addons/' "$MAKEFILE"
           grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
 
-      - name: Cachear archivos descargados de dependencias Kodi
+      - name: Cachear descargas y dependencias compiladas de Kodi
         uses: actions/cache@v4
         with:
-          path: ~/android-tools/xbmc-tarballs
-          key: kodi-dep-tarballs-${{ runner.os }}-${{ github.sha }}
+          path: |
+            ~/android-tools/xbmc-tarballs
+            ~/android-tools/xbmc-depends
+            kodi/tools/depends/build
+          key: kodi-depends-arm32-${{ runner.os }}-${{ hashFiles('kodi/tools/depends/**') }}
           restore-keys: |
-            kodi-dep-tarballs-${{ runner.os }}-
+            kodi-depends-arm32-${{ runner.os }}-
 
       - name: Preparar dependencias de Kodi
         run: |
