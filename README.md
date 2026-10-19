@@ -14,7 +14,7 @@ Compilación privada de Kodi para Android ARM32, con nombre de aplicación, skin
 
 Añade las fuentes de vídeo desde Kodi en **Vídeos > Archivos** y configúralas como películas o series. Cuando Kodi las indexe, sus carátulas y novedades llenarán los carruseles. No es necesario compartir acceso ni contraseña de PlexKodiConnect.
 
-El servicio intenta actualizar la biblioteca una vez al día mientras Kodi está abierto. Los martes, después de la actualización, limpia de la base de datos las referencias a archivos desaparecidos; no borra archivos multimedia. Si el TV Box está apagado, el trabajo se ejecutará cuando Kodi vuelva a abrirse.
+El servicio intenta actualizar una biblioteca local de Kodi una vez al día mientras Kodi está abierto. Los martes, después de la actualización, limpia de la base de datos las referencias a archivos desaparecidos; no borra archivos multimedia. **Si detecta PlexKodiConnect instalado, omite tanto la actualización como la limpieza automática**, porque PKC gestiona la biblioteca sincronizada desde Plex y una limpieza de Kodi podría interferir con ella. Si el TV Box está apagado, el trabajo local se ejecutará cuando Kodi vuelva a abrirse.
 
 ## Tráileres y subtítulos
 
