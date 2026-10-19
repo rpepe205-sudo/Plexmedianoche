@@ -325,8 +325,8 @@ jobs:
           import pathlib, sys
           path = pathlib.Path(sys.argv[1])
           data = path.read_text(encoding="utf-8")
-          old = '\\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" -exec rm -rf {} \\\\;\\n'
-          new = '\\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" ! -path "`pwd`/assets/addons/skin.pepe.plexmedianoche/media/*" -exec rm -rf {} \\\\;\\n'
+          old = '\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" -exec rm -rf {} \\;\n'
+          new = '\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" ! -path "`pwd`/assets/addons/skin.pepe.plexmedianoche/media/*" -exec rm -rf {} \\;\n'
           if new in data:
               print("La limpieza ya conserva las texturas de Plex Media Noche")
           elif old in data:
