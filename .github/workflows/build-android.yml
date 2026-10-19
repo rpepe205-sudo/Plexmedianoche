@@ -148,7 +148,8 @@ jobs:
           # así que hay que copiar también allí la pantalla de inicio personalizada.
           mkdir -p "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i"
           cp skin/1080i/Home.xml "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i/Home.xml"
-          cmp -s skin/1080i/Home.xml "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i/Home.xml"
+          test -s "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i/Home.xml" || { echo "ERROR: no se ha copiado Home.xml al directorio de empaquetado"; exit 1; }
+          echo "Copia de Home.xml preparada para el empaquetado Android"
           python3 - "$ADDON_XML" "kodi/addons/$ADDON_ID/1080i/Home.xml" <<'PY'
           import sys
           import xml.etree.ElementTree as ET
