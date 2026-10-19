@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="service.plexmedianoche.maintenance"
+       name="Plex de Media Noche · Biblioteca"
+       version="1.0.0"
+       provider-name="Plex de Media Noche">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="es_ES">Actualiza la biblioteca cada día y la limpia los martes.</summary>
+    <description lang="es_ES">Al iniciar Kodi, busca novedades una vez al día. Los martes, después de actualizar, elimina de la base de datos las entradas cuyos archivos ya no existen. No borra los archivos multimedia.</description>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
