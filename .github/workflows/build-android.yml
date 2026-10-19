@@ -86,6 +86,29 @@ jobs:
           git clone --depth 1 \
             https://github.com/xbmc/xbmc.git kodi
 
+      - name: Evitar símbolos TLS sin enlazar en libmicrohttpd Android
+        run: |
+          set -e
+          FILE="kodi/tools/depends/target/libmicrohttpd/Makefile"
+          test -s "$FILE"
+          python3 - "$FILE" <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          old = "                      --enable-https"
+          new = "                      --disable-https"
+          if new in data:
+              print("HTTPS opcional de libmicrohttpd ya está desactivado para este APK Android")
+          elif old in data:
+              data = data.replace(old, new, 1)
+              path.write_text(data, encoding="utf-8")
+              print("Desactivado HTTPS opcional en libmicrohttpd para evitar referencias GnuTLS/Nettle sin enlazar")
+          else:
+              raise SystemExit("No se encontró la opción HTTPS esperada en Makefile de libmicrohttpd")
+          PY
+          grep -Fq -- '--disable-https' "$FILE"
+          ! grep -Fq -- '--enable-https' "$FILE"
+
       - name: Conservar el nombre Kodi y usar identificador propio
         run: |
           set -e
