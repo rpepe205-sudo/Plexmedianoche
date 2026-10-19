@@ -8,11 +8,11 @@ Kodi personalizado para Android con interfaz cinematográfica y PlexKodiConnect.
 - `.github/workflows/build-android.yml`: compila Kodi para Android ARM64 e incorpora el skin.
 - `.github/workflows/validate-skin.yml`: comprueba los XML del skin y genera un ZIP instalable.
 
-## Obtener la APK de prueba
+## Obtener e instalar la APK de prueba
 
-En GitHub, abre **Actions**, selecciona **Crear APK de Plex Media Noche** y pulsa **Run workflow** si no hay una compilación en curso. Cuando termine correctamente, abre esa ejecución y descarga el artefacto **Plex-Media-Noche-APK-arm64**.
+En GitHub, abre **Actions**, selecciona **Crear APK de Plex Media Noche** y descarga el artefacto **Plex-Media-Noche-APK-arm64** de la ejecución más reciente que haya terminado correctamente. El artefacto es un ZIP; extráelo para obtener `Plex-Media-Noche-arm64.apk`.
 
-La APK de GitHub Actions se firma con una clave de depuración y el artefacto se conserva durante 7 días. Es una compilación de prueba, no una versión de publicación.
+La próxima compilación usará el identificador independiente `com.plexmedianoche.kodi`, para instalar Plex Media Noche junto a Kodi sin sustituirlo ni borrar sus datos. La clave de prueba se reutiliza en las compilaciones posteriores para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
 
 ## Validar el skin
 
