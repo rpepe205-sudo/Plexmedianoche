@@ -52,10 +52,26 @@ jobs:
         run: |
           sdkmanager --install \
             "platform-tools" \
-            "platforms;android-37" \
+            "platforms;android-37.0" \
             "build-tools;37.0.0" \
             "ndk;28.2.13676358"
           yes | sdkmanager --licenses
+
+      - name: Crear clave de depuración Android
+        run: |
+          set -e
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt \
+              -keystore "$HOME/.android/debug.keystore" \
+              -alias androiddebugkey \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keypass android \
+              -storepass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000
+          fi
 
       - name: Descargar Kodi
         run: |
