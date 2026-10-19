@@ -46,71 +46,69 @@
     <control type="label"><left>66</left><top>444</top><width>900</width><height>30</height><label>SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
     <control type="label" id="9101"><left>66</left><top>476</top><width>1700</width><height>24</height><label>Añade una fuente de vídeo desde Vídeos > Archivos para ver tus series aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
     <control type="panel" id="9100">
-      <left>54</left><top>471</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
-      <scrolltime>300</scrolltime><focusposition>0</focusposition><visible>Library.HasContent(tvshows)</visible>
-      <onup>9001</onup><ondown>9200</ondown><onleft>9100</onleft><onright>9100</onright>
-      <itemlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
+      <left>54</left><top>470</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <scrolltime>300</scrolltime><focusposition>0</focusposition><onup>9001</onup><ondown>9200</ondown><onleft>9100</onleft><onright>9100</onright>
+      <itemlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
       </itemlayout>
-      <focusedlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
+      <focusedlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
       </focusedlayout>
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://tvshows/titles/</content>
     </control>
     
-    <control type="label"><left>66</left><top>575</top><width>900</width><height>30</height><label>CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9201"><left>66</left><top>607</top><width>1700</width><height>24</height><label>Añade una fuente de vídeo desde Vídeos > Archivos para ver tus películas aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
+    <control type="label"><left>66</left><top>590</top><width>900</width><height>30</height><label>CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9201"><left>66</left><top>622</top><width>1700</width><height>24</height><label>Añade una fuente de vídeo desde Vídeos > Archivos para ver tus películas aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
     <control type="panel" id="9200">
-      <left>54</left><top>602</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>616</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition><visible>Library.HasContent(movies)</visible>
       <onup>9100</onup><ondown>9300</ondown><onleft>9200</onleft><onright>9200</onright>
-      <itemlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
+      <itemlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
       </itemlayout>
-      <focusedlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
+      <focusedlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
       </focusedlayout>
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://movies/titles/</content>
     </control>
     
-    <control type="label"><left>66</left><top>706</top><width>900</width><height>30</height><label>ESTRENOS DE SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9301"><left>66</left><top>738</top><width>1700</width><height>24</height><label>Los episodios añadidos recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
+    <control type="label"><left>66</left><top>736</top><width>900</width><height>30</height><label>ESTRENOS DE SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9301"><left>66</left><top>768</top><width>1700</width><height>24</height><label>Los episodios añadidos recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
     <control type="panel" id="9300">
-      <left>54</left><top>733</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
-      <scrolltime>300</scrolltime><focusposition>0</focusposition><visible>Library.HasContent(tvshows)</visible>
-      <onup>9200</onup><ondown>9400</ondown><onleft>9300</onleft><onright>9300</onright>
-      <itemlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
+      <left>54</left><top>762</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <scrolltime>300</scrolltime><focusposition>0</focusposition><onup>9200</onup><ondown>9400</ondown><onleft>9300</onleft><onright>9300</onright>
+      <itemlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
       </itemlayout>
-      <focusedlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
+      <focusedlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
       </focusedlayout>
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://recentlyaddedepisodes/</content>
     </control>
     
-    <control type="label"><left>66</left><top>837</top><width>900</width><height>30</height><label>ESTRENOS DE CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9401"><left>66</left><top>869</top><width>1700</width><height>24</height><label>Las películas añadidas recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
+    <control type="label"><left>66</left><top>882</top><width>900</width><height>30</height><label>ESTRENOS DE CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9401"><left>66</left><top>914</top><width>1700</width><height>24</height><label>Las películas añadidas recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
     <control type="panel" id="9400">
-      <left>54</left><top>864</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>908</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition><visible>Library.HasContent(movies)</visible>
       <onup>9300</onup><ondown>9007</ondown><onleft>9400</onleft><onright>9400</onright>
-      <itemlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
+      <itemlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFFFFF</textcolor><align>center</align><scroll>true</scroll></control>
       </itemlayout>
-      <focusedlayout width="180" height="108">
-        <control type="image"><left>5</left><top>0</top><width>168</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
-        <control type="label"><left>5</left><top>87</top><width>168</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
+      <focusedlayout width="160" height="108">
+        <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>3</bordersize></control>
+        <control type="label"><left>5</left><top>87</top><width>150</width><height>20</height><label>$INFO[ListItem.Label]</label><font>font13</font><textcolor>FFFFC85A</textcolor><align>center</align><scroll>true</scroll></control>
       </focusedlayout>
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://recentlyaddedmovies/</content>
     </control>
 
-    <control type="label"><left>64</left><top>1005</top><width>1750</width><height>25</height><label>TRÁILERES: FICHA DEL TÍTULO SI HAY TRÁILER DISPONIBLE · SUBTÍTULOS: CONTROLES DURANTE LA REPRODUCCIÓN</label><font>font13</font><textcolor>FF7E8CA0</textcolor></control>
+    <!-- Tráileres se abren desde la ficha y los subtítulos desde el OSD del reproductor. -->
   </controls>
 </window>
