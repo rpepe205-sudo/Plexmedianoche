@@ -18,6 +18,7 @@ La APK de GitHub Actions se firma con una clave de depuración y el artefacto se
 
 El flujo **Validar skin de Plex Media Noche** se ejecuta cuando cambia el paquete del proyecto o su propio archivo de flujo. También se puede iniciar manualmente desde **Actions**. Si termina correctamente, publica el artefacto **Plex-Media-Noche-skin**.
 
-## Requisito para la siguiente fase
+## Requisitos para la siguiente fase
 
-Configurar complementos de subtítulos y tráileres para películas y series, accesibles desde el contenido correspondiente y sin añadir accesos al menú principal.
+- Configurar complementos de subtítulos y tráileres para películas y series, accesibles desde el contenido correspondiente y sin añadir accesos al menú principal.
+- Sincronizar diariamente las novedades de PlexKodiConnect y hacer una actualización completa de la biblioteca cada martes para mantenerla actualizada y reorganizada, conservando la configuración existente.
