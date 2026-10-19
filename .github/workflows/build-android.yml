@@ -109,6 +109,25 @@ jobs:
           print("Nombre interno CMake fijado a kodi")
           PY
           grep -Fq 'set(APP_NAME_LC kodi) # Nombre interno seguro para CMake' kodi/CMakeLists.txt
+          # Evitar que la configuración falle si Kodi no ha creado el objetivo global de bibliotecas.
+          python3 - kodi/cmake/scripts/linux/Macros.cmake <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          old = "  add_dependencies(${APP_NAME_LC}-libraries wrap_${libname})"
+          new = (
+              "  if(TARGET ${APP_NAME_LC}-libraries)\n"
+              "    add_dependencies(${APP_NAME_LC}-libraries wrap_${libname})\n"
+              "  endif()"
+          )
+          if new not in data:
+              if old not in data:
+                  raise SystemExit("No se encontró la dependencia de bibliotecas en Macros.cmake")
+              data = data.replace(old, new, 1)
+              path.write_text(data, encoding="utf-8")
+          print("Dependencia de bibliotecas protegida")
+          PY
+          grep -Fq 'if(TARGET ${APP_NAME_LC}-libraries)' kodi/cmake/scripts/linux/Macros.cmake
           echo "Nombre visible: Kodi"
           echo "Identificador privado: com.plexmedianoche.kodi"
       - name: Preparar el skin
