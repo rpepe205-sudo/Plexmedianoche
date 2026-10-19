@@ -9,6 +9,7 @@ on:
       - '.github/workflows/validate-skin.yml'
       - 'Plex_de_Media_Noche_0.4.0_KIT.zip'
       - 'skin/**'
+      - 'addons/**'
 
 permissions:
   contents: read
@@ -59,6 +60,7 @@ jobs:
       - name: Validar XML del skin
         run: |
           python3 - <<'PY'
+          import ast
           import pathlib
           import sys
           import xml.etree.ElementTree as ET
@@ -81,10 +83,28 @@ jobs:
           home = pathlib.Path("skin/1080i/Home.xml")
           root = ET.parse(home).getroot()
           panels = {node.get("id") for node in root.findall(".//control[@type='panel']")}
-          if not {"9100", "9200"}.issubset(panels):
-              print("::error::Faltan las filas de series o películas en Home.xml.")
+          required_panels = {"9100", "9200", "9300", "9400"}
+          if not required_panels.issubset(panels):
+              print("::error::Faltan filas de series, cine o novedades en Home.xml.")
               sys.exit(1)
-          print("La pantalla incluye filas de series y películas.")
+
+          addon_dir = pathlib.Path("addons/service.plexmedianoche.maintenance")
+          addon_xml = ET.parse(addon_dir / "addon.xml").getroot()
+          if addon_xml.get("id") != "service.plexmedianoche.maintenance":
+              print("::error::El identificador del servicio no coincide.")
+              sys.exit(1)
+          entry = addon_xml.find("./extension[@point='xbmc.service']")
+          if entry is None or entry.get("library") != "service.py":
+              print("::error::No se encontró el punto de entrada del servicio.")
+              sys.exit(1)
+          source = (addon_dir / "service.py").read_text(encoding="utf-8")
+          ast.parse(source, filename=str(addon_dir / "service.py"))
+          if "UpdateLibrary(video)" not in source or "today.isoweekday() == 2" not in source:
+              print("::error::Falta la actualización diaria o semanal.")
+              sys.exit(1)
+
+          print("La pantalla incluye las cuatro filas de biblioteca.")
+          print("El servicio diario y de los martes pasó el análisis estático.")
           print("La validación XML terminó correctamente.")
           PY
 
