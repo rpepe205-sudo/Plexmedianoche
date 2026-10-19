@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/build-android.yml'
       - 'Plex_de_Media_Noche_0.4.0_KIT.zip'
+      - 'skin/**'
 
 permissions:
   contents: read
@@ -27,6 +28,7 @@ jobs:
           set -e
           test -f Plex_de_Media_Noche_0.4.0_KIT.zip
           unzip -t Plex_de_Media_Noche_0.4.0_KIT.zip
+          test -s skin/1080i/Home.xml
 
       - name: Instalar dependencias
         run: |
@@ -121,6 +123,18 @@ jobs:
           mkdir -p kodi/addons
           cp -a "$(dirname "$ADDON_XML")" \
             "kodi/addons/$ADDON_ID"
+
+          mkdir -p "kodi/addons/$ADDON_ID/1080i"
+          cp skin/1080i/Home.xml "kodi/addons/$ADDON_ID/1080i/Home.xml"
+          python3 - "$ADDON_XML" "kodi/addons/$ADDON_ID/1080i/Home.xml" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+          addon = ET.parse(sys.argv[1]).getroot()
+          home = ET.parse(sys.argv[2]).getroot()
+          if addon.get("id") != "skin.pepe.plexmedianoche" or home.tag != "window":
+              raise SystemExit("El skin o su pantalla inicial no es válido")
+          print("Pantalla inicial validada")
+          PY
 
           echo "Skin identificado: $ADDON_ID"
 
