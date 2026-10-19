@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/validate-skin.yml'
       - 'Plex_de_Media_Noche_0.4.0_KIT.zip'
+      - 'skin/**'
 
 permissions:
   contents: read
@@ -45,6 +46,14 @@ jobs:
           echo "Comprobando: $ZIP_FILE"
           unzip -t "$ZIP_FILE"
           unzip -q "$ZIP_FILE" -d work/skin
+          ADDON_XML="$(find work/skin -name addon.xml -type f -print -quit)"
+          if [ -z "$ADDON_XML" ]; then
+            echo "::error::No se encontró addon.xml."
+            exit 1
+          fi
+          ADDON_DIR="$(dirname "$ADDON_XML")"
+          mkdir -p "$ADDON_DIR/1080i"
+          cp skin/1080i/Home.xml "$ADDON_DIR/1080i/Home.xml"
           find work/skin -maxdepth 3 -type f | head -n 100
 
       - name: Validar XML del skin
@@ -69,6 +78,13 @@ jobs:
           if errors:
               print("\n".join(errors))
               sys.exit(1)
+          home = pathlib.Path("skin/1080i/Home.xml")
+          root = ET.parse(home).getroot()
+          panels = {node.get("id") for node in root.findall(".//control[@type='panel']")}
+          if not {"9100", "9200"}.issubset(panels):
+              print("::error::Faltan las filas de series o películas en Home.xml.")
+              sys.exit(1)
+          print("La pantalla incluye filas de series y películas.")
           print("La validación XML terminó correctamente.")
           PY
 
