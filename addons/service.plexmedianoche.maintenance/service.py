@@ -40,6 +40,13 @@ def _write_state(name, value):
     os.replace(temporary_path, path)
 
 
+def _pkc_installed():
+    """Avoid Kodi library maintenance while PlexKodiConnect owns the library."""
+    return xbmcvfs.exists(
+        "special://home/addons/plugin.video.plexkodiconnect/addon.xml"
+    )
+
+
 def _is_scanning():
     return xbmc.getCondVisibility("Library.IsScanningVideo")
 
@@ -88,7 +95,16 @@ def run():
         daily_key = today.isoformat()
         week_key = today.strftime("%G-W%V")
 
-        if _read_state("last-daily-update.txt") != daily_key:
+        if _pkc_installed():
+            # PKC mantiene sincronizada la biblioteca Plex y modifica la base de datos de Kodi.
+            # No ejecutar UpdateLibrary/CleanLibrary: una limpieza de Kodi puede romper la sincronización PKC.
+            if _read_state("pkc-notice.txt") != "shown":
+                xbmc.log(
+                    "[Plex Media Noche] PlexKodiConnect detectado; se omite el mantenimiento automático de la biblioteca.",
+                    xbmc.LOGINFO,
+                )
+                _write_state("pkc-notice.txt", "shown")
+        elif _read_state("last-daily-update.txt") != daily_key:
             if _run_video_update(monitor):
                 _write_state("last-daily-update.txt", daily_key)
                 if today.isoweekday() == 2 and _read_state("last-weekly-clean.txt") != week_key:
