@@ -166,6 +166,33 @@ jobs:
           print("Servicio de mantenimiento incluido y validado")
           PY
 
+      - name: Asegurar que el skin y el servicio se empaquetan en la APK
+        run: |
+          set -e
+          MAKEFILE="kodi/tools/android/packaging/Makefile.in"
+          test -s "$MAKEFILE"
+          python3 - "$MAKEFILE" <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          marker = "\tcp -rfp $(DEPENDS_PATH)/share/kodi/* ./assets || true\n"
+          addition = (
+              marker
+              + "\tmkdir -p ./assets/addons\n"
+              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+          )
+          if "skin.pepe.plexmedianoche ./assets/addons/" in data:
+              print("La regla de empaquetado ya contiene la integración")
+          elif marker in data:
+              path.write_text(data.replace(marker, addition, 1), encoding="utf-8")
+              print("Reglas de empaquetado actualizadas")
+          else:
+              raise SystemExit("No se encontró el punto de integración del empaquetado Android")
+          PY
+          grep -Fq 'skin.pepe.plexmedianoche ./assets/addons/' "$MAKEFILE"
+          grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
+
       - name: Preparar dependencias de Kodi
         run: |
           set -e
@@ -209,6 +236,10 @@ jobs:
             exit 1
           fi
           cp "$APK" dist/Plex-Media-Noche-arm32.apk
+          echo "Comprobando que el skin y el servicio están dentro de la APK..."
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/addon.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/1080i/Home.xml'
+          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/service.plexmedianoche.maintenance/addon.xml'
           ls -lh dist/
 
       - name: Publicar APK descargable
