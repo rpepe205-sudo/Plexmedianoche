@@ -387,7 +387,7 @@ jobs:
               + "\tmkdir -p ./assets/addons\n"
               + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/skin.pepe.plexmedianoche ./assets/addons/\n"
               + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/service.plexmedianoche.maintenance ./assets/addons/\n"
-              + "\tfor addon in $(CMAKE_SOURCE_DIR)/../addons/*; do cp -rfp \"$$addon\" ./assets/addons/; done\n"
+              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/* ./assets/addons/\n"
           )
           if "skin.pepe.plexmedianoche ./assets/addons/" in data:
               print("La regla de empaquetado ya contiene la integración")
