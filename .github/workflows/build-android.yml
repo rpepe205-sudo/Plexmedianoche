@@ -320,6 +320,22 @@ jobs:
           else:
               raise SystemExit("No se encontró el punto de integración del empaquetado Android")
           PY
+          # Kodi elimina por defecto las imágenes sueltas de media; conservar las del skin propio.
+          python3 - "$MAKEFILE" <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          old = '\\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" -exec rm -rf {} \\\\;\\n'
+          new = '\\tfind `pwd`/assets/addons/skin.*/media/* -depth -not -iname "*.xbt" ! -path "`pwd`/assets/addons/skin.pepe.plexmedianoche/media/*" -exec rm -rf {} \\\\;\\n'
+          if new in data:
+              print("La limpieza ya conserva las texturas de Plex Media Noche")
+          elif old in data:
+              data = data.replace(old, new, 1)
+              path.write_text(data, encoding="utf-8")
+              print("Regla de limpieza ajustada para conservar las texturas propias")
+          else:
+              raise SystemExit("No se encontró la regla de limpieza de texturas de Kodi; no se puede garantizar el empaquetado")
+          PY
           grep -Fq 'skin.pepe.plexmedianoche ./assets/addons/' "$MAKEFILE"
           grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
 
