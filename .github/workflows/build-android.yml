@@ -94,6 +94,21 @@ jobs:
           grep -Fqx 'APP_NAME Kodi' kodi/version.txt
           sed -i 's/^APP_PACKAGE org[.]xbmc[.]kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
           grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
+          # Evitar que un nombre de marca con espacios contamine los nombres internos de objetivos CMake.
+          python3 - kodi/CMakeLists.txt <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          marker = "add_custom_target(${APP_NAME_LC}-libraries)"
+          fix = "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake\\n" + marker
+          if "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake" not in data:
+              if marker not in data:
+                  raise SystemExit("No se encontró el objetivo de bibliotecas de Kodi para corregir el nombre interno")
+              data = data.replace(marker, fix, 1)
+              path.write_text(data, encoding="utf-8")
+          print("Nombre interno CMake fijado a kodi")
+          PY
+          grep -Fq 'set(APP_NAME_LC kodi) # Nombre interno seguro para CMake' kodi/CMakeLists.txt
           echo "Nombre visible: Kodi"
           echo "Identificador privado: com.plexmedianoche.kodi"
       - name: Preparar el skin
