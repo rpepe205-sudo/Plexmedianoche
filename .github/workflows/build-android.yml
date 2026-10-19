@@ -13,7 +13,8 @@ on:
 
 concurrency:
   group: plexmedianoche-android-build
-  cancel-in-progress: true
+  # No cancelar una compilación larga por un ajuste posterior del workflow.
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -319,7 +320,7 @@ jobs:
           grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
 
       - name: Cachear descargas y dependencias compiladas de Kodi
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/android-tools/xbmc-tarballs
@@ -340,6 +341,17 @@ jobs:
             --with-sdk-path="$ANDROID_SDK_ROOT" \
             --prefix="$HOME/android-tools/xbmc-depends"
           make -j"$(nproc)"
+
+      # Guardar las dependencias en cuanto esta fase termina; así un fallo
+      # posterior al compilar Kodi no obliga a reconstruirlas desde cero.
+      - name: Guardar dependencias compiladas de Kodi
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/android-tools/xbmc-tarballs
+            ~/android-tools/xbmc-depends
+            kodi/tools/depends/build
+          key: kodi-depends-arm32-${{ runner.os }}-${{ hashFiles('kodi/tools/depends/**') }}
 
       - name: Generar sistema de compilación
         run: |
