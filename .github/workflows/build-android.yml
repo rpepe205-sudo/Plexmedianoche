@@ -89,7 +89,7 @@ jobs:
       - name: Identificar la aplicación como Plex Media Noche
         run: |
           set -e
-          sed -i 's/^APP_PACKAGE org\\.xbmc\\.kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
+          sed -i 's/^APP_PACKAGE org[.]xbmc[.]kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
           grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
           echo "Identificador: com.plexmedianoche.kodi"
 
