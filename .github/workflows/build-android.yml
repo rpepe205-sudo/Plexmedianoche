@@ -9,6 +9,7 @@ on:
       - '.github/workflows/build-android.yml'
       - 'Plex_de_Media_Noche_0.4.0_KIT.zip'
       - 'skin/**'
+      - 'addons/**'
 
 permissions:
   contents: read
@@ -143,6 +144,29 @@ jobs:
           sed -i 's#<default>skin.estuary</default>#<default>skin.pepe.plexmedianoche</default>#' kodi/system/settings/settings.xml
           grep -Fq '<default>skin.pepe.plexmedianoche</default>' kodi/system/settings/settings.xml
           echo "Skin configurado como pantalla inicial de Kodi"
+
+      - name: Integrar mantenimiento diario y semanal de biblioteca
+        run: |
+          set -e
+          ADDON_ID="service.plexmedianoche.maintenance"
+          test -s "addons/$ADDON_ID/addon.xml"
+          test -s "addons/$ADDON_ID/service.py"
+          mkdir -p "kodi/addons/$ADDON_ID"
+          cp -a "addons/$ADDON_ID/." "kodi/addons/$ADDON_ID/"
+          python3 - "kodi/addons/$ADDON_ID/addon.xml" "kodi/addons/$ADDON_ID/service.py" <<'PY'
+          import ast
+          import sys
+          import xml.etree.ElementTree as ET
+          addon = ET.parse(sys.argv[1]).getroot()
+          if addon.get("id") != "service.plexmedianoche.maintenance":
+              raise SystemExit("Identificador del servicio inesperado")
+          service = addon.find("./extension[@point='xbmc.service']")
+          if service is None or service.get("library") != "service.py":
+              raise SystemExit("No se encontró el punto de entrada del servicio")
+          with open(sys.argv[2], encoding="utf-8") as source:
+              ast.parse(source.read(), filename=sys.argv[2])
+          print("Servicio de mantenimiento incluido y validado")
+          PY
 
       - name: Preparar dependencias de Kodi
         run: |
