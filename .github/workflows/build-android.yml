@@ -144,6 +144,11 @@ jobs:
 
           mkdir -p "kodi/addons/$ADDON_ID/1080i"
           cp skin/1080i/Home.xml "kodi/addons/$ADDON_ID/1080i/Home.xml"
+          # El empaquetado Android toma el skin desde $GITHUB_WORKSPACE/addons,
+          # así que hay que copiar también allí la pantalla de inicio personalizada.
+          mkdir -p "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i"
+          cp skin/1080i/Home.xml "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i/Home.xml"
+          cmp -s skin/1080i/Home.xml "$GITHUB_WORKSPACE/addons/$ADDON_ID/1080i/Home.xml"
           python3 - "$ADDON_XML" "kodi/addons/$ADDON_ID/1080i/Home.xml" <<'PY'
           import sys
           import xml.etree.ElementTree as ET
