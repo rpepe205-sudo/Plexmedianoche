@@ -365,10 +365,8 @@ jobs:
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/background.jpg'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/panel.png'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/media/tile_7.jpg'
-          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect/addon.xml'
-          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect.movies/addon.xml'
-          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/plugin.video.plexkodiconnect.tvshows/addon.xml'
-          unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/script.module.requests/addon.xml'
+          # PlexKodiConnect se instala manualmente después de instalar la APK; no debe exigirse dentro del paquete base.
+          echo "APK base validada; PlexKodiConnect queda reservado para la integración manual de la biblioteca."
           ls -lh dist/
 
       - name: Publicar APK descargable
