@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    name: Compilar Plex Media Noche para Android ARM64
+    name: Compilar Plex Media Noche para Android ARM32 (armeabi-v7a)
     runs-on: ubuntu-22.04
     timeout-minutes: 360
 
@@ -129,7 +129,7 @@ jobs:
           ./bootstrap
           ./configure \
             --with-tarballs="$HOME/android-tools/xbmc-tarballs" \
-            --host=aarch64-linux-android \
+            --host=arm-linux-androideabi \
             --with-sdk-path="$ANDROID_SDK_ROOT" \
             --prefix="$HOME/android-tools/xbmc-depends"
           make -j2
@@ -163,13 +163,13 @@ jobs:
             echo "::error::No se ha encontrado ninguna APK"
             exit 1
           fi
-          cp "$APK" dist/Plex-Media-Noche-arm64.apk
+          cp "$APK" dist/Plex-Media-Noche-arm32.apk
           ls -lh dist/
 
       - name: Publicar APK descargable
         uses: actions/upload-artifact@v4
         with:
-          name: Plex-Media-Noche-APK-arm64
-          path: dist/Plex-Media-Noche-arm64.apk
+          name: Plex-Media-Noche-APK-arm32
+          path: dist/Plex-Media-Noche-arm32.apk
           if-no-files-found: error
           retention-days: 7
