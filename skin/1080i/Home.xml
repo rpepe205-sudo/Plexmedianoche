@@ -6,12 +6,13 @@
     <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture>background.jpg</texture><aspectratio>stretch</aspectratio></control>
     <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>99000000</colordiffuse></control>
 
-    <control type="label"><left>54</left><top>18</top><width>900</width><height>42</height><label>P L E X   D E   M E D I A   N O C H E</label><font>font30</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label"><left>54</left><top>18</top><width>900</width><height>42</height><label>P L E X   D E   M E D I A   N O C H E</label><font>font36</font><textcolor>FFFFFFFF</textcolor></control>
     <control type="label"><left>56</left><top>59</top><width>900</width><height>26</height><label>TU CINE · TUS SERIES · TU NOCHE</label><font>font16</font><textcolor>FF91B7E8</textcolor></control>
     <control type="label"><left>1435</left><top>22</top><width>425</width><height>34</height><label>$INFO[System.Time]</label><font>font24</font><textcolor>FFFFFFFF</textcolor><align>right</align></control>
     <control type="label"><left>1435</left><top>58</top><width>425</width><height>25</height><label>$INFO[System.Date]</label><font>font13</font><textcolor>FFB7C5D8</textcolor><align>right</align></control>
 
-    <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture fallback="background.jpg">$INFO[Container(9100).ListItem.Art(fanart)]</texture><aspectratio>scale</aspectratio></control>
+    <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>background.jpg</texture><aspectratio>stretch</aspectratio><visible>!Library.HasContent(tvshows)</visible></control>
+    <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>$INFO[Container(9100).ListItem.Art(fanart)]</texture><aspectratio>scale</aspectratio><visible>Library.HasContent(tvshows)</visible></control>
     <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>CC06101E</colordiffuse></control>
     <control type="image"><left>1414</left><top>111</top><width>430</width><height>230</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>BB06101E</colordiffuse></control>
     <control type="label"><left>84</left><top>118</top><width>1120</width><height>30</height><label>DESTACADO DE TU BIBLIOTECA</label><font>font16</font><textcolor>FFFFC85A</textcolor></control>
@@ -19,7 +20,8 @@
     <control type="textbox"><left>86</left><top>218</top><width>1200</width><height>74</height><label>$INFO[Container(9100).ListItem.Plot,Cuando añadas tus fuentes de vídeo desde Kodi, tus películas y series aparecerán aquí.]</label><font>font16</font><textcolor>FFE2E8F0</textcolor></control>
     <control type="label"><left>86</left><top>321</top><width>1200</width><height>24</height><label>Abre la ficha de cada título para ver sus detalles. Durante la reproducción encontrarás los controles de audio y subtítulos.</label><font>font13</font><textcolor>FFB7C5D8</textcolor></control>
     <control type="label"><left>1450</left><top>132</top><width>360</width><height>28</height><label>ESTADO DE LA BIBLIOTECA</label><font>font16</font><textcolor>FF91B7E8</textcolor></control>
-    <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>$INFO[Library.HasContent(movies),PELÍCULAS DISPONIBLES,AÑADE TU BIBLIOTECA EN KODI]</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>PELÍCULAS Y SERIES DISPONIBLES</label><font>font18</font><textcolor>FFFFFFFF</textcolor><visible>Library.HasContent(movies)</visible></control>
+    <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>AÑADE TU BIBLIOTECA EN KODI</label><font>font18</font><textcolor>FFFFFFFF</textcolor><visible>!Library.HasContent(movies)</visible></control>
     <control type="button" id="9050"><left>1450</left><top>266</top><width>330</width><height>48</height><label>ABRIR COMPLEMENTOS</label><font>font16</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus>panel.png</texturefocus><texturenofocus>panel.png</texturenofocus><onclick>ActivateWindow(Addons)</onclick><onup>9006</onup><ondown>9006</ondown><onleft>9006</onleft><onright>9006</onright></control>
 
     <control type="image"><left>48</left><top>374</top><width>1824</width><height>64</height><texture>panel.png</texture><colordiffuse>BB07111F</colordiffuse></control>
