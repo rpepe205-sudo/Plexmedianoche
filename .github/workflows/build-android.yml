@@ -123,6 +123,10 @@ jobs:
           cp -a "$(dirname "$ADDON_XML")" \
             "kodi/addons/$ADDON_ID"
 
+          # Mantener una copia en el repositorio para que el empaquetado Android la encuentre.
+          mkdir -p "$GITHUB_WORKSPACE/addons/$ADDON_ID"
+          cp -a "$(dirname "$ADDON_XML")/." "$GITHUB_WORKSPACE/addons/$ADDON_ID/"
+
           mkdir -p "kodi/addons/$ADDON_ID/1080i"
           cp skin/1080i/Home.xml "kodi/addons/$ADDON_ID/1080i/Home.xml"
           python3 - "$ADDON_XML" "kodi/addons/$ADDON_ID/1080i/Home.xml" <<'PY'
@@ -179,8 +183,8 @@ jobs:
           addition = (
               marker
               + "\tmkdir -p ./assets/addons\n"
-              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/addons/skin.pepe.plexmedianoche ./assets/addons/\n"
-              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/addons/service.plexmedianoche.maintenance ./assets/addons/\n"
+              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/skin.pepe.plexmedianoche ./assets/addons/\n"
+              + "\tcp -rfp $(CMAKE_SOURCE_DIR)/../addons/service.plexmedianoche.maintenance ./assets/addons/\n"
           )
           if "skin.pepe.plexmedianoche ./assets/addons/" in data:
               print("La regla de empaquetado ya contiene la integración")
