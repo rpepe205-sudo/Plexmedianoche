@@ -5,14 +5,14 @@ Kodi personalizado para Android con interfaz cinematográfica y PlexKodiConnect.
 ## Qué hay en el repositorio
 
 - `Plex_de_Media_Noche_0.4.0_KIT.zip`: paquete del skin y archivos de configuración del proyecto.
-- `.github/workflows/build-android.yml`: compila Kodi para Android ARM32 (armeabi-v7a), compatible con la Xiaomi TV Box S de 3.ª generación, e incorpora el skin.
+- `.github/workflows/build-android.yml`: compila Kodi para Android ARM32 (armeabi-v7a), compatible con la Xiaomi TV Box S de 3.ª generación, incorpora el skin y lo establece como interfaz inicial.
 - `.github/workflows/validate-skin.yml`: comprueba los XML del skin y genera un ZIP instalable.
 
 ## Obtener e instalar la APK de prueba
 
 En GitHub, abre **Actions**, selecciona **Crear APK de Plex Media Noche** y descarga el artefacto **Plex-Media-Noche-APK-arm32** de la ejecución más reciente que haya terminado correctamente. El artefacto es un ZIP; extráelo para obtener `Plex-Media-Noche-arm32.apk`.
 
-La APK aparece en Android como **Plex de Media Noche** y usa el identificador independiente `com.plexmedianoche.kodi`, para instalar Plex Media Noche junto a Kodi sin sustituirlo ni borrar sus datos. La compilación ARM32 está dirigida a dispositivos Android con ABI armeabi-v7a; el TV Box puede tener procesador de 64 bits y aun así ejecutar aplicaciones de 32 bits. La clave de prueba se reutiliza para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
+La APK aparece en Android como **Plex de Media Noche** y usa el identificador independiente `com.plexmedianoche.kodi`, para instalarla junto a Kodi sin sustituirlo ni borrar sus datos. Al primer inicio debe abrir el skin Plex de Media Noche. Las secciones de Cine y Series mostrarán contenido cuando PlexKodiConnect esté conectado y haya sincronizado la biblioteca. La compilación ARM32 está dirigida a dispositivos Android con ABI armeabi-v7a; el TV Box puede tener procesador de 64 bits y aun así ejecutar aplicaciones de 32 bits. La clave de prueba se reutiliza para permitir actualizar esta app de prueba. No es una versión de publicación. Los artefactos de APK se conservan durante 7 días.
 
 ## Validar el skin
 
