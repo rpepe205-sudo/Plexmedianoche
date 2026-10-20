@@ -21,7 +21,7 @@ jobs:
       - name: Descargar el proyecto Plex Media Noche
         uses: actions/checkout@v4
 
-      - name: Descargar la base original Arctic Zephyr Reloaded
+      - name: Descargar y conservar Arctic Zephyr Reloaded original
         run: |
           set -euo pipefail
           curl -fL --retry 3 \
@@ -32,97 +32,34 @@ jobs:
           unzip -q upstream.zip -d upstream
           BASE="$(find upstream -type f -name addon.xml -print -quit)"
           test -n "$BASE"
-          mkdir -p work/skin.pepe.plexmedianoche
-          cp -a "$(dirname "$BASE")/." work/skin.pepe.plexmedianoche/
+          mkdir -p work
+          cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
 
-      - name: Instalar herramientas para los recursos visuales
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y python3-pil
-
-      - name: Adaptar el identificador y aplicar nuestra pantalla de inicio
+      - name: Validar y empaquetar el skin original sin modificar su estructura
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           import xml.etree.ElementTree as ET
-
-          root = Path("work/skin.pepe.plexmedianoche")
-          addon_file = root / "addon.xml"
-          tree = ET.parse(addon_file)
-          addon = tree.getroot()
-          addon.set("id", "skin.pepe.plexmedianoche")
-          addon.set("name", "Plex Media Noche")
-          addon.set("version", "0.1.0")
-          addon.set("provider-name", "Plex Media Noche")
-          tree.write(addon_file, encoding="UTF-8", xml_declaration=True)
-
-          home = Path("skin/1080i/Home.xml")
-          if not home.is_file():
-              raise SystemExit("No existe skin/1080i/Home.xml en el repositorio")
-          target = root / "1080i" / "Home.xml"
-          target.parent.mkdir(parents=True, exist_ok=True)
-          target.write_bytes(home.read_bytes())
-
-          # Recursos de reserva para que la pantalla nunca dependa de ficheros inexistentes.
-          # Las carátulas y fanart reales se obtienen de la biblioteca de Kodi.
-          from PIL import Image, ImageDraw
-          import math
-          media = root / "media"
-          media.mkdir(exist_ok=True)
-          w, h = 1920, 1080
-          bg = Image.new("RGB", (w, h))
-          px = bg.load()
-          for y in range(h):
-              for x in range(w):
-                  glow = max(0, 1 - math.sqrt(((x-1350)/1100)**2 + ((y-250)/750)**2))
-                  px[x,y] = (int(4+5*glow), int(9+9*glow), int(19+22*glow))
-          draw = ImageDraw.Draw(bg)
-          draw.rectangle((0, 0, w, 7), fill=(194, 145, 48))
-          bg.save(media / "background.jpg", quality=88)
-          panel = Image.new("RGBA", (1920,1080), (4,10,22,220))
-          panel.save(media / "panel.png")
-          for i in range(8):
-              tile = Image.new("RGB", (448,128), (8+i*2, 18+i*2, 34+i*3))
-              d = ImageDraw.Draw(tile)
-              d.rectangle((0,0,447,5), fill=(194,145,48))
-              d.ellipse((310,-65,475,100), fill=(22,54+i*2,85+i*3))
-              tile.save(media / f"tile_{i}.jpg", quality=88)
-          PY
-          # Home.xml references these textures by name, so put the fallback assets at the skin root too.
-          cp work/skin.pepe.plexmedianoche/media/background.jpg work/skin.pepe.plexmedianoche/background.jpg
-          cp work/skin.pepe.plexmedianoche/media/panel.png work/skin.pepe.plexmedianoche/panel.png
-          cp work/skin.pepe.plexmedianoche/media/tile_*.jpg work/skin.pepe.plexmedianoche/
-
-      - name: Validar el paquete
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import ast
-          import xml.etree.ElementTree as ET
-          root = Path("work/skin.pepe.plexmedianoche")
+          root = Path("work/skin.arctic.zephyr.mod")
           addon = ET.parse(root / "addon.xml").getroot()
-          if addon.get("id") != "skin.pepe.plexmedianoche":
-              raise SystemExit("ID del skin incorrecto")
-          home = ET.parse(root / "1080i" / "Home.xml").getroot()
-          if home.tag != "window":
-              raise SystemExit("Home.xml no contiene una ventana Kodi")
-          ids = {n.get("id") for n in home.findall(".//control[@type='panel']")}
-          if not {"9100","9200","9300","9400"}.issubset(ids):
-              raise SystemExit("Faltan filas de biblioteca")
-          xml_files = list(root.rglob("*.xml"))
-          for path in xml_files:
+          if addon.get("id") != "skin.arctic.zephyr.mod":
+              raise SystemExit("El identificador original de Arctic no coincide")
+          if addon.get("version") != "3.0.3":
+              raise SystemExit(f"Versión de Arctic inesperada: {addon.get('version')}")
+          if not (root / "1080i" / "Home.xml").is_file():
+              raise SystemExit("Falta la portada original de Arctic")
+          if not (root / "1080i" / "IncludesHome.xml").is_file():
+              raise SystemExit("Faltan los includes originales de la portada")
+          count = 0
+          for path in root.rglob("*.xml"):
               ET.parse(path)
-          for asset in ["background.jpg","panel.png"] + [f"tile_{i}.jpg" for i in range(8)]:
-              if not (root / asset).is_file():
-                  raise SystemExit(f"Falta recurso visual: {asset}")
-          print(f"Skin validado: {len(xml_files)} XML; ID={addon.get('id')}; pantalla y recursos presentes.")
+              count += 1
+          print(f"Base original intacta: {addon.get('id')} v{addon.get('version')}; {count} XML válidos.")
           PY
           mkdir -p dist
           cd work
-          zip -qr ../dist/PlexMediaNoche-skin-Omega.zip skin.pepe.plexmedianoche
+          zip -qr ../dist/PlexMediaNoche-skin-Omega.zip skin.arctic.zephyr.mod
           cd ..
           unzip -t dist/PlexMediaNoche-skin-Omega.zip
           ls -lh dist/PlexMediaNoche-skin-Omega.zip
