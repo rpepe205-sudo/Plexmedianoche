@@ -12,8 +12,8 @@ on:
 
 concurrency:
   group: plexmedianoche-android-build
-  # No cancelar una compilación larga por un ajuste posterior del workflow.
-  cancel-in-progress: false
+  # Cancelar ejecuciones antiguas para que pruebe la corrección más reciente sin quedar bloqueada.
+  cancel-in-progress: true
 
 permissions:
   contents: read
