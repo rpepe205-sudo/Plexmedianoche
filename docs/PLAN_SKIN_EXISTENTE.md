@@ -9,19 +9,27 @@ Priorizar una portada y una configuración del skin existente antes de seguir in
 Estilo cinematográfico nocturno, oscuro, elegante y relativamente ligero para Android TV Box:
 - Fondo azul noche / carbón, con acentos dorados y azules.
 - Un bloque destacado con fanart, título y sinopsis cuando los datos de Kodi estén disponibles.
-- Menú directo: Favoritos, Estrenos de series, Series, Cine, Estrenos de cine, TV y Tráilers.
+- Menú horizontal superior: Inicio, Favoritos, Series estrenos, Series, Novedades cine, TV, Ajustes y Apagar.
+- Tráilers accesibles desde la ficha de cada película cuando exista una fuente compatible; sin apartado independiente en el menú.
+- La base que usa el workflow actual es Arctic: Zephyr - Reloaded, no Arctic Zephyr Resurrection.
 - Filas de carteles: Continuar viendo, Series recientes, Cine añadido recientemente y estrenos.
 - Navegación completa con mando y foco visible.
 - Evitar animaciones pesadas, fondos de vídeo y demasiados widgets simultáneos.
 
 ## Estrategia por fases
 
-1. Confirmar el nombre exacto y versión del skin instalado (Arctic Zephyr Resurrection o Arctic Zephyr Reloaded).
+1. El workflow actual toma como base Arctic: Zephyr - Reloaded. Confirmar con el usuario si el skin que tiene instalado en el TV Box es esa variante o Arctic Zephyr Resurrection.
 2. Revisar sus opciones nativas de menú, widgets y vistas. Comprobar «Force Views» solo si la versión instalada lo ofrece; no asumir que las opciones de Reloaded existen en Resurrection.
 3. Configurar primero la portada con opciones nativas y probar el acceso a la biblioteca de PlexKodiConnect.
 4. Ajustar el diseño solo donde la configuración no alcance. Mantener los cambios aislados y reversibles.
 5. Probar navegación, carga de carteles, reproducción, TV/IPTV y rendimiento en el Android TV Box.
 6. Cuando la interfaz esté validada, decidir qué archivos incorporar al paquete y a la futura APK.
+
+## Cambios de portada en curso
+
+- `skin/1080i/Home.xml` se ha actualizado para subir la navegación principal a la parte superior y usar los ocho accesos acordados.
+- El workflow `.github/workflows/build-skin-omega.yml` se activa al cambiar `Home.xml` y prepara un ZIP basado en Reloaded para Kodi Omega.
+- El artefacto debe pasar la validación automatizada y aún necesita una prueba real en Kodi/Android TV Box. No considerar el diseño validado hasta comprobar foco con mando, widgets, carteles, PKC e IPTV.
 
 ## Notas técnicas importantes
 
