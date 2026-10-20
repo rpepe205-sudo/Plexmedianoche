@@ -394,10 +394,10 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          # v2 invalida las dependencias antiguas que se compilaron con TLS/GnuTLS.
-          key: kodi-depends-arm32-tls-off-v4-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          # v5 fuerza una reconstrucción limpia de dependencias para evitar la biblioteca libmicrohttpd antigua con referencias TLS/GnuTLS.
+          key: kodi-depends-arm32-tls-off-v5-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
           restore-keys: |
-            kodi-depends-arm32-tls-off-v4-${{ runner.os }}-
+            kodi-depends-arm32-tls-off-v5-${{ runner.os }}-
 
       - name: Preparar dependencias de Kodi
         run: |
@@ -420,7 +420,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v4-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v5-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
