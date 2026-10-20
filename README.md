@@ -11,6 +11,8 @@ Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Ome
 
 ## Diseño acordado
 
+El paquete aplica una paleta azul noche con acentos dorados y azules. En un perfil nuevo limita los widgets a 12 elementos por fila y desactiva reflejos; mantiene la portada nativa de Arctic y ofrece la paleta original como alternativa. Esto no reproduce automáticamente la maqueta conceptual ni configura widgets con datos reales.
+
 - Apariencia cinematográfica nocturna, carbón/azul noche, con detalles dorados y azules.
 - Menú principal: **Inicio, Favoritos, Series estrenos, Series, Novedades cine, TV, Ajustes y Apagar**.
 - Widgets ligeros para continuar viendo, episodios recientes, series y películas añadidas recientemente.
@@ -29,4 +31,6 @@ La vía recomendada es **Kodi oficial + PlexKodiConnect en modo Addon + el skin*
 La APK heredada queda como vía experimental manual, basada en Kodi 21.1 y su toolchain correspondiente. Usa otra maqueta de skin (`skin.pepe.plexmedianoche`), no el ZIP Arctic, y no integra automáticamente PKC. Los fallos de compilación completos aún necesitan diagnóstico; no hay una APK nueva verificada.
 
 Consulta el [diagnóstico de Android, dependencias, resultados y alternativas](docs/DIAGNOSTICO_ANDROID_Y_ALTERNATIVAS.md).
+
+La [guía de instalación y pruebas en Windows y Android](docs/INSTALAR_Y_PROBAR.md) explica cómo añadir PlexKodiConnect y TV en cada equipo. El artefacto del skin incluye la guía, un informe de dependencias, la revisión upstream y la huella SHA-256 del ZIP.
 
