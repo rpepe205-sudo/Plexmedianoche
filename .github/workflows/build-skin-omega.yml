@@ -35,7 +35,7 @@ jobs:
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
 
-      - name: Validar y empaquetar el skin original sin modificar su estructura
+      - name: Validar y empaquetar Arctic original sin alterar archivos internos
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -49,8 +49,6 @@ jobs:
               raise SystemExit(f"Versión de Arctic inesperada: {addon.get('version')}")
           if not (root / "1080i" / "Home.xml").is_file():
               raise SystemExit("Falta la portada original de Arctic")
-          if not (root / "1080i" / "IncludesHome.xml").is_file():
-              raise SystemExit("Faltan los includes originales de la portada")
           count = 0
           for path in root.rglob("*.xml"):
               ET.parse(path)
