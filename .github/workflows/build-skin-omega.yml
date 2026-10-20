@@ -73,8 +73,6 @@ jobs:
           expected = ['Inicio', 'Favoritos', 'Series estrenos', 'Series', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
           if labels != expected:
               raise SystemExit(f'Menú no coincide con los ocho accesos acordados: {labels}')
-          for icon in root.findall('shortcuts/mainmenu.DATA.xml'):
-              pass
           for shortcut in menu.findall('shortcut'):
               icon = shortcut.findtext('icon', '').replace('special://skin/', '')
               if icon and not (root / icon).is_file():
