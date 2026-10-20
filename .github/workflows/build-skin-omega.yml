@@ -54,7 +54,7 @@ jobs:
           # Repoint only internal references to the renamed skin ID; keep addon dependencies intact.
           old = 'skin.arctic.zephyr.mod'
           for path in root.rglob('*'):
-              if not path.is_file():
+              if not path.is_file() or path == addon_path:
                   continue
               try:
                   data = path.read_bytes()
