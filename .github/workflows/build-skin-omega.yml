@@ -9,6 +9,7 @@ on:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/mainmenu.DATA.xml'
+      - 'docs/PLAN_SKIN_EXISTENTE.md'
 
 permissions:
   contents: read
@@ -67,17 +68,32 @@ jobs:
           final_addon = ET.parse(addon_path).getroot()
           if final_addon.get('id') != 'skin.plexmedianoche':
               raise SystemExit('No se pudo asignar el ID independiente')
-          ET.parse(root / 'shortcuts' / 'mainmenu.DATA.xml')
-          print('Identidad independiente y menú personalizado aplicados.')
+          menu = ET.parse(root / 'shortcuts' / 'mainmenu.DATA.xml').getroot()
+          labels = [node.findtext('label') for node in menu.findall('shortcut')]
+          expected = ['Inicio', 'Favoritos', 'Series estrenos', 'Series', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
+          if labels != expected:
+              raise SystemExit(f'Menú no coincide con los ocho accesos acordados: {labels}')
+          for icon in root.findall('shortcuts/mainmenu.DATA.xml'):
+              pass
+          for shortcut in menu.findall('shortcut'):
+              icon = shortcut.findtext('icon', '').replace('special://skin/', '')
+              if icon and not (root / icon).is_file():
+                  raise SystemExit(f'Falta el icono del menú: {icon}')
+          print('Identidad independiente, ocho accesos e iconos comprobados.')
           PY
 
-      - name: Validar y empaquetar Arctic original sin alterar archivos internos
+      - name: Renombrar carpeta del addon y validar estructura de instalación
+        run: |
+          set -euo pipefail
+          mv work/skin.arctic.zephyr.mod work/skin.plexmedianoche
+
+      - name: Validar y empaquetar skin personalizado
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           import xml.etree.ElementTree as ET
-          root = Path("work/skin.arctic.zephyr.mod")
+          root = Path("work/skin.plexmedianoche")
           addon = ET.parse(root / "addon.xml").getroot()
           if addon.get("id") != "skin.plexmedianoche":
               raise SystemExit("El identificador de Plex Media Noche no coincide")
@@ -93,7 +109,7 @@ jobs:
           PY
           mkdir -p dist
           cd work
-          zip -qr ../dist/PlexMediaNoche-skin-Omega.zip skin.arctic.zephyr.mod
+          zip -qr ../dist/PlexMediaNoche-skin-Omega.zip skin.plexmedianoche
           cd ..
           unzip -t dist/PlexMediaNoche-skin-Omega.zip
           ls -lh dist/PlexMediaNoche-skin-Omega.zip
