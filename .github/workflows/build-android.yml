@@ -56,14 +56,33 @@ jobs:
           path: ~/.android/debug.keystore
           key: plexmedianoche-debug-keystore-v1
 
-      - name: Instalar herramientas Android
+      - name: Instalar herramientas Android (con reintentos)
         run: |
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-37.0" \
-            "build-tools;37.0.0" \
-            "ndk;28.2.13676358"
-          yes | sdkmanager --licenses
+          set -euo pipefail
+          # Aceptar licencias antes de instalar los paquetes.
+          yes | sdkmanager --licenses || true
+
+          # GitHub puede interrumpir una descarga grande del NDK; eliminar
+          # cualquier descarga/carpeta parcial y reintentar desde cero.
+          for attempt in 1 2 3; do
+            echo "Intento $attempt de 3 para instalar el NDK y las herramientas Android"
+            rm -rf "$ANDROID_HOME/ndk/28.2.13676358" "$HOME/.android/cache"
+            if sdkmanager --install \
+              "platform-tools" \
+              "platforms;android-37.0" \
+              "build-tools;37.0.0" \
+              "ndk;28.2.13676358"; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::No se pudieron instalar las herramientas Android después de 3 intentos"
+              exit 1
+            fi
+            sleep 10
+          done
+
+          test -d "$ANDROID_HOME/ndk/28.2.13676358"
+          test -x "$ANDROID_HOME/build-tools/37.0.0/aapt"
 
       - name: Crear clave de depuración Android
         run: |
@@ -369,9 +388,10 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-${{ runner.os }}-${{ hashFiles('kodi/tools/depends/**') }}
+          # v2 invalida las dependencias antiguas que se compilaron con TLS/GnuTLS.
+          key: kodi-depends-arm32-tls-off-v2-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
           restore-keys: |
-            kodi-depends-arm32-${{ runner.os }}-
+            kodi-depends-arm32-tls-off-v2-${{ runner.os }}-
 
       - name: Preparar dependencias de Kodi
         run: |
@@ -394,7 +414,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-${{ runner.os }}-${{ hashFiles('kodi/tools/depends/**') }}
+          key: kodi-depends-arm32-tls-off-v2-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
