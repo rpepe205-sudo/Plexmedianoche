@@ -395,11 +395,19 @@ jobs:
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
           # v6 sin restore-keys: no reutilizar bibliotecas antiguas que aún enlazan símbolos GnuTLS incompatibles.
-          key: kodi-depends-arm32-tls-off-v7-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v8-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Preparar dependencias de Kodi
         run: |
-          set -e
+          set -euo pipefail
+          # No reutilizar una libmicrohttpd antigua que siga compilada con TLS.
+          # El cambio de clave evita restaurar la caché defectuosa; estas limpiezas
+          # fuerzan además a reconstruir esta dependencia desde su código fuente.
+          DEPENDS="$HOME/android-tools/xbmc-depends/arm-linux-androideabi-24-debug"
+          rm -f "$DEPENDS/lib/libmicrohttpd.a"
+          rm -f kodi/tools/depends/target/libmicrohttpd/.installed-* \
+                kodi/tools/depends/target/libmicrohttpd/.configured-*
+          rm -rf kodi/tools/depends/target/libmicrohttpd/arm-linux-androideabi-24-debug
           cd kodi/tools/depends
           ./bootstrap
           ./configure \
@@ -408,6 +416,8 @@ jobs:
             --with-sdk-path="$ANDROID_SDK_ROOT" \
             --prefix="$HOME/android-tools/xbmc-depends"
           make -j"$(nproc)"
+          # Verificar que el nuevo archivo se generó después de limpiar el anterior.
+          test -s "$DEPENDS/lib/libmicrohttpd.a"
 
       # Guardar las dependencias en cuanto esta fase termina; así un fallo
       # posterior al compilar Kodi no obliga a reconstruirlas desde cero.
@@ -418,7 +428,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v7-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v8-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
