@@ -1,34 +1,34 @@
-# Plex Media Noche — skin para Kodi 21.1 Omega
+# Plex Media Noche — skin para Kodi Omega
 
-Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Omega. El objetivo inmediato es un ZIP instalable de skin; la prioridad actual no es construir una APK.
+Interfaz para Android TV (Xiaomi y Homatics), basada en Arctic: Zephyr - Reloaded 3.0.3. El objetivo visual actual es la foto aportada por el usuario: portada panorámica, tarjetas, cuatro filas de biblioteca, azul noche y foco dorado.
 
-## Estado actual
+## Estado real
 
-La ruta activa es un skin independiente `skin.plexmedianoche`, con menú inicial personalizado. Aún no es el diseño final probado en los dispositivos.
+- Skin independiente `skin.plexmedianoche` 0.5.0 con portada nativa personalizada.
+- El PC es solo banco de pruebas. Android es el destino final.
+- Instalación y apertura comprobadas en Kodi 21.3 para Windows; se está verificando la navegación.
+- Biblioteca vacía de forma intencionada durante esta fase. No instalar PlexKodiConnect en el PC ni conectar Plex hasta terminar el skin.
+- Pendientes: comprobación visual con catálogo lleno, mandos Xiaomi/Homatics y reproducción en Android.
+- No es una APK nueva ni incluye películas, credenciales o IPTV.
 
-- Base Arctic: Zephyr - Reloaded 3.0.3 fijada al commit `27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51`.
-- El workflow `build-skin-omega.yml` y el ordenador usan `scripts/build_skin.py` para crear y comprobar el mismo paquete.
-- Se conservan las dependencias, los créditos y la portada original; se cambia el identificador interno y el menú de Skin Shortcuts.
-- La APK antigua queda solo manual. La validación del KIT antiguo ya no publica otro ZIP distinto.
-- Véase [la auditoría y las pruebas pendientes](docs/AUDITORIA.md).
+[Diseño y compatibilidad](docs/DISENO_FOTO.md) · [Auditoría de archivos y Actions](docs/AUDITORIA.md)
 
-Para empaquetar localmente con Python 3.10 o superior, descargar la base del commit fijado y ejecutar:
+## Paquete reproducible
+
+La base Arctic se fija al commit `27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51`. Descargar ese commit y ejecutar con Python 3.10 o superior:
 
 ```text
-python scripts/build_skin.py --source RUTA_BASE_ARCTIC --output RUTA_NUEVA_DE_SALIDA
+python scripts/build_skin.py --source RUTA_BASE_ARCTIC --output RUTA_NUEVA --photo
 ```
 
-La salida debe ser nueva para evitar sobrescribir una compilación anterior. El ZIP y su SHA256 se generan juntos. No incluye credenciales, bibliotecas Plex ni listas IPTV.
+El workflow `build-skin-omega.yml` utiliza ese mismo comando y lo valida en pull requests. Comprueba XML, dependencias, fuentes, texturas, controles, navegación, estructura ZIP y SHA256. La portada upstream se guarda como referencia; las fichas, menús de vídeo y reproductor se conservan de Arctic. El comando sin `--photo` permite reproducir la base anterior.
 
-## Diseño acordado
+## Instalación prevista en Android
 
-- Apariencia cinematográfica nocturna, carbón/azul noche, con detalles dorados y azules.
-- Menú principal: **Inicio, Favoritos, Series estrenos, Series, Novedades cine, TV, Ajustes y Apagar**.
-- Widgets ligeros para continuar viendo, episodios recientes, series y películas añadidas recientemente.
-- Tráilers dentro de las fichas de películas, no como sección independiente.
-- TV/IPTV integrada con los canales configurados en Kodi.
-- Navegación fiable con mando y compatibilidad con PlexKodiConnect; no automatizar limpiezas que puedan interferir con la biblioteca sincronizada.
+Usar Kodi 21 Omega y resolver las dependencias oficiales de Arctic Reloaded. Instalar el ZIP del skin y seleccionarlo en Ajustes → Interfaz → Skin. La instalación real en Xiaomi y Homatics todavía debe probarse; no se considera verificada por funcionar en Windows.
 
-## Validación pendiente
+Después de aprobar el skin se configurarán PlexKodiConnect con la cuenta invitada y PVR IPTV Simple Client con la lista M3U y guía XMLTV del usuario. No ejecutar limpiezas automáticas sobre la biblioteca de PlexKodiConnect.
 
-Un workflow verde y un ZIP íntegro no demuestran que el skin funcione en el Xiaomi. Hay que instalarlo en Kodi 21.1 Omega y verificar navegación, widgets, carátulas, biblioteca de PlexKodiConnect y TV/IPTV. El paquete usa el ID independiente `skin.plexmedianoche`; la instalación y resolución real de dependencias aún deben verificarse en Kodi.
+## Flujos antiguos
+
+La APK queda solo manual y experimental; no se ha reparado ni relanzado. La validación del KIT antiguo queda manual y no publica otro ZIP. La ruta activa entrega un único skin para Kodi, sin recompilar Kodi.

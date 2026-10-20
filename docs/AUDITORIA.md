@@ -73,3 +73,22 @@ compartido, reproducción 1080p, reanudación, subtítulos, canales y guía IPTV
 Después probar foco, botón Atrás y rendimiento en Xiaomi y Homatics. La arquitectura
 Android instalada debe comprobarse en cada equipo; no se deduce del procesador.
 No ejecutar limpiezas automáticas sobre la biblioteca de PlexKodiConnect.
+
+
+## Actualización tras recibir la foto y probar Kodi
+
+La dirección visual se ha concretado en docs/DISENO_FOTO.md y en la portada
+nativa generada por scripts/photo_layout.py (versión 0.5.0). El workflow ahora
+construye esa variante con --photo. Se preservan las dependencias y el resto de
+pantallas de Arctic, y se guarda una copia de Home upstream dentro del paquete.
+
+El PC usa Kodi 21.3 Omega. La base y sus dependencias oficiales se instalaron
+correctamente desde Kodi. El skin Plex Media Noche 0.5.0 se instaló desde ZIP,
+se activó y abrió la portada; el foco se mueve con flechas por menú y filtros.
+La comprobación CI inicial de la PR 1 terminó correctamente (39405543197).
+
+Se añadió el repositorio estable de PlexKodiConnect antes de que el usuario
+aclarara que no quiere el complemento en el PC. El complemento PlexKodiConnect
+no se instaló, no se inició sesión ni se conectó biblioteca alguna. Se detuvo
+esa configuración. El catálogo vacío es intencionado durante la prueba visual.
+El destino final es Android; la prueba en PC no demuestra reproducción Android.

@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['scripts/build_skin.py', 'skin/shortcuts/**', '.github/workflows/build-skin-omega.yml']
+    paths: ['scripts/**', 'skin/shortcuts/**', '.github/workflows/build-skin-omega.yml']
   pull_request:
-    paths: ['scripts/build_skin.py', 'skin/shortcuts/**', '.github/workflows/**']
+    paths: ['scripts/**', 'skin/shortcuts/**', '.github/workflows/**']
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
           curl -fL --retry 3 https://github.com/beatmasterRS/skin.arctic.zephyr.mod/archive/27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51.zip -o upstream.zip
           unzip -q upstream.zip -d upstream
       - name: Validar y empaquetar el skin real
-        run: python3 scripts/build_skin.py --source upstream/skin.arctic.zephyr.mod-27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51 --output dist
+        run: python3 scripts/build_skin.py --source upstream/skin.arctic.zephyr.mod-27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51 --output dist --photo
       - uses: actions/upload-artifact@v4
         with:
           name: Plex-Media-Noche-skin-Kodi-21-Omega
