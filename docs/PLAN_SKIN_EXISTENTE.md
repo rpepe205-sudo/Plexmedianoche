@@ -32,11 +32,23 @@ Estilo cinematográfico nocturno, oscuro, elegante y relativamente ligero para A
 5. Probar navegación, carga de carteles, reproducción, TV/IPTV y rendimiento en el Android TV Box.
 6. Cuando la interfaz esté validada, decidir qué archivos incorporar al paquete y a la futura APK.
 
+## Estado real del ZIP y personalización nativa (20 de octubre de 2026)
+
+- La ejecución `39392947461` terminó correctamente después de corregir el workflow: se valida y empaqueta la base original Arctic: Zephyr - Reloaded v3.0.3 para Kodi 21.1 Omega. El artefacto `Plex-Media-Noche-skin-Kodi-21-Omega` se generó con éxito (aprox. 53 MB).
+- Este ZIP es únicamente una base original de desarrollo; **todavía no es el skin personalizado Plex Media Noche**. No debe presentarse como diseño final ni como prueba de funcionamiento en el TV Box.
+- El fallo anterior se debía a una comprobación incorrecta: la versión upstream no contiene `1080i/IncludesHome.xml` en esa ruta. Se eliminó esa comprobación falsa sin alterar la portada original.
+- `skin/1080i/Home.xml` del repositorio es una maqueta experimental y **no se copia sobre la portada original**. No se deben reemplazar sus controles ni introducir recursos inventados en el ZIP de base.
+- La portada original llama a `script.skinshortcuts` para generar el menú principal y los grupos `x1111`–`x1119`. La siguiente personalización debe aprovechar los archivos de datos de Skin Shortcuts (`shortcuts/mainmenu.DATA.xml`, `shortcuts/x1111.DATA.xml` y `shortcuts/x1112.DATA.xml`) y las opciones nativas de widgets, con pruebas XML y revisión de acciones, no sustituyendo `Home.xml`.
+- Antes de considerar el resultado final se debe resolver de forma segura el identificador del complemento: conservar `skin.arctic.zephyr.mod` permite probar la base, pero no crea una instalación independiente llamada Plex Media Noche. Cambiar el ID sin revisar referencias internas y dependencias puede romper compatibilidad; no hacerlo a ciegas.
+- La instalación y el funcionamiento en Kodi 21.1 Omega sobre el Xiaomi todavía requieren prueba manual. Una ejecución verde solo acredita las comprobaciones y el empaquetado automatizados.
+
 ## Cambios de portada en curso
 
-- `skin/1080i/Home.xml` se ha actualizado para subir la navegación principal a la parte superior y usar los ocho accesos acordados.
-- El workflow `.github/workflows/build-skin-omega.yml` se activa al cambiar `Home.xml` y prepara un ZIP basado en Reloaded para Kodi Omega.
-- El artefacto debe pasar la validación automatizada y aún necesita una prueba real en Kodi/Android TV Box. No considerar el diseño validado hasta comprobar foco con mando, widgets, carteles, PKC e IPTV.
+- No sobrescribir la portada original de Arctic ni sus IDs de control.
+- Mantener el menú deseado: Inicio, Favoritos, Series estrenos, Series, Novedades cine, TV, Ajustes y Apagar.
+- Configurar accesos y widgets mediante Skin Shortcuts y las opciones del skin; comprobar por separado las acciones de favoritos, episodios recientes, biblioteca de series, películas recientes y canales PVR/IPTV.
+- Mantener el diseño oscuro cinematográfico, azul noche/carbón con acentos dorados y azules; priorizar rapidez y navegación con mando.
+- Los tráileres se mantienen dentro de las fichas, no como entrada independiente del menú.
 
 ## Estado del empaquetado Android
 
