@@ -395,7 +395,7 @@ jobs:
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
           # v6 sin restore-keys: no reutilizar bibliotecas antiguas que aún enlazan símbolos GnuTLS incompatibles.
-          key: kodi-depends-arm32-tls-off-v6-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v7-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Preparar dependencias de Kodi
         run: |
@@ -418,7 +418,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v6-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v7-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
