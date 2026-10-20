@@ -7,6 +7,7 @@ on:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/shortcuts/**'
       - 'skin/colors/**'
+      - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
       - 'docs/INSTALAR_Y_PROBAR.md'
   push:
@@ -17,6 +18,7 @@ on:
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/**'
       - 'skin/colors/**'
+      - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
       - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'

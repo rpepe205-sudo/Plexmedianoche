@@ -62,6 +62,15 @@ def prepare(base, project):
     if not all(ids) or len(set(ids)) != len(ids):
         raise ValueError('Missing or duplicate menu IDs')
 
+
+    # Portable library entry points; PKC populates Kodi's own video database.
+    playlist_source = project / 'skin/playlists'
+    playlist_target = base / 'extras/playlists/medianoche'
+    playlist_target.mkdir(parents=True, exist_ok=True)
+    for source in sorted(playlist_source.glob('*.xsp')):
+        ET.parse(source)
+        shutil.copyfile(source, playlist_target / source.name)
+
     palette_path = base / 'colors/defaults.xml'
     palette = ET.parse(palette_path)
     colors = {node.get('name'): node for node in palette.getroot().findall('color')}
