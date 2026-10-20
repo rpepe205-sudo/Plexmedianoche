@@ -2,6 +2,10 @@ name: Crear ZIP instalable de Plex Media Noche (Kodi Omega)
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/build-skin-omega.yml'
+      - 'skin/shortcuts/**'
   push:
     branches:
       - main
@@ -14,6 +18,9 @@ on:
 
 permissions:
   contents: read
+
+env:
+  ARCTIC_SHA: 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51
 
 jobs:
   build-skin:
@@ -28,7 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           curl -fL --retry 3 \
-            https://github.com/beatmasterRS/skin.arctic.zephyr.mod/archive/refs/heads/master.zip \
+            "https://github.com/beatmasterRS/skin.arctic.zephyr.mod/archive/${ARCTIC_SHA}.zip" \
             -o upstream.zip
           unzip -t upstream.zip
           mkdir upstream
@@ -120,3 +127,4 @@ jobs:
           path: dist/PlexMediaNoche-skin-Omega.zip
           if-no-files-found: error
           retention-days: 14
+

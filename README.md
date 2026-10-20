@@ -4,8 +4,8 @@ Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Ome
 
 ## Estado actual
 
-- El workflow `.github/workflows/build-skin-omega.yml` prepara y valida la base original Arctic: Zephyr - Reloaded v3.0.3.
-- La ejecución correcta más reciente conocida es [39392947461](https://github.com/rpepe205-sudo/Plexmedianoche/actions/runs/39392947461). Su artefacto es una **base de desarrollo original**, todavía no el skin personalizado terminado.
+- El workflow `.github/workflows/build-skin-omega.yml` usa Arctic: Zephyr - Reloaded v3.0.3 fijado por revisión, aplica el menú y crea un ZIP con ID independiente `skin.plexmedianoche`.
+- La ejecución correcta más reciente revisada es [39396062807](https://github.com/rpepe205-sudo/Plexmedianoche/actions/runs/39396062807). Acredita el empaquetado, pero **no prueba instalación, widgets ni navegación en el dispositivo**.
 - La portada original `1080i/Home.xml`, sus controles, dependencias y scripts se conservan; la maqueta del repositorio `skin/1080i/Home.xml` no se inyecta en la base.
 - La personalización se desarrollará con el sistema nativo Skin Shortcuts y los ajustes/widgets de Arctic. El paquete no se considerará terminado hasta comprobar la configuración del menú y probarlo en Kodi 21.1 Omega.
 
@@ -20,4 +20,13 @@ Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Ome
 
 ## Validación pendiente
 
-Un workflow verde y un ZIP íntegro no demuestran que el skin funcione en el Xiaomi. Hay que instalarlo en Kodi 21.1 Omega y verificar navegación, widgets, carátulas, biblioteca de PlexKodiConnect y TV/IPTV. La base actual conserva el ID upstream `skin.arctic.zephyr.mod`; para una instalación independiente con nombre propio hay que revisar y cambiar de forma segura las referencias y dependencias antes de publicar el paquete final.
+Un workflow verde y un ZIP íntegro no demuestran que el skin funcione en el Xiaomi. Hay que instalarlo en Kodi 21.1 Omega y verificar navegación, widgets, carátulas, biblioteca de PlexKodiConnect y TV/IPTV. El empaquetado cambia el ID a `skin.plexmedianoche` y sus referencias internas; su funcionamiento real aún necesita esa prueba.
+
+## Android y biblioteca Plex compartida
+
+La vía recomendada es **Kodi oficial + PlexKodiConnect en modo Addon + el skin**. Jellyfin requiere su propio servidor con acceso a los archivos; la invitación Plex no proporciona ese acceso.
+
+La APK heredada queda como vía experimental manual, basada en Kodi 21.1 y su toolchain correspondiente. Usa otra maqueta de skin (`skin.pepe.plexmedianoche`), no el ZIP Arctic, y no integra automáticamente PKC. Los fallos de compilación completos aún necesitan diagnóstico; no hay una APK nueva verificada.
+
+Consulta el [diagnóstico de Android, dependencias, resultados y alternativas](docs/DIAGNOSTICO_ANDROID_Y_ALTERNATIVAS.md).
+

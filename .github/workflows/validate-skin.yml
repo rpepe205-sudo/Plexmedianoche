@@ -1,4 +1,4 @@
-name: Validar skin de Plex Media Noche
+name: Validar maqueta experimental de Plex Media Noche
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validar skin y preparar ZIP instalable
+    name: Validar maqueta y preparar ZIP experimental
     runs-on: ubuntu-22.04
     steps:
       - name: Descargar el repositorio
@@ -108,7 +108,7 @@ jobs:
           print("La validación XML terminó correctamente.")
           PY
 
-      - name: Crear ZIP instalable del skin
+      - name: Crear ZIP experimental de la maqueta
         shell: bash
         run: |
           set -euo pipefail
@@ -123,12 +123,13 @@ jobs:
           cd "$DIR/.."
           zip -qr "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip" "$ADDON_DIR"
           test -s "$GITHUB_WORKSPACE/output/PlexMediaNoche-skin.zip"
-          echo "ZIP instalable creado correctamente."
+          echo "ZIP experimental creado; no acredita instalación ni navegación en Kodi."
 
-      - name: Publicar ZIP instalable
+      - name: Conservar maqueta experimental
         uses: actions/upload-artifact@v4
         with:
-          name: Plex-Media-Noche-skin
+          name: Plex-Media-Noche-maqueta-experimental
           path: output/PlexMediaNoche-skin.zip
           if-no-files-found: error
           retention-days: 14
+
