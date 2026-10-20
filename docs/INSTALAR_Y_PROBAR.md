@@ -35,7 +35,7 @@ Instalar **PVR IPTV Simple Client** desde el repositorio oficial de Kodi corresp
 
 ## Pruebas antes de pasar a Android
 
-- Abrir los ocho accesos: Inicio, Favoritos, Series estrenos, Series, Novedades cine, TV, Ajustes y Apagar. Inicio vuelve a la portada; no es una sección de contenido independiente.
+- Abrir los nueve accesos: Inicio, Favoritos, Series estrenos, Series, Cine, Novedades cine, TV, Ajustes y Apagar. Inicio vuelve a la portada; no es una sección de contenido independiente.
 - Comprobar textos, contraste, foco, flechas, atrás y acceso a Ajustes. Comprobar que no aparecen errores al generar el menú con Skin Shortcuts.
 - Probar una película y un episodio autorizados, pausa, reanudación, audio y subtítulos. Revisar que continuar viendo y el estado visto se sincronizan con Plex.
 - Configurar los widgets mediante las opciones nativas de Arctic. La maqueta conceptual no equivale a widgets ya conectados ni a una captura de Kodi real.

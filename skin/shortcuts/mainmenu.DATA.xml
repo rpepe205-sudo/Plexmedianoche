@@ -17,6 +17,10 @@
         <icon>special://skin/extras/icons/tv.png</icon><action>ActivateWindow(Videos,TVShowTitles,return)</action>
     </shortcut>
     <shortcut>
+        <label>Cine</label><label2>Common Shortcut</label2><defaultID>cine</defaultID>
+        <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,MovieTitles,return)</action>
+    </shortcut>
+    <shortcut>
         <label>Novedades cine</label><label2>Common Shortcut</label2><defaultID>novedades_cine</defaultID>
         <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,RecentlyAddedMovies,return)</action>
     </shortcut>

@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
-          'Novedades cine', 'TV', 'Ajustes', 'Apagar']
+          'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
 
 def digest(path):
