@@ -4,6 +4,13 @@
 
 Priorizar una portada y una configuración del skin existente antes de seguir invirtiendo tiempo en la compilación de una APK personalizada. No se elimina ni se descarta el trabajo de APK: queda como objetivo final, pero se pospone hasta validar la interfaz en Kodi.
 
+## Compatibilidad confirmada para el proyecto
+
+- Kodi de destino: **21.1 Omega**. No usar requisitos de Kodi 22/Piers.
+- Skin base elegida en el historial del proyecto: **Arctic: Zephyr - Reloaded (Omega, rama 3.0.3)**. No cambiar a Resurrection sin una decisión expresa; hubo una mención posterior contradictoria que se corrige aquí.
+- La compilación de APK configurada actualmente apunta a `armeabi-v7a` (ARM32). Esto describe el paquete que se está intentando compilar, no confirma por sí solo la arquitectura física exacta del TV Box Xiaomi; hay que verificarla en el dispositivo antes de dar por final el APK.
+- Dependencias y versiones deben comprobarse contra `addon.xml` de la base seleccionada. Una validación XML y un ZIP correcto no sustituyen la prueba de instalación en Kodi.
+
 ## Dirección visual elegida
 
 Estilo cinematográfico nocturno, oscuro, elegante y relativamente ligero para Android TV Box:
@@ -18,7 +25,7 @@ Estilo cinematográfico nocturno, oscuro, elegante y relativamente ligero para A
 
 ## Estrategia por fases
 
-1. El workflow actual toma como base Arctic: Zephyr - Reloaded. Confirmar con el usuario si el skin que tiene instalado en el TV Box es esa variante o Arctic Zephyr Resurrection.
+1. Mantener como base de desarrollo Arctic: Zephyr - Reloaded para Kodi 21.1 Omega. La variante exacta que está instalada actualmente en el TV Box aún debe confirmarse al probar; no cambiar la base del proyecto a Resurrection por error.
 2. Revisar sus opciones nativas de menú, widgets y vistas. Comprobar «Force Views» solo si la versión instalada lo ofrece; no asumir que las opciones de Reloaded existen en Resurrection.
 3. Configurar primero la portada con opciones nativas y probar el acceso a la biblioteca de PlexKodiConnect.
 4. Ajustar el diseño solo donde la configuración no alcance. Mantener los cambios aislados y reversibles.
@@ -30,6 +37,12 @@ Estilo cinematográfico nocturno, oscuro, elegante y relativamente ligero para A
 - `skin/1080i/Home.xml` se ha actualizado para subir la navegación principal a la parte superior y usar los ocho accesos acordados.
 - El workflow `.github/workflows/build-skin-omega.yml` se activa al cambiar `Home.xml` y prepara un ZIP basado en Reloaded para Kodi Omega.
 - El artefacto debe pasar la validación automatizada y aún necesita una prueba real en Kodi/Android TV Box. No considerar el diseño validado hasta comprobar foco con mando, widgets, carteles, PKC e IPTV.
+
+## Estado del empaquetado Android
+
+- El workflow de APK ha completado instalación de herramientas y compilación de dependencias, pero el último intento falló antes de generar Kodi. El registro muestra que la comprobación exigía `libzip.a` en una ruta fija aunque algunas configuraciones no lo instalan allí; se ha cambiado esa comprobación para que sea informativa cuando el archivo no exista y se deja que la fase de enlace determine si es imprescindible.
+- La caché de dependencias se ha versionado para evitar reutilizar la caché anterior. El resultado de la nueva ejecución debe revisarse antes de considerar corregido el error.
+- La APK sigue sin estar validada ni instalada en el dispositivo.
 
 ## Notas técnicas importantes
 
