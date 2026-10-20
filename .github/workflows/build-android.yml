@@ -134,6 +134,43 @@ jobs:
           grep -Fq -- '--disable-https' "$FILE"
           ! grep -Fq -- '--enable-https' "$FILE"
 
+          # libzip 1.8.0 se compila como biblioteca estática. Desactivar los
+          # backends crypto evita referencias GnuTLS/Nettle sin resolver al enlazar libkodi.so.
+          ZIP_FILE="kodi/tools/depends/target/libzip/Makefile"
+          test -s "$ZIP_FILE"
+          python3 - "$ZIP_FILE" <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          data = path.read_text(encoding="utf-8")
+          marker = "              -DCMAKE_BUILD_TYPE=Debug\n"
+          replacement = (
+              "              -DCMAKE_BUILD_TYPE=Debug \\\n"
+              "              -DENABLE_GNUTLS:BOOL=OFF \\\n"
+              "              -DENABLE_OPENSSL:BOOL=OFF \\\n"
+              "              -DENABLE_MBEDTLS:BOOL=OFF\n"
+          )
+          flags = (
+              "-DENABLE_GNUTLS:BOOL=OFF",
+              "-DENABLE_OPENSSL:BOOL=OFF",
+              "-DENABLE_MBEDTLS:BOOL=OFF",
+          )
+          if all(flag in data for flag in flags):
+              print("Backends crypto de libzip ya están desactivados")
+          elif marker in data:
+              data = data.replace(marker, replacement, 1)
+              path.write_text(data, encoding="utf-8")
+              print("Desactivados GnuTLS/OpenSSL/mbedTLS en libzip para Android")
+          else:
+              raise SystemExit("No se encontró la opción final CMAKE_BUILD_TYPE en libzip/Makefile")
+          data = path.read_text(encoding="utf-8")
+          for flag in flags:
+              if flag not in data:
+                  raise SystemExit("No se aplicó el ajuste esperado: " + flag)
+          PY
+          grep -Fq -- '-DENABLE_GNUTLS:BOOL=OFF' "$ZIP_FILE"
+          grep -Fq -- '-DENABLE_OPENSSL:BOOL=OFF' "$ZIP_FILE"
+          grep -Fq -- '-DENABLE_MBEDTLS:BOOL=OFF' "$ZIP_FILE"
+
       - name: Conservar el nombre Kodi y usar identificador propio
         run: |
           set -e
@@ -387,6 +424,46 @@ jobs:
           grep -Fq 'skin.pepe.plexmedianoche ./assets/addons/' "$MAKEFILE"
           grep -Fq 'service.plexmedianoche.maintenance ./assets/addons/' "$MAKEFILE"
 
+      - name: Preflight completo antes de compilar Kodi
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import ast
+          import xml.etree.ElementTree as ET
+          import zipfile
+
+          root = Path(".")
+          kit = root / "Plex_de_Media_Noche_0.4.0_KIT.zip"
+          assert kit.is_file() and zipfile.is_zipfile(kit), "ZIP del skin no válido"
+          with zipfile.ZipFile(kit) as z:
+              bad = z.testzip()
+              assert bad is None, f"Entrada dañada en ZIP: {bad}"
+
+          home = root / "skin/1080i/Home.xml"
+          assert home.is_file(), "Falta Home.xml"
+          assert ET.parse(home).getroot().tag == "window", "Home.xml no es una ventana Kodi"
+
+          addon_xml = root / "addons/service.plexmedianoche.maintenance/addon.xml"
+          service_py = root / "addons/service.plexmedianoche.maintenance/service.py"
+          addon = ET.parse(addon_xml).getroot()
+          assert addon.get("id") == "service.plexmedianoche.maintenance", "ID de servicio incorrecto"
+          ast.parse(service_py.read_text(encoding="utf-8"), filename=str(service_py))
+
+          libzip = Path("kodi/tools/depends/target/libzip/Makefile").read_text(encoding="utf-8")
+          for flag in ("-DENABLE_GNUTLS:BOOL=OFF", "-DENABLE_OPENSSL:BOOL=OFF", "-DENABLE_MBEDTLS:BOOL=OFF"):
+              assert flag in libzip, f"Falta ajuste crítico de libzip: {flag}"
+          micro = Path("kodi/tools/depends/target/libmicrohttpd/Makefile").read_text(encoding="utf-8")
+          assert "--disable-https" in micro and "--enable-https" not in micro, "libmicrohttpd aún habilita HTTPS"
+          pack = Path("kodi/tools/android/packaging/Makefile.in").read_text(encoding="utf-8")
+          for marker in ("skin.pepe.plexmedianoche", "service.plexmedianoche.maintenance", "background.jpg", "panel.png"):
+              assert marker in pack, f"Falta integración de empaquetado: {marker}"
+
+          for path in root.joinpath("addons").rglob("*.xml"):
+              ET.parse(path)
+          print("PREFLIGHT OK: ZIP íntegro, XML válidos, servicio Python válido, TLS revisado y empaquetado configurado.")
+          PY
+
       - name: Cachear descargas y dependencias compiladas de Kodi
         uses: actions/cache/restore@v4
         with:
@@ -395,7 +472,7 @@ jobs:
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
           # v6 sin restore-keys: no reutilizar bibliotecas antiguas que aún enlazan símbolos GnuTLS incompatibles.
-          key: kodi-depends-arm32-tls-off-v9-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v10-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Preparar dependencias de Kodi
         run: |
@@ -404,10 +481,13 @@ jobs:
           # El cambio de clave evita restaurar la caché defectuosa; estas limpiezas
           # fuerzan además a reconstruir esta dependencia desde su código fuente.
           DEPENDS="$HOME/android-tools/xbmc-depends/arm-linux-androideabi-24-debug"
-          rm -f "$DEPENDS/lib/libmicrohttpd.a"
+          rm -f "$DEPENDS/lib/libmicrohttpd.a" "$DEPENDS/lib/libzip.a"
           rm -f kodi/tools/depends/target/libmicrohttpd/.installed-* \
-                kodi/tools/depends/target/libmicrohttpd/.configured-*
-          rm -rf kodi/tools/depends/target/libmicrohttpd/arm-linux-androideabi-24-debug
+                kodi/tools/depends/target/libmicrohttpd/.configured-* \
+                kodi/tools/depends/target/libzip/.installed-* \
+                kodi/tools/depends/target/libzip/.configured-*
+          rm -rf kodi/tools/depends/target/libmicrohttpd/arm-linux-androideabi-24-debug \
+                 kodi/tools/depends/target/libzip/arm-linux-androideabi-24-debug
           cd kodi/tools/depends
           ./bootstrap
           ./configure \
@@ -424,6 +504,12 @@ jobs:
           else
             echo "::notice::libmicrohttpd.a no se ha instalado en esta configuración; se comprobará durante la generación y el enlace de Kodi"
           fi
+          test -s "$DEPENDS/lib/libzip.a"
+          if nm -u "$DEPENDS/lib/libzip.a" | grep -Eq ' (gnutls_|nettle_|mbedtls_)'; then
+            echo "::error::libzip.a todavía contiene símbolos crypto incompatibles con el enlace final"
+            exit 1
+          fi
+          echo "Comprobación de libzip superada: no quedan referencias GnuTLS/Nettle/mbedTLS"
 
       # Guardar las dependencias en cuanto esta fase termina; así un fallo
       # posterior al compilar Kodi no obliga a reconstruirlas desde cero.
@@ -434,7 +520,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v9-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v10-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
