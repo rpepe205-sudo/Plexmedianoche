@@ -4,10 +4,21 @@ Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Ome
 
 ## Estado actual
 
-- El workflow `.github/workflows/build-skin-omega.yml` prepara y valida la base original Arctic: Zephyr - Reloaded v3.0.3.
-- La ejecución correcta más reciente conocida es [39392947461](https://github.com/rpepe205-sudo/Plexmedianoche/actions/runs/39392947461). Su artefacto es una **base de desarrollo original**, todavía no el skin personalizado terminado.
-- La portada original `1080i/Home.xml`, sus controles, dependencias y scripts se conservan; la maqueta del repositorio `skin/1080i/Home.xml` no se inyecta en la base.
-- La personalización se desarrollará con el sistema nativo Skin Shortcuts y los ajustes/widgets de Arctic. El paquete no se considerará terminado hasta comprobar la configuración del menú y probarlo en Kodi 21.1 Omega.
+La ruta activa es un skin independiente `skin.plexmedianoche`, con menú inicial personalizado. Aún no es el diseño final probado en los dispositivos.
+
+- Base Arctic: Zephyr - Reloaded 3.0.3 fijada al commit `27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51`.
+- El workflow `build-skin-omega.yml` y el ordenador usan `scripts/build_skin.py` para crear y comprobar el mismo paquete.
+- Se conservan las dependencias, los créditos y la portada original; se cambia el identificador interno y el menú de Skin Shortcuts.
+- La APK antigua queda solo manual. La validación del KIT antiguo ya no publica otro ZIP distinto.
+- Véase [la auditoría y las pruebas pendientes](docs/AUDITORIA.md).
+
+Para empaquetar localmente con Python 3.10 o superior, descargar la base del commit fijado y ejecutar:
+
+```text
+python scripts/build_skin.py --source RUTA_BASE_ARCTIC --output RUTA_NUEVA_DE_SALIDA
+```
+
+La salida debe ser nueva para evitar sobrescribir una compilación anterior. El ZIP y su SHA256 se generan juntos. No incluye credenciales, bibliotecas Plex ni listas IPTV.
 
 ## Diseño acordado
 
@@ -20,4 +31,4 @@ Proyecto de personalización de **Arctic: Zephyr - Reloaded** para Kodi 21.1 Ome
 
 ## Validación pendiente
 
-Un workflow verde y un ZIP íntegro no demuestran que el skin funcione en el Xiaomi. Hay que instalarlo en Kodi 21.1 Omega y verificar navegación, widgets, carátulas, biblioteca de PlexKodiConnect y TV/IPTV. La base actual conserva el ID upstream `skin.arctic.zephyr.mod`; para una instalación independiente con nombre propio hay que revisar y cambiar de forma segura las referencias y dependencias antes de publicar el paquete final.
+Un workflow verde y un ZIP íntegro no demuestran que el skin funcione en el Xiaomi. Hay que instalarlo en Kodi 21.1 Omega y verificar navegación, widgets, carátulas, biblioteca de PlexKodiConnect y TV/IPTV. El paquete usa el ID independiente `skin.plexmedianoche`; la instalación y resolución real de dependencias aún deben verificarse en Kodi.
