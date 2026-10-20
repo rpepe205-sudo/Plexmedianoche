@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
+      - 'skin/shortcuts/mainmenu.DATA.xml'
 
 permissions:
   contents: read
@@ -35,6 +36,41 @@ jobs:
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
 
+      - name: Aplicar identidad y menú inicial de Plex Media Noche
+        run: |
+          set -euo pipefail
+          test -f skin/shortcuts/mainmenu.DATA.xml
+          cp skin/shortcuts/mainmenu.DATA.xml work/skin.arctic.zephyr.mod/shortcuts/mainmenu.DATA.xml
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path('work/skin.arctic.zephyr.mod')
+          addon_path = root / 'addon.xml'
+          tree = ET.parse(addon_path)
+          addon = tree.getroot()
+          addon.set('id', 'skin.plexmedianoche')
+          addon.set('name', 'Plex Media Noche')
+          tree.write(addon_path, encoding='UTF-8', xml_declaration=True)
+          # Repoint only internal references to the renamed skin ID; keep addon dependencies intact.
+          old = 'skin.arctic.zephyr.mod'
+          for path in root.rglob('*'):
+              if not path.is_file():
+                  continue
+              try:
+                  data = path.read_bytes()
+                  text = data.decode('utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              if old in text:
+                  path.write_text(text.replace(old, 'skin.plexmedianoche'), encoding='utf-8')
+          # Verify addon identity and menu XML before packaging.
+          final_addon = ET.parse(addon_path).getroot()
+          if final_addon.get('id') != 'skin.plexmedianoche':
+              raise SystemExit('No se pudo asignar el ID independiente')
+          ET.parse(root / 'shortcuts' / 'mainmenu.DATA.xml')
+          print('Identidad independiente y menú personalizado aplicados.')
+          PY
+
       - name: Validar y empaquetar Arctic original sin alterar archivos internos
         run: |
           set -euo pipefail
@@ -43,8 +79,8 @@ jobs:
           import xml.etree.ElementTree as ET
           root = Path("work/skin.arctic.zephyr.mod")
           addon = ET.parse(root / "addon.xml").getroot()
-          if addon.get("id") != "skin.arctic.zephyr.mod":
-              raise SystemExit("El identificador original de Arctic no coincide")
+          if addon.get("id") != "skin.plexmedianoche":
+              raise SystemExit("El identificador de Plex Media Noche no coincide")
           if addon.get("version") != "3.0.3":
               raise SystemExit(f"Versión de Arctic inesperada: {addon.get('version')}")
           if not (root / "1080i" / "Home.xml").is_file():
@@ -53,7 +89,7 @@ jobs:
           for path in root.rglob("*.xml"):
               ET.parse(path)
               count += 1
-          print(f"Base original intacta: {addon.get('id')} v{addon.get('version')}; {count} XML válidos.")
+          print(f"Skin personalizado: {addon.get('id')} v{addon.get('version')}; {count} XML válidos.")
           PY
           mkdir -p dist
           cd work
