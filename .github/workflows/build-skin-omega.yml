@@ -2,18 +2,31 @@ name: Crear ZIP instalable de Plex Media Noche (Kodi Omega)
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/build-skin-omega.yml'
+      - 'skin/shortcuts/**'
+      - 'skin/colors/**'
+      - 'scripts/prepare_skin.py'
+      - 'docs/INSTALAR_Y_PROBAR.md'
   push:
     branches:
       - main
     paths:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
-      - 'skin/shortcuts/mainmenu.DATA.xml'
+      - 'skin/shortcuts/**'
+      - 'skin/colors/**'
+      - 'scripts/prepare_skin.py'
+      - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
       - 'README.md'
 
 permissions:
   contents: read
+
+env:
+  ARCTIC_SHA: 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51
 
 jobs:
   build-skin:
@@ -28,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           curl -fL --retry 3 \
-            https://github.com/beatmasterRS/skin.arctic.zephyr.mod/archive/refs/heads/master.zip \
+            "https://github.com/beatmasterRS/skin.arctic.zephyr.mod/archive/${ARCTIC_SHA}.zip" \
             -o upstream.zip
           unzip -t upstream.zip
           mkdir upstream
@@ -38,48 +51,11 @@ jobs:
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
 
-      - name: Aplicar identidad y menú inicial de Plex Media Noche
+      - name: Aplicar diseño nocturno y validar personalización
         run: |
           set -euo pipefail
-          test -f skin/shortcuts/mainmenu.DATA.xml
-          cp skin/shortcuts/mainmenu.DATA.xml work/skin.arctic.zephyr.mod/shortcuts/mainmenu.DATA.xml
-          python3 - <<'PY'
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          root = Path('work/skin.arctic.zephyr.mod')
-          addon_path = root / 'addon.xml'
-          tree = ET.parse(addon_path)
-          addon = tree.getroot()
-          addon.set('id', 'skin.plexmedianoche')
-          addon.set('name', 'Plex Media Noche')
-          tree.write(addon_path, encoding='UTF-8', xml_declaration=True)
-          # Repoint only internal references to the renamed skin ID; keep addon dependencies intact.
-          old = 'skin.arctic.zephyr.mod'
-          for path in root.rglob('*'):
-              if not path.is_file() or path == addon_path:
-                  continue
-              try:
-                  data = path.read_bytes()
-                  text = data.decode('utf-8')
-              except (UnicodeDecodeError, OSError):
-                  continue
-              if old in text:
-                  path.write_text(text.replace(old, 'skin.plexmedianoche'), encoding='utf-8')
-          # Verify addon identity and menu XML before packaging.
-          final_addon = ET.parse(addon_path).getroot()
-          if final_addon.get('id') != 'skin.plexmedianoche':
-              raise SystemExit('No se pudo asignar el ID independiente')
-          menu = ET.parse(root / 'shortcuts' / 'mainmenu.DATA.xml').getroot()
-          labels = [node.findtext('label') for node in menu.findall('shortcut')]
-          expected = ['Inicio', 'Favoritos', 'Series estrenos', 'Series', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
-          if labels != expected:
-              raise SystemExit(f'Menú no coincide con los ocho accesos acordados: {labels}')
-          for shortcut in menu.findall('shortcut'):
-              icon = shortcut.findtext('icon', '').replace('special://skin/', '')
-              if icon and not (root / icon).is_file():
-                  raise SystemExit(f'Falta el icono del menú: {icon}')
-          print('Identidad independiente, ocho accesos e iconos comprobados.')
-          PY
+          mkdir -p dist
+          python3 scripts/prepare_skin.py work/skin.arctic.zephyr.mod --report dist/validacion-skin.json
 
       - name: Renombrar carpeta del addon y validar estructura de instalación
         run: |
@@ -89,34 +65,22 @@ jobs:
       - name: Validar y empaquetar skin personalizado
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          root = Path("work/skin.plexmedianoche")
-          addon = ET.parse(root / "addon.xml").getroot()
-          if addon.get("id") != "skin.plexmedianoche":
-              raise SystemExit("El identificador de Plex Media Noche no coincide")
-          if addon.get("version") != "3.0.3":
-              raise SystemExit(f"Versión de Arctic inesperada: {addon.get('version')}")
-          if not (root / "1080i" / "Home.xml").is_file():
-              raise SystemExit("Falta la portada original de Arctic")
-          count = 0
-          for path in root.rglob("*.xml"):
-              ET.parse(path)
-              count += 1
-          print(f"Skin personalizado: {addon.get('id')} v{addon.get('version')}; {count} XML válidos.")
-          PY
           mkdir -p dist
           cd work
           zip -qr ../dist/PlexMediaNoche-skin-Omega.zip skin.plexmedianoche
           cd ..
           unzip -t dist/PlexMediaNoche-skin-Omega.zip
           ls -lh dist/PlexMediaNoche-skin-Omega.zip
+          cp docs/INSTALAR_Y_PROBAR.md dist/LEEME-INSTALACION.md
+          printf '%s\n' "$ARCTIC_SHA" > dist/arctic-source-sha.txt
+          cd dist
+          sha256sum PlexMediaNoche-skin-Omega.zip > SHA256SUMS.txt
 
       - name: Publicar ZIP instalable
         uses: actions/upload-artifact@v4
         with:
           name: Plex-Media-Noche-skin-Kodi-21-Omega
-          path: dist/PlexMediaNoche-skin-Omega.zip
+          path: dist/
           if-no-files-found: error
           retention-days: 14
+

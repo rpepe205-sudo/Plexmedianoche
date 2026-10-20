@@ -3,17 +3,15 @@ name: Crear APK de Plex Media Noche
 # Solo ejecución manual: evita compilaciones automáticas en cada cambio.
 on:
   workflow_dispatch:
-  # Ejecutar una nueva prueba cuando se corrija este workflow en main.
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/build-android.yml'
 
 concurrency:
   group: plexmedianoche-android-build
   # Cancelar ejecuciones antiguas para que pruebe la corrección más reciente sin quedar bloqueada.
   cancel-in-progress: true
+
+env:
+  # Kodi 21.1 Omega; no compilar master (actualmente Kodi 23 alpha).
+  KODI_SHA: 183eb85f108c3d8b44a578de80f575f27afe9b9a
 
 permissions:
   contents: read
@@ -23,6 +21,9 @@ jobs:
     name: Compilar Plex Media Noche para Android ARM32 (armeabi-v7a)
     runs-on: ubuntu-22.04
     timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Descargar el repositorio
@@ -30,7 +31,7 @@ jobs:
 
       - name: Comprobar ZIP del skin
         run: |
-          set -e
+          set -euo pipefail
           test -f Plex_de_Media_Noche_0.4.0_KIT.zip
           unzip -t Plex_de_Media_Noche_0.4.0_KIT.zip
           test -s skin/1080i/Home.xml
@@ -46,7 +47,7 @@ jobs:
             python3 python3-pil cmake ninja-build
 
       - name: Configurar Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -72,12 +73,12 @@ jobs:
           # cualquier descarga/carpeta parcial y reintentar desde cero.
           for attempt in 1 2 3; do
             echo "Intento $attempt de 3 para instalar el NDK y las herramientas Android"
-            rm -rf "$ANDROID_HOME/ndk/28.2.13676358" "$HOME/.android/cache"
+            rm -rf "$ANDROID_HOME/ndk/21.4.7075529" "$HOME/.android/cache"
             if sdkmanager --install \
               "platform-tools" \
-              "platforms;android-37.0" \
-              "build-tools;37.0.0" \
-              "ndk;28.2.13676358"; then
+              "platforms;android-34" \
+              "build-tools;33.0.1" \
+              "ndk;21.4.7075529"; then
               break
             fi
             if [ "$attempt" -eq 3 ]; then
@@ -87,12 +88,12 @@ jobs:
             sleep 10
           done
 
-          test -d "$ANDROID_HOME/ndk/28.2.13676358"
-          test -x "$ANDROID_HOME/build-tools/37.0.0/aapt"
+          test -d "$ANDROID_HOME/ndk/21.4.7075529"
+          test -x "$ANDROID_HOME/build-tools/33.0.1/aapt"
 
       - name: Crear clave de depuración Android
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p "$HOME/.android"
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
             keytool -genkeypair -noprompt \
@@ -108,12 +109,21 @@ jobs:
 
       - name: Descargar Kodi
         run: |
-          git clone --depth 1 \
-            https://github.com/xbmc/xbmc.git kodi
+          set -euo pipefail
+          mkdir -p build-logs
+          git init kodi
+          git -C kodi remote add origin https://github.com/xbmc/xbmc.git
+          git -C kodi fetch --depth 1 origin "$KODI_SHA"
+          git -C kodi checkout --detach FETCH_HEAD
+          test "$(git -C kodi rev-parse HEAD)" = "$KODI_SHA"
+          grep -Fqx 'VERSION_MAJOR 21' kodi/version.txt
+          grep -Fqx 'VERSION_MINOR 1' kodi/version.txt
+          cp kodi/version.txt build-logs/kodi-version.txt
+          git -C kodi rev-parse HEAD > build-logs/kodi-sha.txt
 
       - name: Evitar símbolos TLS sin enlazar en libmicrohttpd Android
         run: |
-          set -e
+          set -euo pipefail
           FILE="kodi/tools/depends/target/libmicrohttpd/Makefile"
           test -s "$FILE"
           python3 - "$FILE" <<'PY'
@@ -173,49 +183,15 @@ jobs:
 
       - name: Conservar el nombre Kodi y usar identificador propio
         run: |
-          set -e
+          set -euo pipefail
           grep -Fqx 'APP_NAME Kodi' kodi/version.txt
           sed -i 's/^APP_PACKAGE org[.]xbmc[.]kodi$/APP_PACKAGE com.plexmedianoche.kodi/' kodi/version.txt
           grep -Fqx 'APP_PACKAGE com.plexmedianoche.kodi' kodi/version.txt
-          # Evitar que un nombre de marca con espacios contamine los nombres internos de objetivos CMake.
-          python3 - kodi/CMakeLists.txt <<'PY'
-          import pathlib, sys
-          path = pathlib.Path(sys.argv[1])
-          data = path.read_text(encoding="utf-8")
-          marker = "add_custom_target(${APP_NAME_LC}-libraries)"
-          fix = "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake\n" + marker
-          if "set(APP_NAME_LC kodi) # Nombre interno seguro para CMake" not in data:
-              if marker not in data:
-                  raise SystemExit("No se encontró el objetivo de bibliotecas de Kodi para corregir el nombre interno")
-              data = data.replace(marker, fix, 1)
-              path.write_text(data, encoding="utf-8")
-          print("Nombre interno CMake fijado a kodi")
-          PY
-          grep -Fq 'set(APP_NAME_LC kodi) # Nombre interno seguro para CMake' kodi/CMakeLists.txt
-          # Evitar que la configuración falle si Kodi no ha creado el objetivo global de bibliotecas.
-          python3 - kodi/cmake/scripts/linux/Macros.cmake <<'PY'
-          import pathlib, sys
-          path = pathlib.Path(sys.argv[1])
-          data = path.read_text(encoding="utf-8")
-          old = "  add_dependencies(${APP_NAME_LC}-libraries wrap_${libname})"
-          new = (
-              "  if(TARGET ${APP_NAME_LC}-libraries)\n"
-              "    add_dependencies(${APP_NAME_LC}-libraries wrap_${libname})\n"
-              "  endif()"
-          )
-          if new not in data:
-              if old not in data:
-                  raise SystemExit("No se encontró la dependencia de bibliotecas en Macros.cmake")
-              data = data.replace(old, new, 1)
-              path.write_text(data, encoding="utf-8")
-          print("Dependencia de bibliotecas protegida")
-          PY
-          grep -Fq 'if(TARGET ${APP_NAME_LC}-libraries)' kodi/cmake/scripts/linux/Macros.cmake
           echo "Nombre visible: Kodi"
           echo "Identificador privado: com.plexmedianoche.kodi"
       - name: Preparar el skin
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p "$RUNNER_TEMP/skin"
           unzip -q Plex_de_Media_Noche_0.4.0_KIT.zip \
             -d "$RUNNER_TEMP/skin"
@@ -272,7 +248,7 @@ jobs:
 
       - name: Generar texturas del skin Plex de Media Noche
         run: |
-          set -e
+          set -euo pipefail
           MEDIA_DIR="$GITHUB_WORKSPACE/addons/skin.pepe.plexmedianoche/media"
           mkdir -p "$MEDIA_DIR"
           python3 - "$MEDIA_DIR" <<'PY'
@@ -344,7 +320,7 @@ jobs:
 
       - name: Integrar mantenimiento diario y semanal de biblioteca
         run: |
-          set -e
+          set -euo pipefail
           ADDON_ID="service.plexmedianoche.maintenance"
           test -s "addons/$ADDON_ID/addon.xml"
           test -s "addons/$ADDON_ID/service.py"
@@ -367,7 +343,7 @@ jobs:
 
       - name: Asegurar que el skin y el servicio se empaquetan en la APK
         run: |
-          set -e
+          set -euo pipefail
           MAKEFILE="kodi/tools/android/packaging/Makefile.in"
           test -s "$MAKEFILE"
           python3 - "$MAKEFILE" <<'PY'
@@ -464,92 +440,51 @@ jobs:
           print("PREFLIGHT OK: ZIP íntegro, XML válidos, servicio Python válido, TLS revisado y empaquetado configurado.")
           PY
 
-      - name: Cachear descargas y dependencias compiladas de Kodi
-        uses: actions/cache/restore@v4
+      - name: Cachear descargas de dependencias
+        uses: actions/cache@v4
         with:
-          path: |
-            ~/android-tools/xbmc-tarballs
-            ~/android-tools/xbmc-depends
-            kodi/tools/depends/build
-          # v6 sin restore-keys: no reutilizar bibliotecas antiguas que aún enlazan símbolos GnuTLS incompatibles.
-          key: kodi-depends-arm32-tls-off-v11-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          path: ~/android-tools/xbmc-tarballs
+          key: kodi-tarballs-omega-arm32-v1-${{ runner.os }}-${{ env.KODI_SHA }}
 
       - name: Preparar dependencias de Kodi
         run: |
           set -euo pipefail
-          # No reutilizar una libmicrohttpd antigua que siga compilada con TLS.
-          # El cambio de clave evita restaurar la caché defectuosa; estas limpiezas
-          # fuerzan además a reconstruir esta dependencia desde su código fuente.
-          DEPENDS="$HOME/android-tools/xbmc-depends/arm-linux-androideabi-24-debug"
-          rm -f "$DEPENDS/lib/libmicrohttpd.a" "$DEPENDS/lib/libzip.a"
-          rm -f kodi/tools/depends/target/libmicrohttpd/.installed-* \
-                kodi/tools/depends/target/libmicrohttpd/.configured-* \
-                kodi/tools/depends/target/libzip/.installed-* \
-                kodi/tools/depends/target/libzip/.configured-*
-          rm -rf kodi/tools/depends/target/libmicrohttpd/arm-linux-androideabi-24-debug \
-                 kodi/tools/depends/target/libzip/arm-linux-androideabi-24-debug
           cd kodi/tools/depends
-          ./bootstrap
+          ./bootstrap 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/bootstrap.log"
           ./configure \
             --with-tarballs="$HOME/android-tools/xbmc-tarballs" \
             --host=arm-linux-androideabi \
-            --with-sdk-path="$ANDROID_SDK_ROOT" \
-            --prefix="$HOME/android-tools/xbmc-depends"
-          make -j"$(nproc)"
-          # No fallar aquí por la ausencia de la biblioteca estática: Kodi puede
-          # omitir libmicrohttpd en esta configuración. La compilación y el enlace
-          # posteriores determinarán si realmente hace falta para el APK.
-          if [ -s "$DEPENDS/lib/libmicrohttpd.a" ]; then
-            echo "libmicrohttpd.a está disponible en las dependencias Android"
-          else
-            echo "::notice::libmicrohttpd.a no se ha instalado en esta configuración; se comprobará durante la generación y el enlace de Kodi"
-          fi
-          if [ -s "$DEPENDS/lib/libzip.a" ]; then
-            if nm -u "$DEPENDS/lib/libzip.a" | grep -Eq ' (gnutls_|nettle_|mbedtls_)'; then
-              echo "::error::libzip.a todavía contiene símbolos crypto incompatibles con el enlace final"
-              exit 1
-            fi
-            echo "Comprobación de libzip superada: no quedan referencias GnuTLS/Nettle/mbedTLS"
-          else
-            # Algunas configuraciones de Kodi Omega no instalan libzip como archivo
-            # estático en esta ruta. El generador y el enlazador comprobarán si hace falta.
-            echo "::notice::No existe libzip.a en la ruta estática esperada; se comprobará durante el enlace de Kodi"
-          fi
-
-      # Guardar las dependencias en cuanto esta fase termina; así un fallo
-      # posterior al compilar Kodi no obliga a reconstruirlas desde cero.
-      - name: Guardar dependencias compiladas de Kodi
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/android-tools/xbmc-tarballs
-            ~/android-tools/xbmc-depends
-            kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v11-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+            --with-sdk-path="$ANDROID_HOME" \
+            --with-ndk-path="$ANDROID_HOME/ndk/21.4.7075529" \
+            --prefix="$HOME/android-tools/xbmc-depends" 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/configure.log"
+          make -j"$(nproc)" 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/depends.log"
+          # Descubrir el prefijo real de ARM32, sin asumir API ni sufijo debug.
+          python3 "$GITHUB_WORKSPACE/scripts/check_android_archives.py" \
+            "$HOME/android-tools/xbmc-depends" | tee "$GITHUB_WORKSPACE/build-logs/archives.log"
 
       - name: Generar sistema de compilación
         run: |
-          set -e
+          set -euo pipefail
           cd kodi
           make -C tools/depends/target/cmakebuildsys \
             BUILD_DIR="$GITHUB_WORKSPACE/kodi-build" \
-            CMAKE_EXTRA_ARGUMENTS="-DENABLE_INTERNAL_BLURAY=OFF -DENABLE_INTERNAL_UDFREAD=OFF -DENABLE_SMBCLIENT=OFF"
+            CMAKE_EXTRA_ARGUMENTS="-DENABLE_INTERNAL_BLURAY=OFF -DENABLE_INTERNAL_UDFREAD=OFF -DENABLE_SMBCLIENT=OFF" 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/cmake.log"
 
       - name: Compilar Kodi
         run: |
-          set -e
+          set -euo pipefail
           cd "$GITHUB_WORKSPACE/kodi-build"
-          make -j"$(nproc)"
+          make -j"$(nproc)" 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/build.log"
 
       - name: Crear APK Android
         run: |
-          set -e
+          set -euo pipefail
           cd "$GITHUB_WORKSPACE/kodi-build"
-          make apk
+          make apk 2>&1 | tee "$GITHUB_WORKSPACE/build-logs/apk.log"
 
       - name: Localizar APK
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p dist
           APK="$(find "$GITHUB_WORKSPACE/kodi" \
             -type f -name '*.apk' -print -quit)"
@@ -558,6 +493,11 @@ jobs:
             exit 1
           fi
           cp "$APK" dist/Plex-Media-Noche-arm32.apk
+          "$ANDROID_HOME/build-tools/33.0.1/apksigner" verify --verbose dist/Plex-Media-Noche-arm32.apk
+          "$ANDROID_HOME/build-tools/33.0.1/aapt" dump badging dist/Plex-Media-Noche-arm32.apk > build-logs/apk-badging.txt
+          grep -F "package: name='com.plexmedianoche.kodi'" build-logs/apk-badging.txt
+          grep -F "native-code: 'armeabi-v7a'" build-logs/apk-badging.txt
+          unzip -t dist/Plex-Media-Noche-arm32.apk > build-logs/apk-integrity.txt
           echo "Comprobando que el skin y el servicio están dentro de la APK..."
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/addon.xml'
           unzip -l dist/Plex-Media-Noche-arm32.apk | grep -F 'assets/addons/skin.pepe.plexmedianoche/1080i/Home.xml'
@@ -575,3 +515,18 @@ jobs:
           path: dist/Plex-Media-Noche-arm32.apk
           if-no-files-found: error
           retention-days: 7
+
+
+      - name: Conservar diagnóstico incluso si falla la compilación
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plex-Media-Noche-Android-diagnostico
+          path: |
+            build-logs/
+            kodi-build/CMakeFiles/CMakeError.log
+            kodi-build/CMakeFiles/CMakeOutput.log
+            kodi-build/CMakeFiles/CMakeConfigureLog.yaml
+            kodi/tools/depends/config.log
+          if-no-files-found: warn
+          retention-days: 14
