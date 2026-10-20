@@ -472,7 +472,7 @@ jobs:
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
           # v6 sin restore-keys: no reutilizar bibliotecas antiguas que aún enlazan símbolos GnuTLS incompatibles.
-          key: kodi-depends-arm32-tls-off-v10-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v11-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Preparar dependencias de Kodi
         run: |
@@ -504,12 +504,17 @@ jobs:
           else
             echo "::notice::libmicrohttpd.a no se ha instalado en esta configuración; se comprobará durante la generación y el enlace de Kodi"
           fi
-          test -s "$DEPENDS/lib/libzip.a"
-          if nm -u "$DEPENDS/lib/libzip.a" | grep -Eq ' (gnutls_|nettle_|mbedtls_)'; then
-            echo "::error::libzip.a todavía contiene símbolos crypto incompatibles con el enlace final"
-            exit 1
+          if [ -s "$DEPENDS/lib/libzip.a" ]; then
+            if nm -u "$DEPENDS/lib/libzip.a" | grep -Eq ' (gnutls_|nettle_|mbedtls_)'; then
+              echo "::error::libzip.a todavía contiene símbolos crypto incompatibles con el enlace final"
+              exit 1
+            fi
+            echo "Comprobación de libzip superada: no quedan referencias GnuTLS/Nettle/mbedTLS"
+          else
+            # Algunas configuraciones de Kodi Omega no instalan libzip como archivo
+            # estático en esta ruta. El generador y el enlazador comprobarán si hace falta.
+            echo "::notice::No existe libzip.a en la ruta estática esperada; se comprobará durante el enlace de Kodi"
           fi
-          echo "Comprobación de libzip superada: no quedan referencias GnuTLS/Nettle/mbedTLS"
 
       # Guardar las dependencias en cuanto esta fase termina; así un fallo
       # posterior al compilar Kodi no obliga a reconstruirlas desde cero.
@@ -520,7 +525,7 @@ jobs:
             ~/android-tools/xbmc-tarballs
             ~/android-tools/xbmc-depends
             kodi/tools/depends/build
-          key: kodi-depends-arm32-tls-off-v10-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
+          key: kodi-depends-arm32-tls-off-v11-${{ runner.os }}-${{ hashFiles('Plex_de_Media_Noche_0.4.0_KIT.zip') }}
 
       - name: Generar sistema de compilación
         run: |
