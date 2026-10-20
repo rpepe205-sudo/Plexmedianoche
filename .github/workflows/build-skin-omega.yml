@@ -10,6 +10,7 @@ on:
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/mainmenu.DATA.xml'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
+      - 'README.md'
 
 permissions:
   contents: read
