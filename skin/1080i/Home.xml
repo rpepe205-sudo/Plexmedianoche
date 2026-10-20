@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window id="0">
-  <defaultcontrol always="true">9002</defaultcontrol>
+  <defaultcontrol always="true">9000</defaultcontrol>
   <allowoverlay>no</allowoverlay>
   <controls>
     <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture>background.jpg</texture><aspectratio>stretch</aspectratio></control>
@@ -11,43 +11,43 @@
     <control type="label"><left>1435</left><top>22</top><width>425</width><height>34</height><label>$INFO[System.Time]</label><font>font24</font><textcolor>FFFFFFFF</textcolor><align>right</align></control>
     <control type="label"><left>1435</left><top>58</top><width>425</width><height>25</height><label>$INFO[System.Date]</label><font>font13</font><textcolor>FFB7C5D8</textcolor><align>right</align></control>
 
-    <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>background.jpg</texture><aspectratio>stretch</aspectratio><visible>!Library.HasContent(tvshows)</visible></control>
+    <control type="image"><left>48</left><top>150</top><width>1824</width><height>265</height><texture>background.jpg</texture><aspectratio>stretch</aspectratio><visible>!Library.HasContent(tvshows)</visible></control>
     <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>$INFO[Container(9100).ListItem.Art(fanart)]</texture><aspectratio>scale</aspectratio><visible>Library.HasContent(tvshows)</visible></control>
     <control type="image"><left>48</left><top>96</top><width>1824</width><height>265</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>CC06101E</colordiffuse></control>
-    <control type="image"><left>1414</left><top>111</top><width>430</width><height>230</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>BB06101E</colordiffuse></control>
-    <control type="label"><left>84</left><top>118</top><width>1120</width><height>30</height><label>DESTACADO DE TU BIBLIOTECA</label><font>font16</font><textcolor>FFFFC85A</textcolor></control>
-    <control type="label"><left>84</left><top>155</top><width>1220</width><height>56</height><label>$INFO[Container(9100).ListItem.Label,TU CINE Y TUS SERIES]</label><font>font30</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="textbox"><left>86</left><top>218</top><width>1200</width><height>74</height><label>$INFO[Container(9100).ListItem.Plot,Cuando añadas tus fuentes de vídeo desde Kodi, tus películas y series aparecerán aquí.]</label><font>font16</font><textcolor>FFE2E8F0</textcolor></control>
-    <control type="label"><left>86</left><top>321</top><width>1200</width><height>24</height><label>Abre la ficha de cada título para ver sus detalles. Durante la reproducción encontrarás los controles de audio y subtítulos.</label><font>font13</font><textcolor>FFB7C5D8</textcolor></control>
+    <control type="image"><left>1414</left><top>165</top><width>430</width><height>230</height><texture>panel.png</texture><aspectratio>stretch</aspectratio><colordiffuse>BB06101E</colordiffuse></control>
+    <control type="label"><left>84</left><top>172</top><width>1120</width><height>30</height><label>DESTACADO DE TU BIBLIOTECA</label><font>font16</font><textcolor>FFFFC85A</textcolor></control>
+    <control type="label"><left>84</left><top>209</top><width>1220</width><height>56</height><label>$INFO[Container(9100).ListItem.Label,TU CINE Y TUS SERIES]</label><font>font30</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="textbox"><left>86</left><top>272</top><width>1200</width><height>74</height><label>$INFO[Container(9100).ListItem.Plot,Cuando añadas tus fuentes de vídeo desde Kodi, tus películas y series aparecerán aquí.]</label><font>font16</font><textcolor>FFE2E8F0</textcolor></control>
+    <control type="label"><left>86</left><top>375</top><width>1200</width><height>24</height><label>Abre la ficha de cada título para ver sus detalles. Durante la reproducción encontrarás los controles de audio y subtítulos.</label><font>font13</font><textcolor>FFB7C5D8</textcolor></control>
     <control type="label"><left>1450</left><top>132</top><width>360</width><height>28</height><label>ESTADO DE LA BIBLIOTECA</label><font>font16</font><textcolor>FF91B7E8</textcolor></control>
     <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>PELÍCULAS DISPONIBLES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
     <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>SERIES DISPONIBLES</label><font>font18</font><textcolor>FFFFFFFF</textcolor><visible>Library.HasContent(tvshows) + !Library.HasContent(movies)</visible></control>
     <control type="label"><left>1450</left><top>174</top><width>360</width><height>66</height><label>AÑADE TU BIBLIOTECA EN KODI</label><font>font18</font><textcolor>FFFFFFFF</textcolor><visible>!Library.HasContent(movies) + !Library.HasContent(tvshows)</visible></control>
-    <control type="button" id="9050"><left>1450</left><top>266</top><width>330</width><height>48</height><label>ABRIR COMPLEMENTOS</label><font>font16</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus>panel.png</texturefocus><texturenofocus>panel.png</texturenofocus><onclick>ActivateWindow(Addons)</onclick><onup>9006</onup><ondown>9006</ondown><onleft>9006</onleft><onright>9006</onright></control>
+    <control type="button" id="9050"><left>1450</left><top>320</top><width>330</width><height>48</height><label>ABRIR COMPLEMENTOS</label><font>font16</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus>panel.png</texturefocus><texturenofocus>panel.png</texturenofocus><onclick>ActivateWindow(Addons)</onclick><onup>9006</onup><ondown>9006</ondown><onleft>9006</onleft><onright>9006</onright></control>
 
-    <control type="image"><left>48</left><top>374</top><width>1824</width><height>64</height><texture>panel.png</texture><colordiffuse>BB07111F</colordiffuse></control>
-    <control type="image"><left>48</left><top>374</top><width>224</width><height>64</height><texture>tile_0.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9000"><left>48</left><top>374</top><width>224</width><height>64</height><label>FAVORITOS</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Favourites)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9007</onleft><onright>9001</onright></control>
-<control type="image"><left>276</left><top>374</top><width>224</width><height>64</height><texture>tile_1.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9001"><left>276</left><top>374</top><width>224</width><height>64</height><label>ESTRENOS SERIES</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://recentlyaddedepisodes/)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9000</onleft><onright>9002</onright></control>
-<control type="image"><left>504</left><top>374</top><width>224</width><height>64</height><texture>tile_2.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9002"><left>504</left><top>374</top><width>224</width><height>64</height><label>SERIES</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://tvshows/titles/)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9001</onleft><onright>9003</onright></control>
-<control type="image"><left>732</left><top>374</top><width>224</width><height>64</height><texture>tile_3.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9003"><left>732</left><top>374</top><width>224</width><height>64</height><label>CINE</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://movies/titles/)</onclick><onup>9050</onup><ondown>9200</ondown><onleft>9002</onleft><onright>9004</onright></control>
-<control type="image"><left>960</left><top>374</top><width>224</width><height>64</height><texture>tile_4.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9004"><left>960</left><top>374</top><width>224</width><height>64</height><label>ESTRENOS CINE</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://recentlyaddedmovies/)</onclick><onup>9050</onup><ondown>9200</ondown><onleft>9003</onleft><onright>9005</onright></control>
-<control type="image"><left>1188</left><top>374</top><width>224</width><height>64</height><texture>tile_5.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="image"><left>48</left><top>90</top><width>1824</width><height>64</height><texture>panel.png</texture><colordiffuse>BB07111F</colordiffuse></control>
+    <control type="image"><left>48</left><top>90</top><width>224</width><height>64</height><texture>tile_0.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9000"><left>48</left><top>374</top><width>224</width><height>64</height><label>INICIO</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Favourites)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9007</onleft><onright>9001</onright></control>
+<control type="image"><left>276</left><top>90</top><width>224</width><height>64</height><texture>tile_1.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9001"><left>276</left><top>374</top><width>224</width><height>64</height><label>FAVORITOS</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://recentlyaddedepisodes/)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9000</onleft><onright>9002</onright></control>
+<control type="image"><left>504</left><top>90</top><width>224</width><height>64</height><texture>tile_2.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9002"><left>504</left><top>374</top><width>224</width><height>64</height><label>SERIES ESTRENOS</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://tvshows/titles/)</onclick><onup>9050</onup><ondown>9100</ondown><onleft>9001</onleft><onright>9003</onright></control>
+<control type="image"><left>732</left><top>90</top><width>224</width><height>64</height><texture>tile_3.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9003"><left>732</left><top>374</top><width>224</width><height>64</height><label>SERIES</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://movies/titles/)</onclick><onup>9050</onup><ondown>9200</ondown><onleft>9002</onleft><onright>9004</onright></control>
+<control type="image"><left>960</left><top>90</top><width>224</width><height>64</height><texture>tile_4.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9004"><left>960</left><top>374</top><width>224</width><height>64</height><label>NOVEDADES CINE</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Videos,videodb://recentlyaddedmovies/)</onclick><onup>9050</onup><ondown>9200</ondown><onleft>9003</onleft><onright>9005</onright></control>
+<control type="image"><left>1188</left><top>90</top><width>224</width><height>64</height><texture>tile_5.jpg</texture><aspectratio>stretch</aspectratio></control>
     <control type="button" id="9005"><left>1188</left><top>374</top><width>224</width><height>64</height><label>TV</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(TVChannels)</onclick><onup>9050</onup><ondown>9300</ondown><onleft>9004</onleft><onright>9006</onright></control>
-<control type="image"><left>1416</left><top>374</top><width>224</width><height>64</height><texture>tile_6.jpg</texture><aspectratio>stretch</aspectratio></control>
+<control type="image"><left>1416</left><top>90</top><width>224</width><height>64</height><texture>tile_6.jpg</texture><aspectratio>stretch</aspectratio></control>
     <control type="button" id="9006"><left>1416</left><top>374</top><width>224</width><height>64</height><label>AJUSTES</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(Settings)</onclick><onup>9050</onup><ondown>9400</ondown><onleft>9005</onleft><onright>9007</onright></control>
-<control type="image"><left>1644</left><top>374</top><width>224</width><height>64</height><texture>tile_7.jpg</texture><aspectratio>stretch</aspectratio></control>
-    <control type="button" id="9007"><left>1644</left><top>374</top><width>224</width><height>64</height><label>SALIR</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>Quit</onclick><onup>9050</onup><ondown>9400</ondown><onleft>9006</onleft><onright>9000</onright></control>
+<control type="image"><left>1644</left><top>90</top><width>224</width><height>64</height><texture>tile_7.jpg</texture><aspectratio>stretch</aspectratio></control>
+    <control type="button" id="9007"><left>1644</left><top>374</top><width>224</width><height>64</height><label>APAGAR</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FFFFC85A</focusedcolor><texturefocus colordiffuse="AA54B8FF">panel.png</texturefocus><texturenofocus colordiffuse="22000000">panel.png</texturenofocus><onclick>ActivateWindow(ShutdownMenu)</onclick><onup>9050</onup><ondown>9400</ondown><onleft>9006</onleft><onright>9000</onright></control>
 
     
-    <control type="label"><left>66</left><top>444</top><width>900</width><height>30</height><label>SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9101"><left>66</left><top>476</top><width>1700</width><height>24</height><label>Añade una fuente de vídeo desde Vídeos > Archivos para ver tus series aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
+    <control type="label"><left>66</left><top>390</top><width>900</width><height>30</height><label>SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9101"><left>66</left><top>416</top><width>1700</width><height>24</height><label>Tus series sincronizadas aparecerán aquí cuando PlexKodiConnect termine la sincronización.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
     <control type="panel" id="9100">
-      <left>54</left><top>470</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>416</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition><onup>9001</onup><ondown>9200</ondown><onleft>9100</onleft><onright>9100</onright>
       <itemlayout width="160" height="108">
         <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
@@ -60,10 +60,10 @@
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://tvshows/titles/</content>
     </control>
     
-    <control type="label"><left>66</left><top>590</top><width>900</width><height>30</height><label>CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9201"><left>66</left><top>622</top><width>1700</width><height>24</height><label>Añade una fuente de vídeo desde Vídeos > Archivos para ver tus películas aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
+    <control type="label"><left>66</left><top>530</top><width>900</width><height>30</height><label>CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9201"><left>66</left><top>562</top><width>1700</width><height>24</height><label>Tus películas sincronizadas aparecerán aquí cuando PlexKodiConnect termine la sincronización.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
     <control type="panel" id="9200">
-      <left>54</left><top>616</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>556</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition>
       <onup>9100</onup><ondown>9300</ondown><onleft>9200</onleft><onright>9200</onright>
       <itemlayout width="160" height="108">
@@ -77,10 +77,10 @@
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://movies/titles/</content>
     </control>
     
-    <control type="label"><left>66</left><top>736</top><width>900</width><height>30</height><label>ESTRENOS DE SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9301"><left>66</left><top>768</top><width>1700</width><height>24</height><label>Los episodios añadidos recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
+    <control type="label"><left>66</left><top>670</top><width>900</width><height>30</height><label>ESTRENOS DE SERIES</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9301"><left>66</left><top>702</top><width>1700</width><height>24</height><label>Episodios añadidos recientemente desde tu biblioteca Plex.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(tvshows)</visible></control>
     <control type="panel" id="9300">
-      <left>54</left><top>762</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>696</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition><onup>9200</onup><ondown>9400</ondown><onleft>9300</onleft><onright>9300</onright>
       <itemlayout width="160" height="108">
         <control type="image"><left>42</left><top>0</top><width>76</width><height>86</height><texture>$INFO[ListItem.Art(poster)]</texture><aspectratio>keep</aspectratio><bordertexture>panel.png</bordertexture><bordersize>2</bordersize></control>
@@ -93,10 +93,10 @@
       <content sortby="dateadded" sortorder="descending" limit="14">videodb://recentlyaddedepisodes/</content>
     </control>
     
-    <control type="label"><left>66</left><top>882</top><width>900</width><height>30</height><label>ESTRENOS DE CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
-    <control type="label" id="9401"><left>66</left><top>914</top><width>1700</width><height>24</height><label>Las películas añadidas recientemente aparecerán aquí.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
+    <control type="label"><left>66</left><top>810</top><width>900</width><height>30</height><label>ESTRENOS DE CINE</label><font>font18</font><textcolor>FFFFFFFF</textcolor></control>
+    <control type="label" id="9401"><left>66</left><top>842</top><width>1700</width><height>24</height><label>Películas añadidas recientemente desde tu biblioteca Plex.</label><font>font13</font><textcolor>FF9FB2C8</textcolor><visible>!Library.HasContent(movies)</visible></control>
     <control type="panel" id="9400">
-      <left>54</left><top>908</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
+      <left>54</left><top>836</top><width>1812</width><height>112</height><orientation>horizontal</orientation>
       <scrolltime>300</scrolltime><focusposition>0</focusposition>
       <onup>9300</onup><ondown>9007</ondown><onleft>9400</onleft><onright>9400</onright>
       <itemlayout width="160" height="108">
