@@ -21,7 +21,7 @@ def read_details(rpc, media_type, database_id):
     })[media_type + 'details']
 
 
-def make_item(gui, media_type, database_id, detail):
+def make_item(gui, media_type, database_id, detail, hide_unwatched_plot=False):
     if not detail.get('file'):
         raise ValueError('Missing library playback path')
     item = gui.ListItem(label=detail['title'], path=detail['file'], offscreen=True)
@@ -31,7 +31,9 @@ def make_item(gui, media_type, database_id, detail):
     tag.setDbId(int(database_id))
     tag.setMediaType(media_type)
     tag.setTitle(detail['title'])
-    tag.setPlot(detail.get('plot', ''))
+    hide_plot = (hide_unwatched_plot and media_type == 'episode'
+                 and int(detail.get('playcount', 0)) == 0)
+    tag.setPlot('Sinopsis oculta para evitar spoilers.' if hide_plot else detail.get('plot', ''))
     tag.setDuration(int(detail.get('runtime', 0)))
     tag.setPlaycount(int(detail.get('playcount', 0)))
     tag.setFilenameAndPath(detail['file'])
@@ -70,7 +72,8 @@ def main():
     try:
         media_type, database_id = sys.argv[1:3]
         details = read_details(rpc, media_type, database_id)
-        item = make_item(xbmcgui, media_type, database_id, details)
+        item = make_item(xbmcgui, media_type, database_id, details,
+                         xbmc.getCondVisibility('Skin.HasSetting(medianoche.hideepisodeplots)'))
         xbmcgui.Dialog().info(item)
     except Exception:
         xbmc.log('Plex Media Noche: unable to open local video information', xbmc.LOGWARNING)
