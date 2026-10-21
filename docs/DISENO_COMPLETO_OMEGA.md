@@ -1,4 +1,4 @@
-# Diseño cinematográfico — Plex Media Noche 3.0.4~beta2
+# Diseño cinematográfico — Plex Media Noche 3.0.4~beta3
 
 ## Qué incorpora el paquete
 
@@ -22,6 +22,14 @@ El inicio consulta hasta 13 elementos por fila (52 en total); las bibliotecas in
 Los menús conservan texto visible y añaden iconos nativos con colores de foco de alto contraste. Las carátulas muestran Visto o Continuar únicamente cuando Kodi proporciona ese estado; son indicadores de lectura, sin una nueva acción para marcar contenido visto.
 
 La carátula se obtiene por prioridad: poster del elemento, poster de la serie y miniatura. El fanart puede heredarse de la serie y el clearlogo solo aparece si existe. Se mantienen proporciones, datos reales y las acciones ya implementadas.
+
+## Estructura de la beta 3
+
+Cine y Series añaden accesos a Géneros y Años usando las entradas nativas MovieGenres/MovieYears y TvShowGenres/TvShowYears, presentes en Kodi Omega. Estos accesos abren la navegación de la biblioteca; no configuran rutas de archivos ni cuentas.
+
+La navegación del inicio puede recorrer los títulos de las cuatro filas aunque alguna esté vacía. Los saltos verticales entre carátulas comprueban si la fila vecina tiene contenido y vuelven a su título cuando está vacía. El pie de las bibliotecas vuelve a una categoría existente en vez de intentar enfocar una lista vacía. Se comprobaron estas referencias estáticamente; el ensayo con mando real sigue pendiente.
+
+Series estrenos conserva únicamente sus dos categorías: Series completas y Episodios recientes.
 
 ## Navegación y fichas
 
@@ -55,4 +63,4 @@ Las rutas y la sincronización se dejan para esa sesión. El posible fallo previ
 
 Descargar el artefacto Plex-Media-Noche-skin-Kodi-21-Omega de la compilación entregada. Extraerlo y, en Kodi, instalar el archivo interior PlexMediaNoche-skin-Omega.zip. El ZIP del código del repositorio y el contenedor exterior del artefacto no son el addon.
 
-La versión del fork es 3.0.4~beta2, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
+La versión del fork es 3.0.4~beta3, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
