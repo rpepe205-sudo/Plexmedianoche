@@ -1,4 +1,4 @@
-# Diseño cinematográfico — Plex Media Noche 3.0.4~beta3
+# Diseño cinematográfico — Plex Media Noche 3.0.4~beta4
 
 ## Qué incorpora el paquete
 
@@ -30,6 +30,16 @@ Cine y Series añaden accesos a Géneros y Años usando las entradas nativas Mov
 La navegación del inicio puede recorrer los títulos de las cuatro filas aunque alguna esté vacía. Los saltos verticales entre carátulas comprueban si la fila vecina tiene contenido y vuelven a su título cuando está vacía. El pie de las bibliotecas vuelve a una categoría existente en vez de intentar enfocar una lista vacía. Se comprobaron estas referencias estáticamente; el ensayo con mando real sigue pendiente.
 
 Series estrenos conserva únicamente sus dos categorías: Series completas y Episodios recientes.
+
+## Barra superior de exploración de la beta 4
+
+Bloque compartido en Cine, Series y sus pantallas de novedades/estrenos. Cine ofrece Géneros, Estudios, Actores, Directores y Años. Series ofrece Géneros, Estudios, Actores y Años: Kodi Omega no proporciona un índice equivalente de directores de series en sus entradas rápidas nativas, por lo que no se añade un control sin destino verificado.
+
+Los destinos MovieGenres/Studios/Actors/Directors/Years y TvShowGenres/Studios/Actors/Years se contrastaron con GUIWindowVideoNav.cpp de Kodi Omega. Actores permite explorar la filmografía presente en la biblioteca; el resultado depende de los metadatos sincronizados.
+
+Los accesos abren índices de toda la biblioteca de Cine o Series, como indica la cabecera de la barra. No combinan criterios ni conservan automáticamente el filtro de finalizadas/novedades del carrusel. Las listas inteligentes con criterios combinados se concretarán con el usuario más adelante.
+
+Se sustituyen los anteriores accesos duplicados de Géneros/Años situados abajo a la izquierda. Arriba desde las carátulas o desde la primera categoría lleva a la barra; Abajo o Atrás desde la barra regresa a la categoría elegida. Se acorta la sinopsis y se recoloca el logo para reservar espacio, sin solapar la barra con el contenido.
 
 ## Navegación y fichas
 
@@ -63,4 +73,4 @@ Las rutas y la sincronización se dejan para esa sesión. El posible fallo previ
 
 Descargar el artefacto Plex-Media-Noche-skin-Kodi-21-Omega de la compilación entregada. Extraerlo y, en Kodi, instalar el archivo interior PlexMediaNoche-skin-Omega.zip. El ZIP del código del repositorio y el contenedor exterior del artefacto no son el addon.
 
-La versión del fork es 3.0.4~beta3, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
+La versión del fork es 3.0.4~beta4, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
