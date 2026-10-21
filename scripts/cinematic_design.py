@@ -180,7 +180,8 @@ def build_library(template, window_id, title, categories):
         add(node, 'onfocus', f'SetProperty(MediaNoche.SeriesCategory,{identity})')
         node.find('onclick').text = f'ActivateWindow(Videos,{PLAYLISTS}{playlist},return)'
         node.find('onup').text = str(101 + (index - 1) % len(categories))
-        node.find('ondown').text = str(identity + 1 if index + 1 < len(categories) else 201)
+        node.find('ondown').text = str(identity + 1 if index + 1 < len(categories)
+                                      else (161 if window_id in (1192, 1193) else 201))
         add(node, 'onback', 'ReplaceWindow(1191)')
         controls.append(node)
         marker = image(controls, 56, 608 + 76 * index, 4, 70, 'common/white.png', 'FFE5BC70')
@@ -202,7 +203,21 @@ def build_library(template, window_id, title, categories):
     add(clearlogo, 'visible', '!String.IsEmpty(Container(50).ListItem.Art(clearlogo))')
     add(listing, 'preloaditems', '1')
     item_actions(listing, 50)
-    footer(controls, window_id, 50)
+    if window_id in (1192, 1193):
+        label(controls, 70, 850, 350, 42, 'Más formas de explorar', 'Mini', 'FF91A5BB')
+        prefix = 'Movie' if window_id == 1193 else 'TvShow'
+        for identity, x, caption, destination in (
+            (161, 70, 'Géneros', prefix + 'Genres'),
+            (162, 255, 'Años', prefix + 'Years'),
+        ):
+            node = button(controls, identity, x, 908, 165, 70, caption,
+                          f'ActivateWindow(Videos,{destination},return)')
+            add(node, 'onup', 100 + len(categories))
+            add(node, 'ondown', 201)
+            add(node, 'onleft', 161 if identity == 162 else 101)
+            add(node, 'onright', 162 if identity == 161 else 101)
+            add(node, 'onback', 'ReplaceWindow(1191)')
+    footer(controls, window_id, 101)
     return root
 
 
@@ -278,15 +293,16 @@ def build_home():
         node = button(controls, 301 + index, 70 + index * 254, 350, 238, 68, name, action)
         add(node, 'onleft', 301 + (index - 1) % len(nav))
         add(node, 'onright', 301 + (index + 1) % len(nav))
-        add(node, 'ondown', '501')
-        add(node, 'onup', '504')
+        add(node, 'ondown', '601')
+        add(node, 'onup', '604')
         add(node, 'onback', 'SetFocus(301)')
     image(controls, 70, 440, 1780, 1, 'common/white.png', '8878B8E8')
     for index, (identity, name, description, playlist, target) in enumerate(ROWS):
         top = 468 + index * 134
         node = button(controls, 601 + index, 70, top + 16, 250, 54, name,
                       f'ReplaceWindow({target})')
-        add(node, 'onright', identity)
+        add(node, 'onright', identity, condition=f'Integer.IsGreater(Container({identity}).NumItems,0)')
+        add(node, 'onfocus', f'SetProperty(MediaNoche.ActiveList,{identity})')
         add(node, 'onup', 601 + index - 1 if index else 301)
         add(node, 'ondown', 601 + index + 1 if index < 3 else 201)
         add(node, 'onback', 'SetFocus(301)')
@@ -296,8 +312,20 @@ def build_home():
         add(listing, 'preloaditems', '1')
         add(listing, 'onfocus', f'SetProperty(MediaNoche.ActiveList,{identity})')
         add(listing, 'onleft', 601 + index, condition=f'Container({identity}).Position(0)')
-        add(listing, 'onup', identity - 1 if index else 301)
-        add(listing, 'ondown', identity + 1 if index < 3 else 201)
+        if index:
+            add(listing, 'onup', identity - 1,
+                condition=f'Integer.IsGreater(Container({identity - 1}).NumItems,0)')
+            add(listing, 'onup', 601 + index - 1,
+                condition=f'!Integer.IsGreater(Container({identity - 1}).NumItems,0)')
+        else:
+            add(listing, 'onup', 301)
+        if index < 3:
+            add(listing, 'ondown', identity + 1,
+                condition=f'Integer.IsGreater(Container({identity + 1}).NumItems,0)')
+            add(listing, 'ondown', 601 + index + 1,
+                condition=f'!Integer.IsGreater(Container({identity + 1}).NumItems,0)')
+        else:
+            add(listing, 'ondown', 201)
         add(listing, 'onback', 'SetFocus(301)')
         item_actions(listing, identity)
         for tag in ('itemlayout', 'focusedlayout'):
@@ -313,7 +341,7 @@ def build_home():
                       'Tiny', 'FF91A5BB')
         add(empty, 'visible', f'!Container({identity}).IsUpdating + Integer.IsEqual(Container({identity}).NumItems,0)')
     image(controls, 70, 1014, 1780, 1, 'common/white.png', '4478B8E8')
-    footer(controls, 1191, 504)
+    footer(controls, 1191, 604)
     return root
 
 
