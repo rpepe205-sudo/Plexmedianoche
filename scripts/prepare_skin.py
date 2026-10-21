@@ -19,6 +19,110 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def prepare_video_info(base):
+    """Change only the native video-info navigation; retain Kodi control IDs."""
+    path = base / '1080i/Includes.xml'
+    tree = ET.parse(path)
+    root = tree.getroot()
+    navigation = root.find("include[@name='DialogVideoInfoNavigation']")
+    if navigation is None:
+        raise ValueError('Missing upstream video-info navigation')
+    bar = navigation.find("control[@id='9000']")
+    labels = {
+        '8': '$VAR[MediaNochePlayLabel]',
+        '9078': 'Temporadas y episodios',
+        '9201': '$VAR[MediaNochePauseLabel]',
+        '9077': 'Reproducir / Continuar', '9001': 'Información',
+        '1224': 'Tráiler', '1223': 'Tráiler', '49': 'Preestreno',
+        '7': 'Tu valoración', '1236': 'Extras', '9013': 'Wikipedia',
+        '9002': 'Similares', '9003': 'Del mismo estudio',
+        '9006': 'Del mismo director', '9015': 'Colección',
+        '9004': 'YouTube', '9005': 'Imágenes',
+        '9011': 'Lista de Trakt', '9010': 'Gestionar',
+    }
+    controls = bar.findall('control')
+    if {c.get('id') for c in controls} != set(labels):
+        raise ValueError('Upstream video-info buttons changed')
+    textures = root.find("include[@name='buttontextures']/definition")
+    if textures is None:
+        raise ValueError('Missing upstream button textures')
+    import copy
+    for control in controls:
+        for include in list(control.findall('include')):
+            if include.text == 'buttondimensions':
+                control.remove(include)
+            elif include.get('content') == 'buttontextures':
+                icon = include.find("param[@name='icon']").get('value')
+                control.remove(include)
+                for original in textures:
+                    if original.tag in ('font', 'textcolor'):
+                        continue
+                    node = copy.deepcopy(original)
+                    if node.text:
+                        node.text = node.text.replace('$PARAM[icon]', icon)
+                    for key, value in node.attrib.items():
+                        node.set(key, value.replace('$PARAM[color]', 'Dark4'))
+                    control.append(node)
+        values = {
+            'width': '350', 'height': '88', 'radioposx': '16',
+            'radioposy': '20', 'radiowidth': '48', 'radioheight': '48',
+            'font': 'Tiny', 'textcolor': 'FFFFFFFF',
+            'focusedcolor': 'FF101820', 'disabledcolor': 'FF999999',
+            'textoffsetx': '78', 'align': 'left', 'aligny': 'center',
+            'label': labels[control.get('id')],
+        }
+        for tag, value in values.items():
+            node = control.find(tag)
+            if node is None:
+                node = ET.SubElement(control, tag)
+            node.text = value
+        for node in control.findall('texturefocus'):
+            node.set('colordiffuse', 'FFE5BC70')
+        if control.get('id') == '9001':
+            # The local details panel needs no third-party metadata service.
+            for node in list(control.findall('onclick')):
+                control.remove(node)
+            ET.SubElement(control, 'onclick').text = 'SetProperty(moviecontent,1)'
+        if control.get('id') in ('1223', '1224'):
+            # Do not offer search helpers as if they were a known trailer source.
+            for node in list(control.findall('onclick')):
+                control.remove(node)
+            for node in list(control.findall('visible')):
+                control.remove(node)
+            windowed = control.get('id') == '1223'
+            condition = 'Skin.HasSetting(PlayTrailerWindowed)'
+            if not windowed:
+                condition = '!' + condition
+            ET.SubElement(control, 'visible').text = (
+                condition + ' + !String.IsEmpty(ListItem.Trailer)'
+                ' + !Skin.HasSetting(hidebutton.video.trailer)')
+            ET.SubElement(control, 'onclick').text = (
+                'PlayMedia($INFO[ListItem.Trailer],1)' if windowed else 'SendClick(11)')
+    # Static labels live on each button, independent of Control.HasFocus.
+    for name, condition, selected, fallback in (
+        ('MediaNochePlayLabel', 'ListItem.IsResumable', 'Continuar', 'Reproducir'),
+        ('MediaNochePauseLabel', 'Player.Playing', 'Pausar', 'Continuar'),
+    ):
+        variable = ET.SubElement(root, 'variable', {'name': name})
+        ET.SubElement(variable, 'value', {'condition': condition}).text = selected
+        ET.SubElement(variable, 'value').text = fallback
+    tree.write(path, encoding='UTF-8', xml_declaration=True)
+    preview_path = base / '1080i/Includes_DialogVideoInfo.xml'
+    preview = ET.parse(preview_path)
+    button = preview.getroot().find(".//control[@id='7011']")
+    if button is None:
+        raise ValueError('Missing upstream trailer preview control')
+    for node in list(button.findall('onclick')):
+        button.remove(node)
+    ET.SubElement(button, 'onclick', {
+        'condition': '!String.IsEmpty(ListItem.Trailer)',
+    }).text = 'PlayMedia($INFO[ListItem.Trailer],1)'
+    preview.write(preview_path, encoding='UTF-8', xml_declaration=True)
+    return {'buttons_with_persistent_labels': len(controls),
+            'trailer_requires_listitem_source': True,
+            'favorites_button_implemented': False}
+
+
 def prepare(base, project):
     addon_path = base / 'addon.xml'
     addon = ET.parse(addon_path)
@@ -108,6 +212,7 @@ def prepare(base, project):
     if found != set(replacements):
         raise ValueError(f'Upstream startup settings changed: {set(replacements) - found}')
     startup.write(startup_path, encoding='UTF-8', xml_declaration=True)
+    video_info = prepare_video_info(base)
     final = ET.parse(addon_path).getroot()
     if [dict(node.attrib) for node in final.findall('requires/import')] != dependencies:
         raise ValueError('Dependency declarations changed')
@@ -123,7 +228,8 @@ def prepare(base, project):
             'dependencies': dependencies, 'upstream_home_sha256': home_hash,
             'packaged_home_sha256': digest(home_path),
             'validated_xml_files': count, 'menu': LABELS,
-            'widget_initial_limit': 12, 'runtime_tested': False}
+            'widget_initial_limit': 12, 'video_info': video_info,
+            'runtime_tested': False}
 
 
 if __name__ == '__main__':
@@ -136,3 +242,4 @@ if __name__ == '__main__':
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print(f'{NEW_ID}: palette, lightweight defaults, menu and {result["validated_xml_files"]} XML files checked')
+
