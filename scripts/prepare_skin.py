@@ -115,6 +115,11 @@ def prepare(base, project):
         raise ValueError('Upstream provenance changed')
     if home_path.read_text() != expected_home:
         raise ValueError('Native Home window changed unexpectedly')
+    # Install the project's actual Home design, not just the Arctic base.
+    # Keep the upstream validation above so changes to the pinned base are detected.
+    custom_home = project / 'skin/1080i/Home.xml'
+    ET.parse(custom_home)
+    shutil.copyfile(custom_home, home_path)
     count = 0
     for path in base.rglob('*.xml'):
         ET.parse(path)
