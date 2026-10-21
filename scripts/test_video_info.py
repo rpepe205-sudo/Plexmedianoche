@@ -3,7 +3,6 @@
 Usage: python scripts/test_video_info.py /path/to/original/skin
 These checks do not start Kodi.
 """
-import copy
 from pathlib import Path
 import shutil
 import sys
@@ -17,7 +16,7 @@ def check(upstream):
     with tempfile.TemporaryDirectory() as directory:
         base = Path(directory)
         (base / '1080i').mkdir()
-        for name in ('Includes.xml', 'Includes_DialogVideoInfo.xml'):
+        for name in ('Includes.xml', 'Includes_DialogVideoInfo.xml', 'DialogVideoInfo.xml'):
             shutil.copyfile(upstream / name, base / '1080i' / name)
         original = ET.parse(base / '1080i/Includes.xml').getroot()
         before = original.find("include[@name='DialogVideoInfoNavigation']")
@@ -26,7 +25,7 @@ def check(upstream):
         after = root.find("include[@name='DialogVideoInfoNavigation']")
         old = {c.get('id'): c for c in before.findall('.//control')}
         new = {c.get('id'): c for c in after.findall('.//control')}
-        assert old.keys() == new.keys(), 'Control IDs changed'
+        assert old.keys() | {'9876'} == new.keys(), 'Native control IDs changed'
         for identity, control in new.items():
             if identity == '9000':
                 continue
@@ -35,7 +34,7 @@ def check(upstream):
             assert control.findtext('textcolor') == 'FFFFFFFF'
             assert not any(n.text == 'buttondimensions' or n.get('content') == 'buttontextures'
                            for n in control.findall('include'))
-            if identity not in ('1223', '1224', '9001'):
+            if identity not in ('1223', '1224', '9001', '9876'):
                 for tag in ('onclick', 'visible', 'selected', 'onfocus'):
                     assert [ET.tostring(n) for n in control.findall(tag)] == [
                         ET.tostring(n) for n in old[identity].findall(tag)]
