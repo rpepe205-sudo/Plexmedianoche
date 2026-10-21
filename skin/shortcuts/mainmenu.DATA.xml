@@ -9,7 +9,11 @@
         <icon>special://skin/extras/icons/favourites.png</icon><action>ActivateWindow(Favourites)</action>
     </shortcut>
     <shortcut>
-        <label>Series estrenos</label><label2>Common Shortcut</label2><defaultID>series_estrenos</defaultID>
+        <label>Series completas</label><label2>Common Shortcut</label2><defaultID>series_estrenos</defaultID>
+        <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/series-completas.xsp,return)</action>
+    </shortcut>
+    <shortcut>
+        <label>Episodios recientes</label><label2>Common Shortcut</label2><defaultID>episodios_recientes</defaultID>
         <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/episodios-recientes.xsp,return)</action>
     </shortcut>
     <shortcut>
@@ -37,3 +41,4 @@
         <icon>special://skin/extras/icons/power.png</icon><action>ActivateWindow(shutdownmenu)</action>
     </shortcut>
 </shortcuts>
+
