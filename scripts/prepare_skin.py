@@ -13,7 +13,7 @@ from cinematic_design import build_design
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-CUSTOM_VERSION = '3.0.4~beta4'
+CUSTOM_VERSION = '3.0.4~beta5'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
