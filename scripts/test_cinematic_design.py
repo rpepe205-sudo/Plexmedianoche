@@ -67,6 +67,13 @@ def verify(upstream):
                     assert target is not None and target.findtext('label')
                     assert target.findtext('textoffsetx') == '54'
         home = windows[1191]
+        # Empty libraries still have an uninterrupted path through title buttons.
+        assert home.findtext("controls/control[@id='301']/ondown") == '601'
+        assert home.findtext("controls/control[@id='201']/onup") == '604'
+        for identity in range(601, 605):
+            assert home.find(f"controls/control[@id='{identity}']/onright").get('condition')
+        for identity in (501, 502, 503):
+            assert len(home.findall(f"controls/control[@id='{identity}']/ondown")) == 2
         assert len(home.findall("controls/control[@type='list']")) == 4
         assert all(c.get('limit') == '13' for c in home.findall('.//content'))
         for window_id, (_, categories) in LIBRARIES.items():
@@ -75,6 +82,15 @@ def verify(upstream):
                     for i in range(len(categories))] == [c[0] for c in categories]
             assert 'SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])' in (
                 root.findtext("controls/control[@id='50']/onback"))
+            assert root.findtext("controls/control[@id='201']/onup") == '101'
+            if window_id in (1192, 1193):
+                prefix = 'TvShow' if window_id == 1192 else 'Movie'
+                assert root.findtext("controls/control[@id='161']/onclick") == (
+                    f'ActivateWindow(Videos,{prefix}Genres,return)')
+                assert root.findtext("controls/control[@id='162']/onclick") == (
+                    f'ActivateWindow(Videos,{prefix}Years,return)')
+            else:
+                assert root.find("controls/control[@id='161']") is None
         includes = ET.parse(directory / 'Includes.xml').getroot()
         for name in ('defaultcontroltrue', 'defaultcontrolfalse'):
             action = includes.find(f"include[@name='{name}']/onload")
