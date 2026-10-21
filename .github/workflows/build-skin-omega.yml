@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/shortcuts/**'
+      - 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
@@ -20,6 +21,7 @@ on:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/**'
+      - 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
