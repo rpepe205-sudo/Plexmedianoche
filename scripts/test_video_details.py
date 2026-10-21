@@ -69,6 +69,20 @@ class DetailsTests(unittest.TestCase):
             module.make_item(types.SimpleNamespace(ListItem=FakeItem),
                              'movie', '8', {'title': 'Sin archivo'})
 
+    def test_optional_plot_hiding_only_affects_unwatched_episodes(self):
+        gui = types.SimpleNamespace(ListItem=FakeItem)
+        detail = {'title': 'Título', 'file': 'plugin://pkc/episode/8',
+                  'plot': 'Sinopsis original', 'playcount': 0}
+        hidden = module.make_item(gui, 'episode', '8', detail, True)
+        self.assertEqual(hidden.tag_values['setPlot'], ('Sinopsis oculta para evitar spoilers.',))
+        visible = module.make_item(gui, 'episode', '8', {**detail, 'playcount': 1}, True)
+        self.assertEqual(visible.tag_values['setPlot'], ('Sinopsis original',))
+        movie = module.make_item(gui, 'movie', '8', detail, True)
+        self.assertEqual(movie.tag_values['setPlot'], ('Sinopsis original',))
+        default = module.make_item(gui, 'episode', '8', detail)
+        self.assertEqual(default.tag_values['setPlot'], ('Sinopsis original',))
+        self.assertEqual(detail['plot'], 'Sinopsis original')
+
 
 if __name__ == '__main__':
     unittest.main()
