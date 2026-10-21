@@ -9,6 +9,7 @@ on:
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
+      - 'scripts/test_video_info.py'
       - 'docs/INSTALAR_Y_PROBAR.md'
   push:
     branches:
@@ -20,6 +21,7 @@ on:
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
+      - 'scripts/test_video_info.py'
       - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
       - 'README.md'
@@ -52,6 +54,9 @@ jobs:
           test -n "$BASE"
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
+
+      - name: Comprobar regresiones de fichas contra el upstream fijado
+        run: python3 scripts/test_video_info.py work/skin.arctic.zephyr.mod/1080i
 
       - name: Aplicar diseño nocturno y validar personalización
         run: |
