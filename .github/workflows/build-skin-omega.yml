@@ -18,6 +18,7 @@ on:
       - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/DISENO_COMPLETO_OMEGA.md'
+      - 'docs/REVISION_SKINS_BETA5.md'
   push:
     branches:
       - main
@@ -37,6 +38,7 @@ on:
       - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/DISENO_COMPLETO_OMEGA.md'
+      - 'docs/REVISION_SKINS_BETA5.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
       - 'README.md'
 
@@ -106,6 +108,7 @@ jobs:
           ls -lh dist/PlexMediaNoche-skin-Omega.zip
           cp docs/INSTALAR_Y_PROBAR.md dist/LEEME-INSTALACION.md
           cp docs/DISENO_COMPLETO_OMEGA.md dist/LEEME-DISENO.md
+          cp docs/REVISION_SKINS_BETA5.md dist/REVISION_SKINS_BETA5.md
           printf '%s\n' "$ARCTIC_SHA" > dist/arctic-source-sha.txt
           cd dist
           sha256sum PlexMediaNoche-skin-Omega.zip > SHA256SUMS.txt
