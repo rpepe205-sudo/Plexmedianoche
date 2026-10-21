@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-LABELS = ['Inicio', 'Favoritos', 'Series completas', 'Episodios recientes', 'Series',
+LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
 
@@ -198,6 +198,10 @@ def prepare(base, project):
     if not all(ids) or len(set(ids)) != len(ids):
         raise ValueError('Missing or duplicate menu IDs')
 
+
+    hub_source = project / 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
+    ET.parse(hub_source)
+    shutil.copyfile(hub_source, base / '1080i/Custom_SeriesEstrenos_1190.xml')
 
     # Portable library entry points; PKC populates Kodi's own video database.
     playlist_source = project / 'skin/playlists'
