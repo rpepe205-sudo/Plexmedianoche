@@ -1,0 +1,22 @@
+{
+  "Highlight": "FFFFD580",
+  "Highlight2": "FFA3D7FF",
+  "ColoredStars": "FFFFD580",
+  "ColoredIcons": "FFA3D7FF",
+  "ColorRating": "FFFFD580",
+  "ColorUserrating": "FFA3D7FF",
+  "MenuSlide": "FF03080F",
+  "InfoBackground": "FF03080F",
+  "Background": "FF03080F",
+  "BackgroundNew": "FF03080F",
+  "BackgroundNewBlur": "FF03080F",
+  "FloorFade": "FF03080F",
+  "FloorFade2": "FF03080F",
+  "FloorFadeBlur": "FF03080F",
+  "OSDBack": "FF03080F",
+  "Panel": "FF101C2A",
+  "Box2": "FF344B64",
+  "BoxNotification": "FF344B64",
+  "BoxWidget": "FF344B64",
+  "BoxHomerow": "FF344B64"
+}

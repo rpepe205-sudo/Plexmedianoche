@@ -63,16 +63,20 @@ def prepare(base, project):
         raise ValueError('Missing or duplicate menu IDs')
 
     palette_path = base / 'colors/defaults.xml'
-    palette = ET.parse(palette_path)
-    colors = {node.get('name'): node for node in palette.getroot().findall('color')}
-    overrides = json.loads((project / 'skin/colors/media-noche.json').read_text())
-    for name, value in overrides.items():
-        if name not in colors or not re.fullmatch('[A-Fa-f0-9]{8}', value):
-            raise ValueError(f'Invalid or unknown color: {name}={value}')
-        colors[name].text = value
     shutil.copyfile(palette_path, base / 'colors/Arctic Original.xml')
-    palette.write(palette_path, encoding='UTF-8', xml_declaration=True)
-    palette.write(base / 'colors/Media Noche.xml', encoding='UTF-8', xml_declaration=True)
+    themes = [('media-noche.json', 'Media Noche'),
+              ('media-noche-contraste.json', 'Media Noche Contraste')]
+    for filename, title in themes:
+        palette = ET.parse(base / 'colors/Arctic Original.xml')
+        colors = {node.get('name'): node for node in palette.getroot().findall('color')}
+        overrides = json.loads((project / 'skin/colors' / filename).read_text())
+        for name, value in overrides.items():
+            if name not in colors or not re.fullmatch('[A-Fa-f0-9]{8}', value):
+                raise ValueError(f'Invalid or unknown color: {name}={value}')
+            colors[name].text = value
+        palette.write(base / 'colors' / f'{title}.xml', encoding='UTF-8', xml_declaration=True)
+        if title == 'Media Noche':
+            palette.write(palette_path, encoding='UTF-8', xml_declaration=True)
 
     startup_path = base / '1080i/Startup.xml'
     startup = ET.parse(startup_path)
