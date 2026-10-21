@@ -1,84 +1,394 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <window type="window" id="1190">
-    <defaultcontrol always="true">101</defaultcontrol>
-    <onload>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/series-completas.xsp)</onload>
-    <onunload>ClearProperty(MediaNoche.SeriesPlaylist)</onunload>
-    <controls>
+  <defaultcontrol always="true">101</defaultcontrol>
+  <onload>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/series-completas.xsp)</onload>
+  <onunload>ClearProperty(MediaNoche.SeriesPlaylist)</onunload>
+  <onload>SetProperty(MediaNoche.SeriesCategory,101)</onload>
+  <onunload>ClearProperty(MediaNoche.SeriesCategory)</onunload>
+  <controls>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>1920</width>
+      <height>1080</height>
+      <texture colordiffuse="FF080F18">common/white.png</texture>
+    </control>
+    <control type="image">
+      <left>570</left>
+      <top>0</top>
+      <width>1350</width>
+      <height>515</height>
+      <texture background="true">$INFO[Container(50).ListItem.Art(fanart)]</texture>
+      <aspectratio>scale</aspectratio>
+      <fadetime>350</fadetime>
+    </control>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>1000</width>
+      <height>515</height>
+      <texture colordiffuse="E6080F18">common/white.png</texture>
+    </control>
+    <control type="image">
+      <left>0</left>
+      <top>280</top>
+      <width>1920</width>
+      <height>260</height>
+      <texture colordiffuse="FF080F18">common/shadowbottom.png</texture>
+    </control>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>1920</width>
+      <height>118</height>
+      <texture colordiffuse="D9080F18">common/white.png</texture>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>24</top>
+      <width>160</width>
+      <height>44</height>
+      <font>MediumBold</font>
+      <textcolor>FFE5BC70</textcolor>
+      <label>PLEX</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>66</top>
+      <width>260</width>
+      <height>28</height>
+      <font>Small20</font>
+      <textcolor>FFC2CDD9</textcolor>
+      <label>DE MEDIA NOCHE</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="image">
+      <left>345</left>
+      <top>30</top>
+      <width>2</width>
+      <height>62</height>
+      <texture colordiffuse="6678B8E8">common/white.png</texture>
+    </control>
+    <control type="label">
+      <left>380</left>
+      <top>28</top>
+      <width>900</width>
+      <height>62</height>
+      <font>SmallBold</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Series estrenos</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="label">
+      <left>1490</left>
+      <top>22</top>
+      <width>360</width>
+      <height>42</height>
+      <font>SmallBold</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>$INFO[System.Time]</label>
+      <aligny>center</aligny>
+      <align>right</align>
+    </control>
+    <control type="label">
+      <left>1320</left>
+      <top>66</top>
+      <width>530</width>
+      <height>30</height>
+      <font>Mini</font>
+      <textcolor>FFC2CDD9</textcolor>
+      <label>$INFO[System.Date]</label>
+      <aligny>center</aligny>
+      <align>right</align>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>144</top>
+      <width>800</width>
+      <height>36</height>
+      <font>Mini</font>
+      <textcolor>FFE5BC70</textcolor>
+      <label>TU PRÓXIMA HISTORIA</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>190</top>
+      <width>850</width>
+      <height>110</height>
+      <font>LargeNew</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>$INFO[Container(50).ListItem.Label]</label>
+      <aligny>center</aligny>
+      <visible>Integer.IsGreater(Container(50).NumItems,0)</visible>
+      <scroll>true</scroll>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>190</top>
+      <width>850</width>
+      <height>110</height>
+      <font>Large</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Buenas historias, siempre.</label>
+      <aligny>center</aligny>
+      <visible>!Integer.IsGreater(Container(50).NumItems,0)</visible>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>302</top>
+      <width>820</width>
+      <height>42</height>
+      <font>Tiny</font>
+      <textcolor>FFC2CDD9</textcolor>
+      <label>$INFO[Container(50).ListItem.Year]$INFO[Container(50).ListItem.Genre,  ·  ]</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="textbox">
+      <left>70</left>
+      <top>357</top>
+      <width>810</width>
+      <height>112</height>
+      <font>Tiny</font>
+      <textcolor>FFE1E7EE</textcolor>
+      <label>$INFO[Container(50).ListItem.Plot]</label>
+    </control>
+    <control type="image">
+      <left>70</left>
+      <top>514</top>
+      <width>1780</width>
+      <height>2</height>
+      <texture colordiffuse="8878B8E8">common/white.png</texture>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>542</top>
+      <width>350</width>
+      <height>38</height>
+      <font>Mini</font>
+      <textcolor>FF91A5BB</textcolor>
+      <label>EXPLORAR</label>
+      <aligny>center</aligny>
+    </control>
+    <control type="button" id="101">
+      <left>70</left>
+      <top>608</top>
+      <width>350</width>
+      <height>88</height>
+      <font>Tiny</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <focusedcolor>FF101820</focusedcolor>
+      <texturenofocus colordiffuse="FF182331">common/white.png</texturenofocus>
+      <texturefocus colordiffuse="FFE5BC70">common/white.png</texturefocus>
+      <label>Series completas</label>
+      <onfocus>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/series-completas.xsp)</onfocus>
+      <onclick>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/series-completas.xsp,return)</onclick>
+      <onup>102</onup>
+      <ondown>102</ondown>
+      <onright>50</onright>
+      <onleft>101</onleft>
+      <align>left</align>
+      <textoffsetx>26</textoffsetx>
+      <onfocus>SetProperty(MediaNoche.SeriesCategory,101)</onfocus>
+    </control>
+    <control type="image">
+      <left>56</left>
+      <top>608</top>
+      <width>4</width>
+      <height>88</height>
+      <texture colordiffuse="FFE5BC70">common/white.png</texture>
+      <visible>String.IsEqual(Window.Property(MediaNoche.SeriesCategory),101)</visible>
+    </control>
+    <control type="button" id="102">
+      <left>70</left>
+      <top>718</top>
+      <width>350</width>
+      <height>88</height>
+      <font>Tiny</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <focusedcolor>FF101820</focusedcolor>
+      <texturenofocus colordiffuse="FF182331">common/white.png</texturenofocus>
+      <texturefocus colordiffuse="FFE5BC70">common/white.png</texturefocus>
+      <label>Episodios recientes</label>
+      <onfocus>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/episodios-recientes.xsp)</onfocus>
+      <onclick>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/episodios-recientes.xsp,return)</onclick>
+      <onup>101</onup>
+      <ondown>101</ondown>
+      <onright>50</onright>
+      <onleft>102</onleft>
+      <align>left</align>
+      <textoffsetx>26</textoffsetx>
+      <onfocus>SetProperty(MediaNoche.SeriesCategory,102)</onfocus>
+    </control>
+    <control type="image">
+      <left>56</left>
+      <top>718</top>
+      <width>4</width>
+      <height>88</height>
+      <texture colordiffuse="FFE5BC70">common/white.png</texture>
+      <visible>String.IsEqual(Window.Property(MediaNoche.SeriesCategory),102)</visible>
+    </control>
+    <control type="label">
+      <left>470</left>
+      <top>548</top>
+      <width>1000</width>
+      <height>44</height>
+      <font>Small</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Series completas · últimas incorporaciones</label>
+      <aligny>center</aligny>
+      <visible>String.IsEqual(Window.Property(MediaNoche.SeriesCategory),101)</visible>
+    </control>
+    <control type="label">
+      <left>470</left>
+      <top>548</top>
+      <width>1000</width>
+      <height>44</height>
+      <font>Small</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Episodios · recién añadidos</label>
+      <aligny>center</aligny>
+      <visible>String.IsEqual(Window.Property(MediaNoche.SeriesCategory),102)</visible>
+    </control>
+    <control type="label">
+      <left>1570</left>
+      <top>550</top>
+      <width>280</width>
+      <height>40</height>
+      <font>Mini</font>
+      <textcolor>FF91A5BB</textcolor>
+      <label>$INFO[Container(50).NumItems,, títulos]</label>
+      <aligny>center</aligny>
+      <align>right</align>
+    </control>
+    <control type="list" id="50">
+      <left>460</left>
+      <top>604</top>
+      <width>1400</width>
+      <height>400</height>
+      <orientation>horizontal</orientation>
+      <onclick condition="String.IsEqual(Container(50).ListItem.DBType,tvshow)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.DBID]/,return)</onclick>
+      <onclick condition="String.IsEqual(Container(50).ListItem.DBType,episode)">PlayMedia($ESCINFO[Container(50).ListItem.FileNameAndPath])</onclick>
+      <itemlayout width="280" height="400">
         <control type="image">
-            <width>1920</width><height>1080</height>
-            <texture colordiffuse="FF080F18">common/white.png</texture>
+          <left>31</left>
+          <top>5</top>
+          <width>218</width>
+          <height>327</height>
+          <texture fallback="DefaultVideo.png">$INFO[ListItem.Art(poster)]</texture>
+          <aspectratio>keep</aspectratio>
         </control>
         <control type="label">
-            <left>70</left><top>65</top><width>1700</width><height>80</height>
-            <font>SmallBold</font><textcolor>FFE5BC70</textcolor><label>Series estrenos</label>
+          <left>10</left>
+          <top>336</top>
+          <width>260</width>
+          <height>38</height>
+          <font>Tiny</font>
+          <textcolor>FFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Label]</label>
+        </control>
+        <control type="label">
+          <left>10</left>
+          <top>376</top>
+          <width>260</width>
+          <height>24</height>
+          <font>Small20</font>
+          <textcolor>FF91A5BB</textcolor>
+          <label>$INFO[ListItem.Year]$INFO[ListItem.Season,  ·  T]$INFO[ListItem.Episode, · E]</label>
+        </control>
+      </itemlayout>
+      <focusedlayout width="280" height="400">
+        <control type="image">
+          <left>26</left>
+          <top>0</top>
+          <width>228</width>
+          <height>337</height>
+          <texture colordiffuse="FFE5BC70">common/white.png</texture>
         </control>
         <control type="image">
-            <left>70</left><top>160</top><width>1780</width><height>2</height>
-            <texture colordiffuse="FF78B8E8">common/white.png</texture>
-        </control>
-        <control type="button" id="101">
-            <left>70</left><top>230</top><width>350</width><height>88</height>
-            <font>Tiny</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FF101820</focusedcolor>
-            <texturenofocus colordiffuse="FF182331">common/white.png</texturenofocus>
-            <texturefocus colordiffuse="FFE5BC70">common/white.png</texturefocus>
-            <label>Series completas</label>
-            <onfocus>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/series-completas.xsp)</onfocus>
-            <onclick>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/series-completas.xsp,return)</onclick>
-            <onup>102</onup><ondown>102</ondown><onright>50</onright><onleft>101</onleft>
-        </control>
-        <control type="button" id="102">
-            <left>70</left><top>340</top><width>350</width><height>88</height>
-            <font>Tiny</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FF101820</focusedcolor>
-            <texturenofocus colordiffuse="FF182331">common/white.png</texturenofocus>
-            <texturefocus colordiffuse="FFE5BC70">common/white.png</texturefocus>
-            <label>Episodios recientes</label>
-            <onfocus>SetProperty(MediaNoche.SeriesPlaylist,special://skin/extras/playlists/medianoche/episodios-recientes.xsp)</onfocus>
-            <onclick>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/episodios-recientes.xsp,return)</onclick>
-            <onup>101</onup><ondown>101</ondown><onright>50</onright><onleft>102</onleft>
+          <left>31</left>
+          <top>5</top>
+          <width>218</width>
+          <height>327</height>
+          <texture fallback="DefaultVideo.png">$INFO[ListItem.Art(poster)]</texture>
+          <aspectratio>keep</aspectratio>
         </control>
         <control type="label">
-            <left>470</left><top>200</top><width>1350</width><height>60</height>
-            <font>Small</font><textcolor>FFFFFFFF</textcolor>
-            <label>Añadidas recientemente</label>
-        </control>
-        <control type="list" id="50">
-            <left>470</left><top>290</top><width>1350</width><height>480</height>
-            <orientation>horizontal</orientation>
-            <onleft condition="Container(50).Position(0)">101</onleft>
-            <onup>101</onup><ondown>102</ondown><onback>101</onback>
-            <onclick condition="String.IsEqual(Container(50).ListItem.DBType,tvshow)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[Container(50).ListItem.DBID]/,return)</onclick>
-            <onclick condition="String.IsEqual(Container(50).ListItem.DBType,episode)">PlayMedia($ESCINFO[Container(50).ListItem.FileNameAndPath])</onclick>
-            <itemlayout width="270" height="480">
-                <control type="image">
-                    <left>10</left><top>10</top><width>240</width><height>360</height>
-                    <aspectratio>keep</aspectratio><texture fallback="DefaultVideo.png">$INFO[ListItem.Art(poster)]</texture>
-                </control>
-                <control type="label">
-                    <left>10</left><top>385</top><width>240</width><height>75</height>
-                    <font>Tiny</font><textcolor>FFFFFFFF</textcolor><label>$INFO[ListItem.Label]</label>
-                </control>
-            </itemlayout>
-            <focusedlayout width="270" height="480">
-                <control type="image">
-                    <left>5</left><top>5</top><width>250</width><height>370</height>
-                    <texture colordiffuse="FFE5BC70">common/white.png</texture>
-                </control>
-                <control type="image">
-                    <left>10</left><top>10</top><width>240</width><height>360</height>
-                    <aspectratio>keep</aspectratio><texture fallback="DefaultVideo.png">$INFO[ListItem.Art(poster)]</texture>
-                </control>
-                <control type="label">
-                    <left>10</left><top>385</top><width>240</width><height>75</height>
-                    <font>Tiny</font><textcolor>FFE5BC70</textcolor><scroll>true</scroll><label>$INFO[ListItem.Label]</label>
-                </control>
-            </focusedlayout>
-            <content target="videos">$INFO[Window.Property(MediaNoche.SeriesPlaylist)]</content>
+          <left>10</left>
+          <top>336</top>
+          <width>260</width>
+          <height>38</height>
+          <font>Tiny</font>
+          <textcolor>FFE5BC70</textcolor>
+          <label>$INFO[ListItem.Label]</label>
+          <scroll>true</scroll>
         </control>
         <control type="label">
-            <left>470</left><top>800</top><width>1350</width><height>100</height>
-            <font>Tiny</font><textcolor>FFFFFFFF</textcolor><wrapmultiline>true</wrapmultiline>
-            <visible>!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)</visible>
-            <label>No hay resultados en esta categoría. Series completas necesita el estado de serie finalizada en Kodi.</label>
+          <left>10</left>
+          <top>376</top>
+          <width>260</width>
+          <height>24</height>
+          <font>Small20</font>
+          <textcolor>FF91A5BB</textcolor>
+          <label>$INFO[ListItem.Year]$INFO[ListItem.Season,  ·  T]$INFO[ListItem.Episode, · E]</label>
         </control>
-    </controls>
+      </focusedlayout>
+      <content target="videos">$INFO[Window.Property(MediaNoche.SeriesPlaylist)]</content>
+      <onleft condition="Container(50).Position(0)">SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])</onleft>
+      <onup>SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])</onup>
+      <ondown>SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])</ondown>
+      <onback>SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])</onback>
+    </control>
+    <control type="label">
+      <left>500</left>
+      <top>690</top>
+      <width>1200</width>
+      <height>70</height>
+      <font>Small</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Todavía no hay títulos en esta categoría.</label>
+      <aligny>center</aligny>
+      <visible>!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)</visible>
+    </control>
+    <control type="label">
+      <left>500</left>
+      <top>770</top>
+      <width>1200</width>
+      <height>60</height>
+      <font>Tiny</font>
+      <textcolor>FF91A5BB</textcolor>
+      <label>Puedes consultar toda tu biblioteca desde Series.</label>
+      <aligny>center</aligny>
+      <visible>!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)</visible>
+    </control>
+    <control type="label">
+      <left>500</left>
+      <top>690</top>
+      <width>1200</width>
+      <height>70</height>
+      <font>Small</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <label>Cargando tu biblioteca…</label>
+      <aligny>center</aligny>
+      <visible>Container(50).IsUpdating</visible>
+    </control>
+    <control type="image">
+      <left>70</left>
+      <top>1014</top>
+      <width>1780</width>
+      <height>1</height>
+      <texture colordiffuse="4478B8E8">common/white.png</texture>
+    </control>
+    <control type="label">
+      <left>70</left>
+      <top>1030</top>
+      <width>1780</width>
+      <height>36</height>
+      <font>Mini</font>
+      <textcolor>FF91A5BB</textcolor>
+      <label>Categorías a la izquierda  ·  Derecha: explorar carátulas  ·  Atrás: volver</label>
+      <aligny>center</aligny>
+    </control>
+  </controls>
 </window>
