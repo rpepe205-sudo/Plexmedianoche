@@ -1,4 +1,4 @@
-# Diseño cinematográfico — Plex Media Noche 3.0.4~beta4
+# Diseño cinematográfico — Plex Media Noche 3.0.4~beta5
 
 ## Qué incorpora el paquete
 
@@ -41,6 +41,16 @@ Los accesos abren índices de toda la biblioteca de Cine o Series, como indica l
 
 Se sustituyen los anteriores accesos duplicados de Géneros/Años situados abajo a la izquierda. Arriba desde las carátulas o desde la primera categoría lleva a la barra; Abajo o Atrás desde la barra regresa a la categoría elegida. Se acorta la sinopsis y se recoloca el logo para reservar espacio, sin solapar la barra con el contenido.
 
+## Mejoras seleccionadas de la beta 5
+
+Tras revisar Estuary, Arctic Horizon 2 y Nimbus se añaden Continuar en Cine y Continuar episodios en Series, ordenados por última reproducción. Diseño permite elegir filas de catálogo o filas para continuar en las dos primeras posiciones del inicio; el catálogo sigue siendo el valor inicial.
+
+Diseño también permite ocultar sinopsis de episodios sin ver en nuestras cabeceras y fichas abiertas desde las carátulas. La opción solo oculta texto de episodios con playcount=0 y no cambia la biblioteca. Los títulos e imágenes siguen visibles.
+
+La barra de Cine incorpora Colecciones, que abre las agrupaciones existentes en Kodi. No crea metadatos. Series estrenos conserva sus dos categorías.
+
+La revisión de fuentes, alcance exacto y pruebas están documentados en [REVISION_SKINS_BETA5.md](REVISION_SKINS_BETA5.md). Rutas, sincronización y catch-up siguen pendientes de la sesión con el usuario.
+
 ## Navegación y fichas
 
 - Las categorías de la izquierda abren su lista en la navegación nativa al aceptar. Derecha pasa a las carátulas y Atrás regresa a la categoría elegida.
@@ -73,4 +83,4 @@ Las rutas y la sincronización se dejan para esa sesión. El posible fallo previ
 
 Descargar el artefacto Plex-Media-Noche-skin-Kodi-21-Omega de la compilación entregada. Extraerlo y, en Kodi, instalar el archivo interior PlexMediaNoche-skin-Omega.zip. El ZIP del código del repositorio y el contenedor exterior del artefacto no son el addon.
 
-La versión del fork es 3.0.4~beta4, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
+La versión del fork es 3.0.4~beta5, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
