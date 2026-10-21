@@ -16,6 +16,14 @@
 Decisión del usuario: series añadidas recientemente que ya estén finalizadas, no comprobar que todos los episodios estén disponibles. Se muestran las finalizadas empezando por las últimas incorporadas, sin ventana temporal arbitraria.
 Kodi Omega admite FieldTvShowStatus en playlists de tipo tvshows. El filtro necesita que PKC haya escrito Ended en el campo status de Kodi; falta comprobarlo con esta biblioteca. Si falta ese dato, el apartado puede quedar vacío. La entrada Series conserva todo el catálogo. No se infiere finalización por cantidad de episodios o por estado visto.
 
+## Diseño cinematográfico de Series estrenos
+
+Cabecera con marca Plex de Media Noche, reloj y fecha reales. Fanart, título, género, año y sinopsis proceden del elemento seleccionado en la biblioteca; no se incorporan títulos, horarios ni imágenes de muestra. Fondo carbón y azul noche, texto blanco y acentos dorados.
+
+Las dos categorías permanecen a la izquierda. Una marca dorada conserva la categoría elegida al pasar a las carátulas. La fila derecha presenta cinco carátulas en proporción 2:3 sin recortar, con título y metadatos. El foco tiene marco dorado y texto destacado. Atrás, arriba y abajo desde la fila regresan a la categoría elegida. Estados de carga y categoría vacía diferenciados.
+
+Comprobación estática adicional: todos los nombres de fuente existen en Font.xml del upstream fijado, los controles caben en 1920×1080, las carátulas caben en sus layouts, no hay IDs duplicados y las acciones apuntan a los controles esperados. La evaluación visual final y el comportamiento con mando requieren Kodi real.
+
 ## Verificación
 
 Pruebas estáticas sobre Includes.xml, Includes_DialogVideoInfo.xml y DialogVideoInfo.xml de la revisión 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51:
