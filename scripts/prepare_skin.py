@@ -1,4 +1,4 @@
-"""Customize the pinned Arctic base without replacing its native Home window."""
+"""Customize the pinned Arctic base and install the Plex Media Noche Home window."""
 
 import argparse
 import hashlib
@@ -118,7 +118,15 @@ def prepare(base, project):
     # Install the project's actual Home design, not just the Arctic base.
     # Keep the upstream validation above so changes to the pinned base are detected.
     custom_home = project / 'skin/1080i/Home.xml'
-    ET.parse(custom_home)
+    custom_tree = ET.parse(custom_home)
+    custom_root = custom_tree.getroot()
+    ids = [int(node.get('id')) for node in custom_root.iter('control') if node.get('id')]
+    if len(ids) != len(set(ids)):
+        raise ValueError('Duplicate control IDs in custom Home.xml')
+    required = {'GÉNEROS CINE', 'AÑOS CINE', 'GÉNEROS SERIES', 'AÑOS SERIES'}
+    labels = {node.text for node in custom_root.iter('label') if node.text}
+    if not required.issubset(labels):
+        raise ValueError(f'Missing navigation labels: {required - labels}')
     shutil.copyfile(custom_home, home_path)
     count = 0
     for path in base.rglob('*.xml'):
