@@ -23,11 +23,13 @@ LIBRARIES = {
         ('Todas las series', 'series.xsp'),
         ('Finalizadas', 'series-completas.xsp'),
         ('Episodios recientes', 'episodios-recientes.xsp'),
+        ('Continuar episodios', 'episodios-continuar.xsp'),
     ]),
     1193: ('Cine', [
         ('Todas las películas', 'cine.xsp'),
         ('Añadidas recientemente', 'cine-reciente.xsp'),
         ('Sin ver', 'cine-sin-ver.xsp'),
+        ('Continuar', 'cine-continuar.xsp'),
     ]),
     1194: ('Novedades cine', [
         ('Últimas incorporaciones', 'cine-reciente.xsp'),
@@ -40,6 +42,16 @@ ROWS = [
     (503, 'Series estrenos', 'Finalizadas · recién añadidas', 'series-completas.xsp', 1190),
     (504, 'Novedades cine', 'Últimas incorporaciones', 'cine-reciente.xsp', 1194),
 ]
+CONTINUE_ROWS = {
+    501: ('episodios-continuar.xsp', 'Series · A medias', 'No hay episodios a medias.'),
+    502: ('cine-continuar.xsp', 'Cine · A medias', 'No hay películas a medias.'),
+}
+
+
+def hidden_episode_plot(identity):
+    return (f'Skin.HasSetting(medianoche.hideepisodeplots) + '
+            f'String.IsEqual(Container({identity}).ListItem.DBType,episode) + '
+            f'!Integer.IsGreater(Container({identity}).ListItem.PlayCount,0)')
 
 
 def add(parent, tag, text=None, **attributes):
@@ -157,10 +169,12 @@ def filter_bar(controls, movie):
     if movie:
         entries.append(('Directores', 'Directors'))
     entries.append(('Años', 'Years'))
+    if movie:
+        entries.append(('Colecciones', 'Sets'))
     label(controls, 70, 412, 1780, 24,
           'EXPLORAR TODA LA BIBLIOTECA DE ' + ('CINE' if movie else 'SERIES'),
           'Small20', 'FF91A5BB')
-    stride = 360 if movie else 450
+    stride = 1800 // len(entries)
     width = stride - 20
     for index, (caption, suffix) in enumerate(entries):
         identity = 401 + index
@@ -228,6 +242,10 @@ def build_library(template, window_id, title, categories):
     for synopsis in controls.findall("control[@type='textbox']"):
         synopsis.find('top').text = '345'
         synopsis.find('height').text = '62'
+        add(synopsis, 'visible', '![' + hidden_episode_plot(50) + ']')
+    notice = label(controls, 70, 345, 810, 62, 'Sinopsis oculta para evitar spoilers.',
+                   'Tiny', 'FF91A5BB')
+    add(notice, 'visible', hidden_episode_plot(50))
     for old in list(listing.findall('onup')):
         listing.remove(old)
     add(listing, 'onup', 401)
@@ -255,6 +273,10 @@ def home_variables(root):
     for name, field in fields.items():
         variable = add(root, 'variable', name='MediaNoche.Home' + name)
         for identity, *_ in ROWS:
+            if name == 'Plot':
+                add(variable, 'value', 'Sinopsis oculta para evitar spoilers.',
+                    condition=(f'String.IsEqual(Window.Property(MediaNoche.ActiveList),{identity})'
+                               ' + ' + hidden_episode_plot(identity)))
             value = (f'$VAR[MediaNoche.Art{identity}]' if name == 'Art'
                      else f'$INFO[Container({identity}).ListItem.{field}]')
             add(variable, 'value', value,
@@ -267,6 +289,29 @@ def home_variables(root):
             f'$INFO[Container({identity}).ListItem.Year]$INFO[Container({identity}).ListItem.Genre,  ·  ]',
             condition=f'String.IsEqual(Window.Property(MediaNoche.ActiveList),{identity})')
     add(metadata, 'value', '')
+    for identity, name, description, playlist, _ in ROWS:
+        if identity not in CONTINUE_ROWS:
+            continue
+        ongoing, ongoing_description, empty = CONTINUE_ROWS[identity]
+        for suffix, selected, fallback in (
+            ('Source', PLAYLISTS + ongoing, PLAYLISTS + playlist),
+            ('Title', 'Continuar', name),
+            ('Description', ongoing_description, description),
+            ('Empty', empty, 'Todavía no hay títulos en esta fila.'),
+        ):
+            variable = add(root, 'variable', name=f'MediaNoche.{suffix}{identity}')
+            add(variable, 'value', selected, condition='Skin.HasSetting(medianoche.continuehome)')
+            add(variable, 'value', fallback)
+    for name, true_text, false_text, condition in (
+        ('HomeMode', 'Filas del inicio: continuar', 'Filas del inicio: catálogo',
+         'Skin.HasSetting(medianoche.continuehome)'),
+        ('EpisodePlotMode', 'Sinopsis de episodios sin ver: ocultas',
+         'Sinopsis de episodios sin ver: visibles',
+         'Skin.HasSetting(medianoche.hideepisodeplots)'),
+    ):
+        variable = add(root, 'variable', name='MediaNoche.' + name)
+        add(variable, 'value', true_text, condition=condition)
+        add(variable, 'value', false_text)
 
 
 def build_home():
@@ -316,12 +361,19 @@ def build_home():
         top = 468 + index * 134
         node = button(controls, 601 + index, 70, top + 16, 250, 54, name,
                       f'ReplaceWindow({target})')
+        if identity in CONTINUE_ROWS:
+            node.find('label').text = f'$VAR[MediaNoche.Title{identity}]'
+            node.find('onclick').set('condition', '!Skin.HasSetting(medianoche.continuehome)')
+            add(node, 'onclick', f'ActivateWindow(Videos,{PLAYLISTS}{CONTINUE_ROWS[identity][0]},return)',
+                condition='Skin.HasSetting(medianoche.continuehome)')
         add(node, 'onright', identity, condition=f'Integer.IsGreater(Container({identity}).NumItems,0)')
         add(node, 'onfocus', f'SetProperty(MediaNoche.ActiveList,{identity})')
         add(node, 'onup', 601 + index - 1 if index else 301)
         add(node, 'ondown', 601 + index + 1 if index < 3 else 201)
         add(node, 'onback', 'SetFocus(301)')
-        label(controls, 90, top + 77, 230, 40, description, 'Small20', 'FF91A5BB')
+        label(controls, 90, top + 77, 230, 40,
+              f'$VAR[MediaNoche.Description{identity}]' if identity in CONTINUE_ROWS else description,
+              'Small20', 'FF91A5BB')
         listing = control(controls, 'list', 340, top, 1512, 120, identity)
         add(listing, 'orientation', 'horizontal')
         add(listing, 'preloaditems', '1')
@@ -351,8 +403,11 @@ def build_home():
             artwork.find('texture').set('fallback', 'DefaultVideo.png')
             add(artwork, 'aspectratio', 'keep')
             state_badges(layout, compact=True)
-        add(listing, 'content', PLAYLISTS + playlist, target='videos', limit='13')
-        empty = label(controls, 360, top + 35, 1400, 50, 'Todavía no hay títulos en esta fila.',
+        source = f'$VAR[MediaNoche.Source{identity}]' if identity in CONTINUE_ROWS else PLAYLISTS + playlist
+        add(listing, 'content', source, target='videos', limit='13')
+        empty = label(controls, 360, top + 35, 1400, 50,
+                      f'$VAR[MediaNoche.Empty{identity}]' if identity in CONTINUE_ROWS
+                      else 'Todavía no hay títulos en esta fila.',
                       'Tiny', 'FF91A5BB')
         add(empty, 'visible', f'!Container({identity}).IsUpdating + Integer.IsEqual(Container({identity}).NumItems,0)')
     image(controls, 70, 1014, 1780, 1, 'common/white.png', '4478B8E8')
@@ -367,10 +422,16 @@ def build_preferences():
     image(controls, 0, 0, 1920, 1080, 'common/white.png', 'FF080F18')
     label(controls, 110, 90, 1600, 90, 'Tu forma de ver la noche', 'Large', 'FFE5BC70')
     label(controls, 110, 200, 1600, 60, 'Elige el inicio que prefieres.', 'Small', 'FFC2CDD9')
+    label(controls, 110, 270, 1600, 40, '$VAR[MediaNoche.HomeMode]', 'Tiny', 'FF91A5BB')
     entries = [
         ('Inicio cinematográfico', ['Skin.Reset(medianoche.nativehome)', 'ReplaceWindow(1191)']),
         ('Inicio clásico', ['Skin.SetBool(medianoche.nativehome)', 'ReplaceWindow(Home)']),
         ('Ajustes del skin', ['ActivateWindow(SkinSettings)']),
+        ('Filas del inicio: catálogo',
+         ['Skin.Reset(medianoche.continuehome)', 'ReplaceWindow(1191)']),
+        ('Filas del inicio: continuar',
+         ['Skin.SetBool(medianoche.continuehome)', 'ReplaceWindow(1191)']),
+        ('$VAR[MediaNoche.EpisodePlotMode]', ['Skin.ToggleSetting(medianoche.hideepisodeplots)']),
     ]
     for index, (title, actions) in enumerate(entries):
         node = button(controls, 101 + index, 110, 340 + index * 110, 760, 86, title, actions[0])
