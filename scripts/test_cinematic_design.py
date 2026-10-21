@@ -6,7 +6,7 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 
-from cinematic_design import build_design, LIBRARIES
+from cinematic_design import build_design, ICONS, LIBRARIES
 
 
 def verify(upstream):
@@ -50,6 +50,22 @@ def verify(upstream):
                 assert (project / 'skin/playlists' / playlist).is_file(), playlist
                 ET.parse(project / 'skin/playlists' / playlist)
         assert set(windows) == {1190, 1191, 1192, 1193, 1194, 1195}
+        if (upstream / 'addon.xml').is_file():
+            for name in set(ICONS.values()) | {'eye.png', 'play2.png'}:
+                assert (upstream / 'extras/icons' / name).is_file(), name
+        variables = ET.parse(directory / 'Includes_MediaNoche.xml').getroot()
+        poster = variables.find("variable[@name='MediaNoche.Poster']")
+        assert [v.text for v in poster.findall('value')] == [
+            '$INFO[ListItem.Art(poster)]', '$INFO[ListItem.Art(tvshow.poster)]',
+            '$INFO[ListItem.Art(thumb)]', 'DefaultVideo.png']
+        for root in windows.values():
+            for icon in root.findall("controls/control[@type='image']"):
+                visible = icon.findtext('visible', '')
+                if 'Control.HasFocus(' in visible:
+                    identity = visible.split('Control.HasFocus(')[1].split(')')[0]
+                    target = root.find(f"controls/control[@id='{identity}']")
+                    assert target is not None and target.findtext('label')
+                    assert target.findtext('textoffsetx') == '54'
         home = windows[1191]
         assert len(home.findall("controls/control[@type='list']")) == 4
         assert all(c.get('limit') == '13' for c in home.findall('.//content'))
