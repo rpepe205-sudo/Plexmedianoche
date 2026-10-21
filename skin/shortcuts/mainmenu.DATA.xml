@@ -1,39 +1,66 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <shortcuts>
-    <shortcut>
-        <label>Inicio</label><label2>Common Shortcut</label2><defaultID>inicio</defaultID>
-        <icon>special://skin/extras/icons/home.png</icon><action>ActivateWindow(Home)</action>
-    </shortcut>
-    <shortcut>
-        <label>Favoritos</label><label2>Common Shortcut</label2><defaultID>favoritos</defaultID>
-        <icon>special://skin/extras/icons/favourites.png</icon><action>ActivateWindow(Favourites)</action>
-    </shortcut>
-    <shortcut>
-        <label>Series estrenos</label><label2>Common Shortcut</label2><defaultID>series_estrenos</defaultID>
-        <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/episodios-recientes.xsp,return)</action>
-    </shortcut>
-    <shortcut>
-        <label>Series</label><label2>Common Shortcut</label2><defaultID>series</defaultID>
-        <icon>special://skin/extras/icons/tv.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/series.xsp,return)</action>
-    </shortcut>
-    <shortcut>
-        <label>Cine</label><label2>Common Shortcut</label2><defaultID>cine</defaultID>
-        <icon>special://skin/extras/icons/film.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/cine.xsp,return)</action>
-    </shortcut>
-    <shortcut>
-        <label>Novedades cine</label><label2>Common Shortcut</label2><defaultID>novedades_cine</defaultID>
-        <icon>special://skin/extras/icons/recentlyadded.png</icon><action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/cine-reciente.xsp,return)</action>
-    </shortcut>
-    <shortcut>
-        <label>TV</label><label2>Common Shortcut</label2><defaultID>tv</defaultID>
-        <icon>special://skin/extras/icons/livetv.png</icon><action>ActivateWindow(Tvchannels)</action>
-    </shortcut>
-    <shortcut>
-        <label>Ajustes</label><label2>Common Shortcut</label2><defaultID>ajustes</defaultID>
-        <icon>special://skin/extras/icons/settings.png</icon><action>ActivateWindow(Settings)</action>
-    </shortcut>
-    <shortcut>
-        <label>Apagar</label><label2>Common Shortcut</label2><defaultID>apagar</defaultID>
-        <icon>special://skin/extras/icons/power.png</icon><action>ActivateWindow(shutdownmenu)</action>
-    </shortcut>
+  <shortcut>
+    <label>Inicio</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>inicio</defaultID>
+    <icon>special://skin/extras/icons/home.png</icon>
+    <action>ActivateWindow(1191)</action>
+  </shortcut>
+  <shortcut>
+    <label>Favoritos</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>favoritos</defaultID>
+    <icon>special://skin/extras/icons/favourites.png</icon>
+    <action>ActivateWindow(Favourites)</action>
+  </shortcut>
+  <shortcut>
+    <label>Series estrenos</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>series_estrenos</defaultID>
+    <icon>special://skin/extras/icons/recentlyadded.png</icon>
+    <action>ActivateWindow(1190)</action>
+  </shortcut>
+  <shortcut>
+    <label>Series</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>series</defaultID>
+    <icon>special://skin/extras/icons/tv.png</icon>
+    <action>ActivateWindow(1192)</action>
+  </shortcut>
+  <shortcut>
+    <label>Cine</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>cine</defaultID>
+    <icon>special://skin/extras/icons/film.png</icon>
+    <action>ActivateWindow(1193)</action>
+  </shortcut>
+  <shortcut>
+    <label>Novedades cine</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>novedades_cine</defaultID>
+    <icon>special://skin/extras/icons/recentlyadded.png</icon>
+    <action>ActivateWindow(1194)</action>
+  </shortcut>
+  <shortcut>
+    <label>TV</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>tv</defaultID>
+    <icon>special://skin/extras/icons/livetv.png</icon>
+    <action>ActivateWindow(Tvchannels)</action>
+  </shortcut>
+  <shortcut>
+    <label>Ajustes</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>ajustes</defaultID>
+    <icon>special://skin/extras/icons/settings.png</icon>
+    <action>ActivateWindow(Settings)</action>
+  </shortcut>
+  <shortcut>
+    <label>Apagar</label>
+    <label2>Common Shortcut</label2>
+    <defaultID>apagar</defaultID>
+    <icon>special://skin/extras/icons/power.png</icon>
+    <action>ActivateWindow(shutdownmenu)</action>
+  </shortcut>
 </shortcuts>

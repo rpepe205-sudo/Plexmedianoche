@@ -1,0 +1,86 @@
+# Diseño cinematográfico — Plex Media Noche 3.0.4~beta5
+
+## Qué incorpora el paquete
+
+| Pantalla | Diseño y contenido |
+| --- | --- |
+| Inicio | Cabecera con fanart y sinopsis del título seleccionado, marca, reloj y fecha reales; cuatro filas: Series, Cine, Series estrenos y Novedades cine. |
+| Series estrenos | Dos categorías a la izquierda: Series completas (finalizadas, últimas incorporaciones primero) y Episodios recientes. |
+| Series | Todas las series, Finalizadas y Episodios recientes. |
+| Cine | Todas las películas, Añadidas recientemente y Sin ver. |
+| Novedades cine | Últimas incorporaciones y Pendientes de ver. |
+| Fichas | Ventana nativa con fondo nocturno, fanart tenue, 20 botones con icono y texto persistente y foco dorado. |
+| Diseño | Elección entre inicio cinematográfico e inicio clásico; acceso a ajustes del skin. |
+| TV, Favoritos, ajustes y apagado | Accesos a las ventanas nativas de Kodi; la paleta nocturna ya se aplica al skin base. |
+
+Las carátulas conservan la proporción 2:3 y la categoría elegida queda marcada al explorar la fila. Los títulos, fanart, género, año, sinopsis, temporadas y episodios proceden de Kodi. No se incluyen carátulas de muestra, meteorología inventada ni supuestas fechas de sincronización.
+
+El inicio consulta hasta 13 elementos por fila (52 en total); las bibliotecas interiores conservan el catálogo completo. No se reproducen tráilers automáticamente. Se precarga un elemento por fila para contener el coste en Android TV.
+
+## Pulido de la beta 2
+
+Los menús conservan texto visible y añaden iconos nativos con colores de foco de alto contraste. Las carátulas muestran Visto o Continuar únicamente cuando Kodi proporciona ese estado; son indicadores de lectura, sin una nueva acción para marcar contenido visto.
+
+La carátula se obtiene por prioridad: poster del elemento, poster de la serie y miniatura. El fanart puede heredarse de la serie y el clearlogo solo aparece si existe. Se mantienen proporciones, datos reales y las acciones ya implementadas.
+
+## Estructura de la beta 3
+
+Cine y Series añaden accesos a Géneros y Años usando las entradas nativas MovieGenres/MovieYears y TvShowGenres/TvShowYears, presentes en Kodi Omega. Estos accesos abren la navegación de la biblioteca; no configuran rutas de archivos ni cuentas.
+
+La navegación del inicio puede recorrer los títulos de las cuatro filas aunque alguna esté vacía. Los saltos verticales entre carátulas comprueban si la fila vecina tiene contenido y vuelven a su título cuando está vacía. El pie de las bibliotecas vuelve a una categoría existente en vez de intentar enfocar una lista vacía. Se comprobaron estas referencias estáticamente; el ensayo con mando real sigue pendiente.
+
+Series estrenos conserva únicamente sus dos categorías: Series completas y Episodios recientes.
+
+## Barra superior de exploración de la beta 4
+
+Bloque compartido en Cine, Series y sus pantallas de novedades/estrenos. Cine ofrece Géneros, Estudios, Actores, Directores y Años. Series ofrece Géneros, Estudios, Actores y Años: Kodi Omega no proporciona un índice equivalente de directores de series en sus entradas rápidas nativas, por lo que no se añade un control sin destino verificado.
+
+Los destinos MovieGenres/Studios/Actors/Directors/Years y TvShowGenres/Studios/Actors/Years se contrastaron con GUIWindowVideoNav.cpp de Kodi Omega. Actores permite explorar la filmografía presente en la biblioteca; el resultado depende de los metadatos sincronizados.
+
+Los accesos abren índices de toda la biblioteca de Cine o Series, como indica la cabecera de la barra. No combinan criterios ni conservan automáticamente el filtro de finalizadas/novedades del carrusel. Las listas inteligentes con criterios combinados se concretarán con el usuario más adelante.
+
+Se sustituyen los anteriores accesos duplicados de Géneros/Años situados abajo a la izquierda. Arriba desde las carátulas o desde la primera categoría lleva a la barra; Abajo o Atrás desde la barra regresa a la categoría elegida. Se acorta la sinopsis y se recoloca el logo para reservar espacio, sin solapar la barra con el contenido.
+
+## Mejoras seleccionadas de la beta 5
+
+Tras revisar Estuary, Arctic Horizon 2 y Nimbus se añaden Continuar en Cine y Continuar episodios en Series, ordenados por última reproducción. Diseño permite elegir filas de catálogo o filas para continuar en las dos primeras posiciones del inicio; el catálogo sigue siendo el valor inicial.
+
+Diseño también permite ocultar sinopsis de episodios sin ver en nuestras cabeceras y fichas abiertas desde las carátulas. La opción solo oculta texto de episodios con playcount=0 y no cambia la biblioteca. Los títulos e imágenes siguen visibles.
+
+La barra de Cine incorpora Colecciones, que abre las agrupaciones existentes en Kodi. No crea metadatos. Series estrenos conserva sus dos categorías.
+
+La revisión de fuentes, alcance exacto y pruebas están documentados en [REVISION_SKINS_BETA5.md](REVISION_SKINS_BETA5.md). Rutas, sincronización y catch-up siguen pendientes de la sesión con el usuario.
+
+## Navegación y fichas
+
+- Las categorías de la izquierda abren su lista en la navegación nativa al aceptar. Derecha pasa a las carátulas y Atrás regresa a la categoría elegida.
+- Las carátulas de series abren las temporadas reales de la biblioteca. Las de películas y episodios consultan los detalles locales por ID y abren el diálogo nativo de Kodi con ruta, ID, carátulas y posición de reproducción.
+- El helper de fichas utiliza InfoTagVideo y Dialog.info disponibles en Kodi Omega; los campos solicitados se contrastaron con el esquema JSON-RPC de Omega. La reproducción concreta de las rutas PKC requiere prueba real.
+- Los botones nativos de Reproducir, Continuar y temporadas se conservan. El tráiler solo se ofrece con ListItem.Trailer.
+- Favoritos consulta y alterna el estado de Kodi, con lectura posterior para confirmar. No modifica listas del servidor Plex.
+- Inicio clásico conserva Home.xml original. La entrada cinematográfica se realiza mediante los includes de control inicial del Home, condicionada por la preferencia medianoche.nativehome. El cambio se revierte desde Diseño → Inicio clásico.
+
+## Verificación realizada
+
+- Sintaxis Python, XML y playlists.
+- Seis ventanas generadas con IDs sin colisiones con las ventanas del upstream fijado.
+- Fuentes contrastadas con Font.xml; controles dentro de 1920×1080; destinos de foco y playlists existentes.
+- Home.xml conservado; controles originales de la ficha intactos al añadir el fondo.
+- Cuatro pruebas de datos de fichas (rutas plugin, ID/resume/art, consulta de episodios, errores).
+- Cuatro pruebas de Favoritos (ciclo realista añadir/quitar con API simulada, nombres personalizados, ventanas de series y fallos).
+- Regresiones de los 19 IDs nativos de botones y visibilidad persistente de etiquetas.
+- GitHub Actions prepara el ZIP, valida todos los XML y comprueba la integridad del archivo. Consultar el resultado del run para el commit entregado.
+
+## Pendiente en el equipo del usuario
+
+No se ha ejecutado Kodi ni revisado visualmente este diseño en un render real de Kodi. runtime_tested sigue false y el PR permanece como borrador.
+
+Al llegar al PC, instalar el ZIP y probar primero el inicio, Diseño → Inicio clásico/cinematográfico, las categorías y la vuelta con mando. Después probar una película, una serie y un episodio con PKC, reanudación, favoritos, tráiler, subtítulos e IPTV; repetir en Xiaomi/Homatics para revisar legibilidad y rendimiento.
+
+Las rutas y la sincronización se dejan para esa sesión. El posible fallo previo de las series no está diagnosticado. Una fila vacía no demuestra que el skin esté roto: hay que comprobar la biblioteca y el registro de PKC. El filtro de finalizadas depende de que Kodi tenga status=Ended; no se deduce a partir de capítulos vistos ni garantiza que todos estén disponibles.
+
+## Instalación
+
+Descargar el artefacto Plex-Media-Noche-skin-Kodi-21-Omega de la compilación entregada. Extraerlo y, en Kodi, instalar el archivo interior PlexMediaNoche-skin-Omega.zip. El ZIP del código del repositorio y el contenedor exterior del artefacto no son el addon.
+
+La versión del fork es 3.0.4~beta5, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.

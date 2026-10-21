@@ -2,5 +2,6 @@
 <smartplaylist type="movies">
   <name>Cine</name>
   <match>all</match>
-  <order direction="descending">dateadded</order>
+  <order direction="ascending">sorttitle</order>
 </smartplaylist>
+

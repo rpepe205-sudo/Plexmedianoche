@@ -6,10 +6,19 @@ on:
     paths:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/shortcuts/**'
+      - 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
+      - 'scripts/cinematic_design.py'
+      - 'scripts/test_cinematic_design.py'
+      - 'scripts/test_video_details.py'
+      - 'scripts/test_video_info.py'
+      - 'scripts/test_favourites.py'
+      - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
+      - 'docs/DISENO_COMPLETO_OMEGA.md'
+      - 'docs/REVISION_SKINS_BETA5.md'
   push:
     branches:
       - main
@@ -17,15 +26,28 @@ on:
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/**'
+      - 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
       - 'skin/colors/**'
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
+      - 'scripts/cinematic_design.py'
+      - 'scripts/test_cinematic_design.py'
+      - 'scripts/test_video_details.py'
+      - 'scripts/test_video_info.py'
+      - 'scripts/test_favourites.py'
+      - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
+      - 'docs/DISENO_COMPLETO_OMEGA.md'
+      - 'docs/REVISION_SKINS_BETA5.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
       - 'README.md'
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   ARCTIC_SHA: 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51
@@ -53,6 +75,17 @@ jobs:
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
 
+      - name: Comprobar ciclo de favoritos y errores de la API local
+        run: python3 scripts/test_favourites.py
+
+      - name: Comprobar regresiones de fichas contra el upstream fijado
+        run: python3 scripts/test_video_info.py work/skin.arctic.zephyr.mod/1080i
+
+      - name: Comprobar navegación y datos del diseño cinematográfico
+        run: |
+          python3 scripts/test_cinematic_design.py work/skin.arctic.zephyr.mod
+          python3 scripts/test_video_details.py
+
       - name: Aplicar diseño nocturno y validar personalización
         run: |
           set -euo pipefail
@@ -74,6 +107,8 @@ jobs:
           unzip -t dist/PlexMediaNoche-skin-Omega.zip
           ls -lh dist/PlexMediaNoche-skin-Omega.zip
           cp docs/INSTALAR_Y_PROBAR.md dist/LEEME-INSTALACION.md
+          cp docs/DISENO_COMPLETO_OMEGA.md dist/LEEME-DISENO.md
+          cp docs/REVISION_SKINS_BETA5.md dist/REVISION_SKINS_BETA5.md
           printf '%s\n' "$ARCTIC_SHA" > dist/arctic-source-sha.txt
           cd dist
           sha256sum PlexMediaNoche-skin-Omega.zip > SHA256SUMS.txt
@@ -85,4 +120,5 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 14
+
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smartplaylist type="tvshows">
+  <name>Series completas · añadidas recientemente</name>
+  <match>all</match>
+  <rule field="status" operator="is">
+    <value>Ended</value>
+  </rule>
+  <order direction="descending">dateadded</order>
+</smartplaylist>
+
