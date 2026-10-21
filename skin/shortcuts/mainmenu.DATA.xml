@@ -5,7 +5,7 @@
     <label2>Common Shortcut</label2>
     <defaultID>inicio</defaultID>
     <icon>special://skin/extras/icons/home.png</icon>
-    <action>ActivateWindow(Home)</action>
+    <action>ActivateWindow(1191)</action>
   </shortcut>
   <shortcut>
     <label>Favoritos</label>
@@ -26,21 +26,21 @@
     <label2>Common Shortcut</label2>
     <defaultID>series</defaultID>
     <icon>special://skin/extras/icons/tv.png</icon>
-    <action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/series.xsp,return)</action>
+    <action>ActivateWindow(1192)</action>
   </shortcut>
   <shortcut>
     <label>Cine</label>
     <label2>Common Shortcut</label2>
     <defaultID>cine</defaultID>
     <icon>special://skin/extras/icons/film.png</icon>
-    <action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/cine.xsp,return)</action>
+    <action>ActivateWindow(1193)</action>
   </shortcut>
   <shortcut>
     <label>Novedades cine</label>
     <label2>Common Shortcut</label2>
     <defaultID>novedades_cine</defaultID>
     <icon>special://skin/extras/icons/recentlyadded.png</icon>
-    <action>ActivateWindow(Videos,special://skin/extras/playlists/medianoche/cine-reciente.xsp,return)</action>
+    <action>ActivateWindow(1194)</action>
   </shortcut>
   <shortcut>
     <label>TV</label>
