@@ -54,6 +54,21 @@ def verify(upstream):
             for name in set(ICONS.values()) | {'eye.png', 'play2.png'}:
                 assert (upstream / 'extras/icons' / name).is_file(), name
         variables = ET.parse(directory / 'Includes_MediaNoche.xml').getroot()
+        xml = ET.tostring(variables, encoding='unicode')
+        for playlist in re.findall(r'playlists/medianoche/([\w.-]+\.xsp)', xml):
+            assert (project / 'skin/playlists' / playlist).is_file(), playlist
+        for identity, source_type, name in (
+            (501, 'episodes', 'episodios-continuar.xsp'),
+            (502, 'movies', 'cine-continuar.xsp'),
+        ):
+            source = variables.find(f"variable[@name='MediaNoche.Source{identity}']")
+            assert source.find('value').get('condition') == 'Skin.HasSetting(medianoche.continuehome)'
+            assert source.findtext('value').endswith(name)
+            playlist = ET.parse(project / 'skin/playlists' / name).getroot()
+            assert playlist.get('type') == source_type
+            assert playlist.find("rule[@field='inprogress']").get('operator') == 'true'
+            assert playlist.findtext('order') == 'lastplayed'
+            assert playlist.find('limit') is None
         poster = variables.find("variable[@name='MediaNoche.Poster']")
         assert [v.text for v in poster.findall('value')] == [
             '$INFO[ListItem.Art(poster)]', '$INFO[ListItem.Art(tvshow.poster)]',
@@ -75,6 +90,14 @@ def verify(upstream):
         for identity in (501, 502, 503):
             assert len(home.findall(f"controls/control[@id='{identity}']/ondown")) == 2
         assert len(home.findall("controls/control[@type='list']")) == 4
+        assert len(LIBRARIES[1190][1]) == 2
+        for identity in (501, 502):
+            assert home.findtext(f"controls/control[@id='{identity}']/content") == (
+                f'$VAR[MediaNoche.Source{identity}]')
+        plot = variables.find("variable[@name='MediaNoche.HomePlot']")
+        assert any('medianoche.hideepisodeplots' in value.get('condition', '')
+                   and value.text == 'Sinopsis oculta para evitar spoilers.'
+                   for value in plot.findall('value'))
         assert all(c.get('limit') == '13' for c in home.findall('.//content'))
         for window_id, (_, categories) in LIBRARIES.items():
             root = windows[window_id]
@@ -89,6 +112,8 @@ def verify(upstream):
             if movie:
                 fields.append('Directors')
             fields.append('Years')
+            if movie:
+                fields.append('Sets')
             for index, field in enumerate(fields):
                 assert root.findtext(f"controls/control[@id='{401+index}']/onclick") == (
                     f'ActivateWindow(Videos,{prefix}{field},return)')
@@ -105,6 +130,9 @@ def verify(upstream):
         assert 'Skin.SetBool(medianoche.nativehome)' in preferences
         assert 'Skin.Reset(medianoche.nativehome)' in preferences
         assert 'ReplaceWindow(Home)' in preferences
+        assert 'Skin.SetBool(medianoche.continuehome)' in preferences
+        assert 'Skin.Reset(medianoche.continuehome)' in preferences
+        assert 'Skin.ToggleSetting(medianoche.hideepisodeplots)' in preferences
         print(report)
         print('PASS: six windows, routes, focus targets, fonts, bounds, Home preservation and classic mode')
 
