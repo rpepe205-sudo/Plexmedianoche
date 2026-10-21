@@ -8,6 +8,12 @@ import xml.etree.ElementTree as ET
 
 
 PLAYLISTS = 'special://skin/extras/playlists/medianoche/'
+ICONS = {
+    'Inicio': 'home.png', 'Series': 'tv.png', 'Cine': 'film.png',
+    'Series estrenos': 'recentlyadded.png', 'Novedades cine': 'recent.png',
+    'TV': 'livetv.png', 'Favoritos': 'favourites.png', 'Diseño': 'paintbrush.png',
+    'Ajustes': 'configure.png', 'Apagar': 'power.png',
+}
 LIBRARIES = {
     1190: ('Series estrenos', [
         ('Series completas', 'series-completas.xsp'),
@@ -76,7 +82,34 @@ def button(parent, identity, x, y, width, height, value, action):
     add(node, 'texturenofocus', 'common/white.png', colordiffuse='FF142130')
     add(node, 'texturefocus', 'common/white.png', colordiffuse='FFE5BC70')
     add(node, 'onclick', action)
+    if value in ICONS:
+        node.find('textoffsetx').text = '54'
+        # Icons are decoration; the button retains its text, ID and actions.
+        for focused, color in ((False, 'FFE5BC70'), (True, 'FF101820')):
+            icon = image(parent, x + 16, y + (height - 24) // 2, 24, 24,
+                         'special://skin/extras/icons/' + ICONS[value], color)
+            add(icon, 'visible', ('' if focused else '!') + f'Control.HasFocus({identity})')
     return node
+
+
+def state_badges(layout, compact=False):
+    conditions = (
+        ('ListItem.IsResumable', 'play2.png', 'Continuar'),
+        ('String.IsEqual(ListItem.Overlay,OverlayWatched.png) + !ListItem.IsResumable',
+         'eye.png', 'Visto'),
+    )
+    for condition, icon_name, text in conditions:
+        group = add(layout, 'control', type='group')
+        add(group, 'visible', condition)
+        if compact:
+            image(group, 66, 6, 24, 24, 'common/white.png', 'E6080F18')
+            image(group, 70, 10, 16, 16,
+                  'special://skin/extras/icons/' + icon_name, 'FFE5BC70')
+        else:
+            image(group, 31, 296, 218, 36, 'common/white.png', 'E6080F18')
+            image(group, 41, 304, 20, 20,
+                  'special://skin/extras/icons/' + icon_name, 'FFE5BC70')
+            label(group, 73, 296, 160, 36, text, 'Small20', 'FFFFFFFF')
 
 
 def save(path, root):
@@ -155,6 +188,18 @@ def build_library(template, window_id, title, categories):
         header = label(controls, 470, 548, 1050, 44, category, 'Small')
         add(header, 'visible', f'String.IsEqual(Window.Property(MediaNoche.SeriesCategory),{identity})')
     listing = controls.find("control[@id='50']")
+    for layout in (listing.find('itemlayout'), listing.find('focusedlayout')):
+        for texture in layout.findall("control[@type='image']/texture"):
+            if texture.text and 'ListItem.Art(poster)' in texture.text:
+                texture.text = '$VAR[MediaNoche.Poster]'
+        state_badges(layout)
+    for texture in controls.findall("control[@type='image']/texture"):
+        if texture.text == '$INFO[Container(50).ListItem.Art(fanart)]':
+            texture.text = '$VAR[MediaNoche.LibraryArt]'
+    clearlogo = image(controls, 1390, 365, 430, 100,
+                      '$INFO[Container(50).ListItem.Art(clearlogo)]')
+    add(clearlogo, 'aspectratio', 'keep')
+    add(clearlogo, 'visible', '!String.IsEmpty(Container(50).ListItem.Art(clearlogo))')
     add(listing, 'preloaditems', '1')
     item_actions(listing, 50)
     footer(controls, window_id, 50)
@@ -162,6 +207,17 @@ def build_library(template, window_id, title, categories):
 
 
 def home_variables(root):
+    poster = add(root, 'variable', name='MediaNoche.Poster')
+    for field in ('Art(poster)', 'Art(tvshow.poster)', 'Art(thumb)'):
+        add(poster, 'value', f'$INFO[ListItem.{field}]',
+            condition=f'!String.IsEmpty(ListItem.{field})')
+    add(poster, 'value', 'DefaultVideo.png')
+    for name, identity in [('LibraryArt', 50)] + [(f'Art{row[0]}', row[0]) for row in ROWS]:
+        variable = add(root, 'variable', name='MediaNoche.' + name)
+        for field in ('Art(fanart)', 'Art(tvshow.fanart)'):
+            add(variable, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
+                condition=f'!String.IsEmpty(Container({identity}).ListItem.{field})')
+        add(variable, 'value', '')
     fields = {
         'Title': 'Label', 'Plot': 'Plot', 'Art': 'Art(fanart)',
         'Year': 'Year', 'Genre': 'Genre',
@@ -169,7 +225,9 @@ def home_variables(root):
     for name, field in fields.items():
         variable = add(root, 'variable', name='MediaNoche.Home' + name)
         for identity, *_ in ROWS:
-            add(variable, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
+            value = (f'$VAR[MediaNoche.Art{identity}]' if name == 'Art'
+                     else f'$INFO[Container({identity}).ListItem.{field}]')
+            add(variable, 'value', value,
                 condition=(f'String.IsEqual(Window.Property(MediaNoche.ActiveList),{identity})'
                            f' + !String.IsEmpty(Container({identity}).ListItem.Label)'))
         add(variable, 'value', 'Buenas historias, siempre.' if name == 'Title' else '')
@@ -246,9 +304,10 @@ def build_home():
             layout = add(listing, tag, width='112', height='120')
             if tag == 'focusedlayout':
                 image(layout, 15, 0, 82, 120, 'common/white.png', 'FFE5BC70')
-            artwork = image(layout, 18, 3, 76, 114, '$INFO[ListItem.Art(poster)]')
+            artwork = image(layout, 18, 3, 76, 114, '$VAR[MediaNoche.Poster]')
             artwork.find('texture').set('fallback', 'DefaultVideo.png')
             add(artwork, 'aspectratio', 'keep')
+            state_badges(layout, compact=True)
         add(listing, 'content', PLAYLISTS + playlist, target='videos', limit='13')
         empty = label(controls, 360, top + 35, 1400, 50, 'Todavía no hay títulos en esta fila.',
                       'Tiny', 'FF91A5BB')
