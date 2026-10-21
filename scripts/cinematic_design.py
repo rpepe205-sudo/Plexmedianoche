@@ -150,6 +150,29 @@ def item_actions(container, identity):
         condition=f'[String.IsEqual({prefix}.DBType,movie) | String.IsEqual({prefix}.DBType,episode)] + !String.IsEmpty({prefix}.DBID)')
 
 
+def filter_bar(controls, movie):
+    """Native metadata indexes, scoped to the whole movie or series library."""
+    prefix = 'Movie' if movie else 'TvShow'
+    entries = [('Géneros', 'Genres'), ('Estudios', 'Studios'), ('Actores', 'Actors')]
+    if movie:
+        entries.append(('Directores', 'Directors'))
+    entries.append(('Años', 'Years'))
+    label(controls, 70, 412, 1780, 24,
+          'EXPLORAR TODA LA BIBLIOTECA DE ' + ('CINE' if movie else 'SERIES'),
+          'Small20', 'FF91A5BB')
+    stride = 360 if movie else 450
+    width = stride - 20
+    for index, (caption, suffix) in enumerate(entries):
+        identity = 401 + index
+        node = button(controls, identity, 70 + index * stride, 442, width, 58,
+                      caption, f'ActivateWindow(Videos,{prefix}{suffix},return)')
+        add(node, 'onleft', 401 + (index - 1) % len(entries))
+        add(node, 'onright', 401 + (index + 1) % len(entries))
+        add(node, 'ondown', 'SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])')
+        add(node, 'onup', identity)
+        add(node, 'onback', 'SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])')
+
+
 def build_library(template, window_id, title, categories):
     root = copy.deepcopy(template)
     root.set('id', str(window_id))
@@ -179,9 +202,8 @@ def build_library(template, window_id, title, categories):
         add(node, 'onfocus', f'SetProperty(MediaNoche.SeriesPlaylist,{PLAYLISTS}{playlist})')
         add(node, 'onfocus', f'SetProperty(MediaNoche.SeriesCategory,{identity})')
         node.find('onclick').text = f'ActivateWindow(Videos,{PLAYLISTS}{playlist},return)'
-        node.find('onup').text = str(101 + (index - 1) % len(categories))
-        node.find('ondown').text = str(identity + 1 if index + 1 < len(categories)
-                                      else (161 if window_id in (1192, 1193) else 201))
+        node.find('onup').text = str(identity - 1 if index else 401)
+        node.find('ondown').text = str(identity + 1 if index + 1 < len(categories) else 201)
         add(node, 'onback', 'ReplaceWindow(1191)')
         controls.append(node)
         marker = image(controls, 56, 608 + 76 * index, 4, 70, 'common/white.png', 'FFE5BC70')
@@ -197,26 +219,19 @@ def build_library(template, window_id, title, categories):
     for texture in controls.findall("control[@type='image']/texture"):
         if texture.text == '$INFO[Container(50).ListItem.Art(fanart)]':
             texture.text = '$VAR[MediaNoche.LibraryArt]'
-    clearlogo = image(controls, 1390, 365, 430, 100,
+    clearlogo = image(controls, 1390, 330, 430, 80,
                       '$INFO[Container(50).ListItem.Art(clearlogo)]')
     add(clearlogo, 'aspectratio', 'keep')
     add(clearlogo, 'visible', '!String.IsEmpty(Container(50).ListItem.Art(clearlogo))')
     add(listing, 'preloaditems', '1')
     item_actions(listing, 50)
-    if window_id in (1192, 1193):
-        label(controls, 70, 850, 350, 42, 'Más formas de explorar', 'Mini', 'FF91A5BB')
-        prefix = 'Movie' if window_id == 1193 else 'TvShow'
-        for identity, x, caption, destination in (
-            (161, 70, 'Géneros', prefix + 'Genres'),
-            (162, 255, 'Años', prefix + 'Years'),
-        ):
-            node = button(controls, identity, x, 908, 165, 70, caption,
-                          f'ActivateWindow(Videos,{destination},return)')
-            add(node, 'onup', 100 + len(categories))
-            add(node, 'ondown', 201)
-            add(node, 'onleft', 161 if identity == 162 else 101)
-            add(node, 'onright', 162 if identity == 161 else 101)
-            add(node, 'onback', 'ReplaceWindow(1191)')
+    for synopsis in controls.findall("control[@type='textbox']"):
+        synopsis.find('top').text = '345'
+        synopsis.find('height').text = '62'
+    for old in list(listing.findall('onup')):
+        listing.remove(old)
+    add(listing, 'onup', 401)
+    filter_bar(controls, movie=window_id in (1193, 1194))
     footer(controls, window_id, 101)
     return root
 
