@@ -8,7 +8,8 @@
 - Los dos modos de tráiler y su vista previa exigen ListItem.Trailer. No se usa una búsqueda IMDB/Bingie como sustituto de una fuente conocida.
 - Favoritos consulta Favourites.GetFavourites y utiliza Favourites.AddFavourite, cuya implementación en Kodi Omega alterna añadir/quitar. Vuelve a consultar para confirmar el cambio. Conserva los nombres personalizados al quitar. Las películas apuntan al archivo/plugin registrado por Kodi; las series abren temporadas en videodb. No cambia favoritos del servidor Plex.
 - Cine: catálogo completo por título de ordenación. Novedades cine: catálogo por fecha de incorporación descendente. No se aplica un límite de días.
-- Series completas: tipo tvshows, status is Ended, dateadded descendente. Episodios recientes es un apartado separado, conservando la playlist de episodios.
+- El menú principal conserva Series estrenos. Abre la ventana 1190, con Series completas y Episodios recientes como categorías a la izquierda y carátulas a la derecha. Aceptar sobre una categoría abre su playlist en la navegación nativa; las carátulas permiten abrir temporadas o reproducir episodios.
+- Series completas: tipo tvshows, status is Ended, dateadded descendente. Episodios recientes conserva la playlist de episodios.
 
 ## Semántica de Series completas
 
