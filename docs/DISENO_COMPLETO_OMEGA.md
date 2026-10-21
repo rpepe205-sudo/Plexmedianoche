@@ -1,4 +1,4 @@
-# Diseño cinematográfico — Plex Media Noche 3.0.4~beta1
+# Diseño cinematográfico — Plex Media Noche 3.0.4~beta2
 
 ## Qué incorpora el paquete
 
@@ -16,6 +16,12 @@
 Las carátulas conservan la proporción 2:3 y la categoría elegida queda marcada al explorar la fila. Los títulos, fanart, género, año, sinopsis, temporadas y episodios proceden de Kodi. No se incluyen carátulas de muestra, meteorología inventada ni supuestas fechas de sincronización.
 
 El inicio consulta hasta 13 elementos por fila (52 en total); las bibliotecas interiores conservan el catálogo completo. No se reproducen tráilers automáticamente. Se precarga un elemento por fila para contener el coste en Android TV.
+
+## Pulido de la beta 2
+
+Los menús conservan texto visible y añaden iconos nativos con colores de foco de alto contraste. Las carátulas muestran Visto o Continuar únicamente cuando Kodi proporciona ese estado; son indicadores de lectura, sin una nueva acción para marcar contenido visto.
+
+La carátula se obtiene por prioridad: poster del elemento, poster de la serie y miniatura. El fanart puede heredarse de la serie y el clearlogo solo aparece si existe. Se mantienen proporciones, datos reales y las acciones ya implementadas.
 
 ## Navegación y fichas
 
@@ -49,4 +55,4 @@ Las rutas y la sincronización se dejan para esa sesión. El posible fallo previ
 
 Descargar el artefacto Plex-Media-Noche-skin-Kodi-21-Omega de la compilación entregada. Extraerlo y, en Kodi, instalar el archivo interior PlexMediaNoche-skin-Omega.zip. El ZIP del código del repositorio y el contenedor exterior del artefacto no son el addon.
 
-La versión del fork es 3.0.4~beta1, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
+La versión del fork es 3.0.4~beta2, con ID skin.plexmedianoche; la base continúa fijada en Arctic Zephyr Reloaded 3.0.3, SHA 27b7bd7f31b8f111a8adfb21f9bbdce835ac3e51. Se mantienen dependencias y atribución originales. No se construye APK.
