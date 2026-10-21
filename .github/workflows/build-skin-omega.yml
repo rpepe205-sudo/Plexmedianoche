@@ -10,6 +10,8 @@ on:
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
       - 'scripts/test_video_info.py'
+      - 'scripts/test_favourites.py'
+      - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
   push:
     branches:
@@ -22,6 +24,8 @@ on:
       - 'skin/playlists/**'
       - 'scripts/prepare_skin.py'
       - 'scripts/test_video_info.py'
+      - 'scripts/test_favourites.py'
+      - 'skin/extras/**'
       - 'docs/INSTALAR_Y_PROBAR.md'
       - 'docs/PLAN_SKIN_EXISTENTE.md'
       - 'README.md'
@@ -54,6 +58,9 @@ jobs:
           test -n "$BASE"
           mkdir -p work
           cp -a "$(dirname "$BASE")" work/skin.arctic.zephyr.mod
+
+      - name: Comprobar ciclo de favoritos y errores de la API local
+        run: python3 scripts/test_favourites.py
 
       - name: Comprobar regresiones de fichas contra el upstream fijado
         run: python3 scripts/test_video_info.py work/skin.arctic.zephyr.mod/1080i
@@ -90,4 +97,5 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 14
+
 
