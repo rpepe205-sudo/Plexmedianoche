@@ -8,9 +8,12 @@ import re
 import shutil
 import xml.etree.ElementTree as ET
 
+from cinematic_design import build_design
+
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
+CUSTOM_VERSION = '3.0.4~beta1'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
@@ -168,6 +171,7 @@ def prepare(base, project):
     provenance = root.findtext("extension[@point='xbmc.addon.metadata']/source")
     root.set('id', NEW_ID)
     root.set('name', 'Plex Media Noche')
+    root.set('version', CUSTOM_VERSION)
     addon.write(addon_path, encoding='UTF-8', xml_declaration=True)
     for path in base.rglob('*'):
         if not path.is_file() or path == addon_path:
@@ -198,10 +202,6 @@ def prepare(base, project):
     if not all(ids) or len(set(ids)) != len(ids):
         raise ValueError('Missing or duplicate menu IDs')
 
-
-    hub_source = project / 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
-    ET.parse(hub_source)
-    shutil.copyfile(hub_source, base / '1080i/Custom_SeriesEstrenos_1190.xml')
 
     # Portable library entry points; PKC populates Kodi's own video database.
     playlist_source = project / 'skin/playlists'
@@ -251,7 +251,10 @@ def prepare(base, project):
     (base / 'extras').mkdir(exist_ok=True)
     shutil.copyfile(project / 'skin/extras/medianoche_favourites.py',
                     base / 'extras/medianoche_favourites.py')
+    shutil.copyfile(project / 'skin/extras/medianoche_info.py',
+                    base / 'extras/medianoche_info.py')
     video_info = prepare_video_info(base)
+    design = build_design(base, project)
     final = ET.parse(addon_path).getroot()
     if [dict(node.attrib) for node in final.findall('requires/import')] != dependencies:
         raise ValueError('Dependency declarations changed')
@@ -267,7 +270,7 @@ def prepare(base, project):
             'dependencies': dependencies, 'upstream_home_sha256': home_hash,
             'packaged_home_sha256': digest(home_path),
             'validated_xml_files': count, 'menu': LABELS,
-            'widget_initial_limit': 12, 'video_info': video_info,
+            'widget_initial_limit': 12, 'video_info': video_info, 'design': design,
             'runtime_tested': False}
 
 
