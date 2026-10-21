@@ -83,14 +83,18 @@ def verify(upstream):
             assert 'SetFocus($INFO[Window.Property(MediaNoche.SeriesCategory)])' in (
                 root.findtext("controls/control[@id='50']/onback"))
             assert root.findtext("controls/control[@id='201']/onup") == '101'
-            if window_id in (1192, 1193):
-                prefix = 'TvShow' if window_id == 1192 else 'Movie'
-                assert root.findtext("controls/control[@id='161']/onclick") == (
-                    f'ActivateWindow(Videos,{prefix}Genres,return)')
-                assert root.findtext("controls/control[@id='162']/onclick") == (
-                    f'ActivateWindow(Videos,{prefix}Years,return)')
-            else:
-                assert root.find("controls/control[@id='161']") is None
+            movie = window_id in (1193, 1194)
+            prefix = 'Movie' if movie else 'TvShow'
+            fields = ['Genres', 'Studios', 'Actors']
+            if movie:
+                fields.append('Directors')
+            fields.append('Years')
+            for index, field in enumerate(fields):
+                assert root.findtext(f"controls/control[@id='{401+index}']/onclick") == (
+                    f'ActivateWindow(Videos,{prefix}{field},return)')
+            assert root.find("controls/control[@id='161']") is None
+            assert root.findtext("controls/control[@id='50']/onup") == '401'
+            assert root.findtext("controls/control[@id='101']/onup") == '401'
         includes = ET.parse(directory / 'Includes.xml').getroot()
         for name in ('defaultcontroltrue', 'defaultcontrolfalse'):
             action = includes.find(f"include[@name='{name}']/onload")
