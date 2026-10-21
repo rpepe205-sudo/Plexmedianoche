@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
+LABELS = ['Inicio', 'Favoritos', 'Series completas', 'Episodios recientes', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
 
@@ -64,7 +64,7 @@ def prepare_video_info(base):
                         node.set(key, value.replace('$PARAM[color]', 'Dark4'))
                     control.append(node)
         values = {
-            'width': '350', 'height': '88', 'radioposx': '16',
+            'width': '390', 'height': '88', 'radioposx': '16',
             'radioposy': '20', 'radiowidth': '48', 'radioheight': '48',
             'font': 'Tiny', 'textcolor': 'FFFFFFFF',
             'focusedcolor': 'FF101820', 'disabledcolor': 'FF999999',
@@ -78,6 +78,8 @@ def prepare_video_info(base):
             node.text = value
         for node in control.findall('texturefocus'):
             node.set('colordiffuse', 'FFE5BC70')
+        for tag in ('textureradioonfocus', 'textureradioofffocus'):
+            control.find(tag).set('colordiffuse', 'FF101820')
         if control.get('id') == '9001':
             # The local details panel needs no third-party metadata service.
             for node in list(control.findall('onclick')):
@@ -106,7 +108,37 @@ def prepare_video_info(base):
         variable = ET.SubElement(root, 'variable', {'name': name})
         ET.SubElement(variable, 'value', {'condition': condition}).text = selected
         ET.SubElement(variable, 'value').text = fallback
+    favourite = copy.deepcopy(bar.find("control[@id='9001']"))
+    favourite.set('id', '9876')
+    for tag in ('onclick', 'onfocus', 'visible'):
+        for node in list(favourite.findall(tag)):
+            favourite.remove(node)
+    favourite.find('label').text = '$VAR[MediaNocheFavouriteLabel]'
+    for tag in ('textureradioonfocus', 'textureradioonnofocus',
+                'textureradioofffocus', 'textureradiooffnofocus',
+                'textureradiooffdisabled', 'textureradioondisabled'):
+        favourite.find(tag).text = 'special://skin/extras/icons/favourites.png'
+    supported = ('[String.IsEqual(ListItem.DBType,movie) | '
+                 'String.IsEqual(ListItem.DBType,tvshow)] + !String.IsEmpty(ListItem.DBID)')
+    script = ('RunScript(special://skin/extras/medianoche_favourites.py,'
+              '$INFO[ListItem.DBType],$INFO[ListItem.DBID],')
+    ET.SubElement(favourite, 'visible').text = supported
+    ET.SubElement(favourite, 'enable').text = (
+        'String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),added) | '
+        'String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),absent)')
+    ET.SubElement(favourite, 'onclick').text = script + 'toggle)'
+    bar.insert(list(bar).index(bar.find("control[@id='9001']")) + 1, favourite)
+    variable = ET.SubElement(root, 'variable', {'name': 'MediaNocheFavouriteLabel'})
+    ET.SubElement(variable, 'value', {
+        'condition': 'String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),added)',
+    }).text = 'Quitar de favoritos'
+    ET.SubElement(variable, 'value').text = 'Añadir a favoritos'
     tree.write(path, encoding='UTF-8', xml_declaration=True)
+    dialog_path = base / '1080i/DialogVideoInfo.xml'
+    dialog = ET.parse(dialog_path)
+    ET.SubElement(dialog.getroot(), 'onload').text = 'ClearProperty(MediaNoche.FavouriteState,home)'
+    ET.SubElement(dialog.getroot(), 'onload', {'condition': supported}).text = script + 'refresh)'
+    dialog.write(dialog_path, encoding='UTF-8', xml_declaration=True)
     preview_path = base / '1080i/Includes_DialogVideoInfo.xml'
     preview = ET.parse(preview_path)
     button = preview.getroot().find(".//control[@id='7011']")
@@ -118,9 +150,9 @@ def prepare_video_info(base):
         'condition': '!String.IsEmpty(ListItem.Trailer)',
     }).text = 'PlayMedia($INFO[ListItem.Trailer],1)'
     preview.write(preview_path, encoding='UTF-8', xml_declaration=True)
-    return {'buttons_with_persistent_labels': len(controls),
+    return {'buttons_with_persistent_labels': len(controls) + 1,
             'trailer_requires_listitem_source': True,
-            'favorites_button_implemented': False}
+            'favorites_button_implemented': True}
 
 
 def prepare(base, project):
@@ -212,6 +244,9 @@ def prepare(base, project):
     if found != set(replacements):
         raise ValueError(f'Upstream startup settings changed: {set(replacements) - found}')
     startup.write(startup_path, encoding='UTF-8', xml_declaration=True)
+    (base / 'extras').mkdir(exist_ok=True)
+    shutil.copyfile(project / 'skin/extras/medianoche_favourites.py',
+                    base / 'extras/medianoche_favourites.py')
     video_info = prepare_video_info(base)
     final = ET.parse(addon_path).getroot()
     if [dict(node.attrib) for node in final.findall('requires/import')] != dependencies:
