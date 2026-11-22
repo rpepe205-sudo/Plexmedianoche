@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smartplaylist type="tvshows">
+  <name>Temporadas nuevas</name>
+  <match>all</match>
+  <rule field="dateadded" operator="inthelast"><value>30 days</value></rule>
+  <order direction="descending">dateadded</order>
+</smartplaylist>

@@ -21,7 +21,8 @@ ICONS = 'special://skin/extras/icons/'
 INFO_SCRIPT = 'special://skin/extras/medianoche_info.py'
 FICHA_SCRIPT = 'special://skin/extras/medianoche_ficha.py'
 TRAILER_SCRIPT = 'special://skin/extras/medianoche_trailer.py'
-FAV_SCRIPT = 'special://skin/extras/medianoche_favourites.py'
+FAV_SCRIPT = 'special://skin/extras/medianoche_misfavoritos.py'
+DOWNLOAD_SCRIPT = 'special://skin/extras/medianoche_descargar.py'
 EXPLORE_SCRIPT = 'special://skin/extras/medianoche_explore.py'
 P = 'Window(home).Property'
 
@@ -50,7 +51,7 @@ DOCK = [  # etiqueta, icono, acción, ventana de la sección
     ('Series estrenos', 'recentlyadded.png', 'ReplaceWindow(1190)', '1190'),
     ('Series', 'tv.png', 'ReplaceWindow(1192)', '1192'),
     ('Cine', 'film.png', 'ReplaceWindow(1193)', '1193'),
-    ('Novedades cine', 'recent.png', 'ReplaceWindow(1194)', '1194'),
+    ('Estrenos cine', 'recent.png', 'ReplaceWindow(1194)', '1194'),
     ('TV', 'livetv.png', 'ActivateWindow(TVChannels)', ''),
     ('Ajustes', 'settings.png', 'ReplaceWindow(1195)', '1195'),
     ('Apagar', 'power.png', 'ActivateWindow(shutdownmenu)', ''),
@@ -62,6 +63,34 @@ LIB_DOWN = [('50', 'Integer.IsGreater(Container(50).NumItems,0)'),
 _C = 'Integer.IsGreater(Container(520).NumItems,0)'
 _R = 'Integer.IsGreater(Container(521).NumItems,0)'
 CONT_DOWN = [('520', _C), ('521', f'!{_C} + {_R}'), ('9100', f'!{_C} + !{_R}')]
+
+FAVS = 'special://profile/addon_data/skin.plexmedianoche/'
+GRIDS = {  # ventana: (título, tipo, [(pestaña, contenido)])
+    1192: ('Series', 'tvshow', [
+        ('Novedades', PLAYLISTS + 'series.xsp'),
+        ('Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp'),
+        ('Favoritos', FAVS + 'favoritos-tvshow.xsp'),
+        ('Géneros', 'videodb://tvshows/genres/'),
+        ('Continuar', PLAYLISTS + 'episodios-continuar.xsp'),
+    ]),
+    1193: ('Cine', 'movie', [
+        ('Novedades', PLAYLISTS + 'cine-reciente.xsp'),
+        ('Recomendadas', PLAYLISTS + 'cine-recomendadas.xsp'),
+        ('Favoritos', FAVS + 'favoritos-movie.xsp'),
+        ('Géneros', 'videodb://movies/genres/'),
+        ('Continuar', PLAYLISTS + 'cine-continuar.xsp'),
+    ]),
+    1194: ('Estrenos cine', 'movie', [
+        ('Estrenos', PLAYLISTS + 'cine-estrenos.xsp'),
+        ('Últimas añadidas', PLAYLISTS + 'cine-reciente.xsp'),
+        ('Sin ver', PLAYLISTS + 'cine-sin-ver.xsp'),
+    ]),
+    1190: ('Series estrenos', 'tvshow', [
+        ('Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp'),
+        ('Episodios recientes', PLAYLISTS + 'episodios-recientes.xsp'),
+        ('Finalizadas', PLAYLISTS + 'series-completas.xsp'),
+    ]),
+}
 
 HOME_ROWS = [  # id, pestaña, lista
     (501, 'Novedades cine', 'cine-reciente.xsp'),
@@ -297,7 +326,8 @@ def pill_button(controls, identity, x, y, w, text, icon, actions):
     add(node, 'font', 'MN_Button')
     add(node, 'textcolor', DARK)
     add(node, 'focusedcolor', DARK)
-    add(node, 'textoffsetx', '62')
+    add(node, 'textoffsetx', '40')
+    add(node, 'align', 'center')
     add(node, 'aligny', 'center')
     add(node, 'label', text)
     for action in actions:
@@ -309,7 +339,7 @@ def pill_button(controls, identity, x, y, w, text, icon, actions):
                visible=f'Control.HasFocus({identity})')
     controls.remove(glow)
     controls.insert(list(controls).index(node), glow)
-    img(controls, x + 26, y + 20, 24, 24, ICONS + 'play2.png', DARK, aspect='keep')
+    img(controls, x + 22, y + 20, 24, 24, ICONS + 'play2.png', DARK, aspect='keep')
     return node
 
 
@@ -605,52 +635,143 @@ def build_home():
 
 
 # --------------------------------------------------------------- bibliotecas
-def build_library(window_id, title, categories):
+def build_library(window_id, title, media, tabs):
+    """Cuadrícula de 5 columnas; a la izquierda, sinopsis, datos y tráiler del enfocado."""
+    path = 'Window.Property(MediaNoche.Path)'
     root = ET.Element('window', type='window', id=str(window_id))
     add(root, 'defaultcontrol', '101', always='true')
     add(root, 'onload', f'SetProperty(MediaNoche.Page,{window_id})')
-    add(root, 'onload', f'SetProperty(MediaNoche.Path,{PLAYLISTS}{categories[0][1]})',
+    add(root, 'onload', f'SetProperty(MediaNoche.Path,{tabs[0][1]})',
         condition='String.IsEmpty(Window.Property(MediaNoche.Path))')
     add(root, 'onload', 'SetProperty(MediaNoche.Cat,101)',
         condition='String.IsEmpty(Window.Property(MediaNoche.Cat))')
     add(root, 'onload', 'SetFocus($INFO[Window.Property(MediaNoche.Cat)])')
+    add(root, 'onload', 'AlarmClock(mn_rejilla,SetFocus(50),00:01,silent)')
     controls = add(root, 'controls')
     background(controls, '$VAR[MediaNoche.LibraryArt]')
+    img(controls, 0, 0, 1920, 1080, 'common/white.png', '73000000')
     header(controls)
-    hero_texts(controls, 'Container(50).ListItem', 150, title.upper(),
-               plot_hidden=hidden_episode_plot(50))
-    x = 80
-    for index, (name, playlist) in enumerate(categories):
-        width = 40 + len(name) * 11
+    prefix = 'Container(50).ListItem'
+    # Panel izquierdo.
+    lbl(controls, 80, 100, 560, 30, title.upper(), 'MN_Kicker', GOLD)
+    info = add(controls, 'control', type='group')
+    add(info, 'visible', 'Integer.IsGreater(Container(50).NumItems,0)')
+    logo = img(info, 80, 140, 560, 130, f'$INFO[{prefix}.Art(clearlogo)]', aspect='keep', fade='250',
+               visible=f'!String.IsEmpty({prefix}.Art(clearlogo))')
+    logo.find('aspectratio').set('align', 'left')
+    episode = f'String.IsEqual({prefix}.DBType,episode)'
+    no_logo = f'String.IsEmpty({prefix}.Art(clearlogo))'
+    lbl(info, 80, 136, 560, 140, f'$INFO[{prefix}.TVShowTitle]', 'MN_HeroM', WHITE,
+        aligny='top', wrap=True, visible=f'{no_logo} + {episode}')
+    lbl(info, 80, 136, 560, 140, f'$INFO[{prefix}.Label]', 'MN_HeroM', WHITE,
+        aligny='top', wrap=True, visible=f'{no_logo} + !{episode}')
+    lbl(info, 80, 284, 560, 32,
+        f'$INFO[{prefix}.Year]$INFO[{prefix}.Duration(mins),  ·  , min]$INFO[{prefix}.Rating,  ·  ★ ]',
+        'MN_Meta', MUTED, visible=f'!{episode}')
+    lbl(info, 80, 284, 560, 32,
+        f'T$INFO[{prefix}.Season]  ·  E$INFO[{prefix}.Episode]  ·  $INFO[{prefix}.Label]',
+        'MN_Meta', MUTED, visible=episode)
+    lbl(info, 80, 318, 560, 30, f'$INFO[{prefix}.Genre]', 'MN_Small', FAINT)
+    hero_badges(info, prefix, 80, 356)
+    box = textbox(info, 80, 404, 560, 290, f'$INFO[{prefix}.Plot]', 'MN_Small')
+    add(box, 'visible', f'![{hidden_episode_plot(50)}]')
+    add(box, 'autoscroll', '6000,4000,2', time='3000', delay='6000', repeat='8000')
+    lbl(info, 80, 404, 560, 32, 'Sinopsis oculta para evitar spoilers.', 'MN_Small', FAINT,
+        visible=hidden_episode_plot(50))
+    folder = f'String.IsEqual({prefix}.DBType,genre)'
+    play = [(f'RunScript({FICHA_SCRIPT},play,$INFO[{prefix}.DBType],$INFO[{prefix}.DBID])',
+             f'!String.IsEqual({prefix}.DBType,tvshow) + !{folder}'),
+            (f'RunScript({FICHA_SCRIPT},tvshow,$INFO[{prefix}.DBID])', f'String.IsEqual({prefix}.DBType,tvshow)'),
+            (f'SetProperty(MediaNoche.Path,$INFO[{prefix}.FolderPath])', folder)]
+    img(controls, 80, 712, 560, 1, 'common/white.png', '66E5BC70')
+    media_item = f'!String.IsEmpty({prefix}.DBID) + !{folder}'
+    b = pill_button(controls, 801, 80, 736, 230, 'Reproducir', 'play2.png', play)
+    nav(b, right=802, up=101, down=9100)
+    b = round_button(controls, 802, 330, 736, 'film.png',
+                     [f'RunScript({TRAILER_SCRIPT},$ESCINFO[{prefix}.Trailer])'])
+    nav(b, left=801, right=804, up=101, down=9100)
+    b = round_button(controls, 804, 414, 736, 'favourites.png',
+                     [f'RunScript({FAV_SCRIPT},$INFO[{prefix}.DBType],$INFO[{prefix}.DBID],toggle)'])
+    nav(b, left=802, right=805, up=101, down=9100)
+    b = round_button(controls, 805, 498, 736, 'download.png',
+                     [f'RunScript({DOWNLOAD_SCRIPT},$INFO[{prefix}.DBType],$INFO[{prefix}.DBID])'])
+    nav(b, left=804, right=803, up=101, down=9100)
+    b = round_button(controls, 803, 582, 736, 'info.png',
+                     [(f'RunScript({FICHA_SCRIPT},$INFO[{prefix}.DBType],$INFO[{prefix}.DBID])',
+                       f'!String.IsEqual({prefix}.DBType,episode)'),
+                      (f'RunScript({INFO_SCRIPT},episode,$INFO[{prefix}.DBID])', episode)])
+    nav(b, left=805, right=50, up=101, down=9100)
+    lbl(controls, 80, 810, 560, 30,
+        'Reproducir  ·  Tráiler  ·  Favorito  ·  Descargar  ·  Ficha', 'MN_Tiny', FAINT,
+        visible='[Control.HasFocus(801) | Control.HasFocus(802) | Control.HasFocus(803) | Control.HasFocus(804) | Control.HasFocus(805)]')
+    # Pestañas encima de la cuadrícula.
+    x = 690
+    for index, (name, content) in enumerate(tabs):
+        width = 40 + len(name) * 12
         identity = 101 + index
         selected = f'String.IsEqual(Window.Property(MediaNoche.Cat),{identity})'
-        node = tab(controls, identity, x, 568, width, name, selected,
-                   focus=[f'SetProperty(MediaNoche.Path,{PLAYLISTS}{playlist})',
+        node = tab(controls, identity, x, 96, width, name, selected,
+                   focus=[f'SetProperty(MediaNoche.Path,{content})',
                           f'SetProperty(MediaNoche.Cat,{identity})'])
-        nav(node, left=identity - 1 if index else 401,
-            right=identity + 1 if index + 1 < len(categories) else 401, down=LIB_DOWN)
-        x += width + 24
-    explore = ctrl(controls, 'button', 1600, 571, 240, 48, 401)
-    add(explore, 'texturefocus', MEDIA + 'pill.png', colordiffuse=GOLD, border='32')
-    add(explore, 'texturenofocus', MEDIA + 'pill.png', colordiffuse='1CFFFFFF', border='32')
-    add(explore, 'font', 'MN_Tab')
-    add(explore, 'textcolor', WHITE)
-    add(explore, 'focusedcolor', DARK)
-    add(explore, 'align', 'center')
-    add(explore, 'aligny', 'center')
-    add(explore, 'label', 'Explorar')
-    add(explore, 'onclick', f'RunScript({EXPLORE_SCRIPT},{"movie" if window_id in (1193, 1194) else "tvshow"})')
-    nav(explore, left=100 + len(categories), right=101, down=LIB_DOWN)
-    count = lbl(controls, 1240, 520, 600, 30, '$INFO[Container(50).NumItems,, títulos]',
+        nav(node, left=identity - 1 if index else 801,
+            right=identity + 1 if index + 1 < len(tabs) else identity, down=LIB_DOWN)
+        x += width + 22
+    count = lbl(controls, 1340, 100, 500, 40, '$INFO[Container(50).NumItems,, títulos]',
                 'MN_Small', FAINT, 'right')
     add(count, 'visible', 'Integer.IsGreater(Container(50).NumItems,0)')
-    listing = poster_list(controls, 50, 70, 625, 1780, '$INFO[Window.Property(MediaNoche.Path)]')
-    nav(listing, up='SetFocus($INFO[Window.Property(MediaNoche.Cat)])', down=9100)
-    item_click(listing)
-    lbl(controls, 90, 700, 1400, 60, 'Cargando tu biblioteca…', 'MN_Body', FAINT,
+    # Cuadrícula.
+    pw, ph, cw, chh = 186, 279, 234, 320
+    grid = ctrl(controls, 'panel', 690, 156, 1170, 830, 50)
+    add(grid, 'orientation', 'vertical')
+    add(grid, 'scrolltime', '220', tween='cubic', easing='out')
+    add(grid, 'preloaditems', '2')
+    nav(grid, up='SetFocus($INFO[Window.Property(MediaNoche.Cat)])', left=801, down=9100)
+    for tag in ('itemlayout', 'focusedlayout'):
+        layout = add(grid, tag, width=str(cw), height=str(chh))
+        focused = tag == 'focusedlayout'
+        cx, cy = (cw - pw) // 2, 22
+        centre = f'{cx + pw // 2},{cy + ph // 2}'
+        if focused:
+            on = 'Control.HasFocus(50)'
+            halo = img(layout, cx - 30, cy - 30, pw + 60, ph + 60, MEDIA + 'glow.png', '80E5BC70',
+                       border='60', visible=on)
+            zoom(halo, 106, centre)
+            frame = img(layout, cx - 6, cy - 6, pw + 12, ph + 12, MEDIA + 'round14.png', GOLD,
+                        border='14', visible=on)
+            zoom(frame, 106, centre)
+        art = img(layout, cx, cy, pw, ph, '$VAR[MediaNoche.Poster]',
+                  None if focused else 'B3FFFFFF', diffuse=MEDIA + 'mask_poster.png',
+                  aspect='scale', background=True)
+        art.find('texture').set('fallback', 'DefaultVideo.png')
+        if focused:
+            zoom(art, 106, centre)
+        # Géneros y carpetas: tarjeta con el nombre.
+        lbl(layout, cx + 10, cy + 10, pw - 20, ph - 20, '$INFO[ListItem.Label]', 'MN_Head', WHITE,
+            align='center', wrap=True, visible='String.IsEqual(ListItem.DBType,genre)')
+        check = img(layout, cx + pw - 36, cy + 8, 28, 28, MEDIA + 'check.png',
+                    visible='ListItem.IsWatched | String.IsEqual(ListItem.Overlay,OverlayWatched.png)')
+        if focused:
+            zoom(check, 106, centre)
+        bar = ctrl(layout, 'progress', cx + 12, cy + ph - 16, pw - 24, 5)
+        add(bar, 'texturebg', 'common/white.png', colordiffuse='59FFFFFF')
+        add(bar, 'midtexture', 'common/white.png', colordiffuse=GOLD)
+        add(bar, 'info', 'ListItem.PercentPlayed')
+        add(bar, 'visible', 'ListItem.IsResumable')
+    add(grid, 'content', f'$INFO[{path}]', target='videos')
+    item_click(grid)
+    add(grid, 'onclick', f'SetProperty(MediaNoche.Path,$INFO[{prefix}.FolderPath])',
+        condition=f'String.IsEqual({prefix}.DBType,genre)')
+    genres = 'videodb://movies/genres/' if media == 'movie' else 'videodb://tvshows/genres/'
+    add(grid, 'onback', f'SetProperty(MediaNoche.Path,{genres})',
+        condition=f'String.StartsWith({path},{genres}) + !String.IsEqual({path},{genres})')
+    lbl(controls, 700, 400, 1100, 60, 'Cargando tu biblioteca…', 'MN_Body', FAINT,
         visible='Container(50).IsUpdating')
-    lbl(controls, 90, 700, 1400, 60, 'Todavía no hay títulos en esta categoría.', 'MN_Body', FAINT,
-        visible='!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)')
+    empty = lbl(controls, 700, 400, 1100, 60, 'Todavía no hay títulos aquí.', 'MN_Body', FAINT,
+                visible='!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)')
+    lbl(controls, 700, 450, 1100, 60,
+        'En la ficha de una película o serie, pulsa el corazón para añadirla.', 'MN_Small', FAINT,
+        visible='!Container(50).IsUpdating + Integer.IsEqual(Container(50).NumItems,0)'
+                ' + String.Contains(Window.Property(MediaNoche.Path),favoritos-)')
     dock(controls, str(window_id), 50)
     return root
 
@@ -672,6 +793,7 @@ def build_preferences():
         ('Inicio premium', ['Skin.Reset(medianoche.nativehome)', 'ReplaceWindow(1191)']),
         ('Inicio clásico', ['Skin.SetBool(medianoche.nativehome)', 'ReplaceWindow(Home)']),
         ('$VAR[MediaNoche.EpisodePlotMode]', ['Skin.ToggleSetting(medianoche.hideepisodeplots)']),
+        ('Carpeta de descargas', ['Skin.SetPath(medianoche.descargas)']),
     ]
     for index, (text, actions) in enumerate(entries):
         identity = 101 + index
@@ -772,8 +894,11 @@ def build_ficha():
         visible='String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),added)')
     b = round_button(controls, 1204, x + 448, 510, 'info.png',
                      [f'RunScript({INFO_SCRIPT},movie,$INFO[{P}({f}.DBID)])'])
-    nav(b, left=1203, down=1301)
-    lbl(controls, x + 540, 510, 600, 64, f'$INFO[{P}({f}.EndTime)]', 'MN_Small', FAINT)
+    nav(b, left=1203, right=1205, down=1301)
+    b = round_button(controls, 1205, x + 532, 510, 'download.png',
+                     [f'RunScript({DOWNLOAD_SCRIPT},movie,$INFO[{P}({f}.DBID)])'])
+    nav(b, left=1204, down=1301)
+    lbl(controls, x + 624, 510, 560, 64, f'$INFO[{P}({f}.EndTime)]', 'MN_Small', FAINT)
     tabs = (('Reparto', 1301), ('Parecidas', 1302), ('Detalles', 1303))
     tx = x
     for index, (name, identity) in enumerate(tabs):
@@ -832,13 +957,16 @@ def build_serie():
         visible='String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),added)')
     b = round_button(controls, 1204, x + 488, 676, 'info.png',
                      [f'RunScript({INFO_SCRIPT},tvshow,$INFO[{P}({s}.DBID)])'])
-    nav(b, left=1203, right=300)
+    nav(b, left=1203, right=1205)
+    b = round_button(controls, 1205, x + 572, 676, 'download.png',
+                     [f'RunScript({DOWNLOAD_SCRIPT},tvshow,$INFO[{P}({s}.DBID)])'])
+    nav(b, left=1204, right=300)
     person_row(controls, s, x - 15, 790, 4, 'true')
     # Temporadas (pestañas) y episodios.
     seasons = ctrl(controls, 'list', 830, 70, 1000, 60, 300)
     add(seasons, 'orientation', 'horizontal')
     add(seasons, 'scrolltime', '200')
-    nav(seasons, left=1204, down=310, up=310)
+    nav(seasons, left=1205, down=310, up=310)
     for tag in ('itemlayout', 'focusedlayout'):
         layout = add(seasons, tag, width='250', height='60')
         current = tag == 'focusedlayout'
@@ -950,10 +1078,10 @@ def apply(base, project):
     directory = base / '1080i'
     make_textures(base / 'extras/medianoche')
     install_fonts(base, project)
-    for window_id, (title, categories) in LIBRARIES.items():
+    for window_id, (title, media, tabs) in GRIDS.items():
         filename = ('Custom_SeriesEstrenos_1190.xml' if window_id == 1190
                     else f'Custom_MediaNoche_{window_id}.xml')
-        save(directory / filename, build_library(window_id, title, categories))
+        save(directory / filename, build_library(window_id, title, media, tabs))
     save(directory / 'Custom_MediaNoche_1191.xml', build_home())
     save(directory / 'Custom_MediaNoche_1195.xml', build_preferences())
     save(directory / 'Custom_MediaNoche_1196.xml', build_ficha())
@@ -963,7 +1091,8 @@ def apply(base, project):
     variables(includes)
     save(includes_path, includes)
     fix_focus_colours(base)
-    for name in ('medianoche_ficha.py', 'medianoche_explore.py'):
+    for name in ('medianoche_ficha.py', 'medianoche_explore.py', 'medianoche_misfavoritos.py',
+                 'medianoche_descargar.py'):
         shutil.copyfile(project / 'skin/extras' / name, base / 'extras' / name)
     return {'premium_windows': [1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197],
             'fonts': [name for name, _, _ in FONTS], 'dock_items': len(DOCK)}

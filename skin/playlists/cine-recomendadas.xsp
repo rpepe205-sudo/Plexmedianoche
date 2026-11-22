@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smartplaylist type="movies">
+  <name>Recomendadas</name>
+  <match>all</match>
+  <rule field="playcount" operator="is"><value>0</value></rule>
+  <rule field="rating" operator="greaterthan"><value>7</value></rule>
+  <order direction="descending">rating</order>
+</smartplaylist>

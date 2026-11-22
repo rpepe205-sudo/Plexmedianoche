@@ -51,6 +51,7 @@ def check(base):
             assert (base / path).is_file(), (name, path)
         for path in re.findall(r'playlists/medianoche/([\w.-]+\.xsp)', xml):
             assert (base / 'extras/playlists/medianoche' / path).is_file(), (name, path)
+        # Las pestañas de Favoritos apuntan a listas que se crean al marcar el primero.
         for variable in re.findall(r'\$VAR\[([\w.]+)\]', xml):
             assert f'name="{variable}"' in includes, (name, variable)
         if window_id != 1196 and window_id != 1197:
@@ -58,11 +59,11 @@ def check(base):
             assert dock is not None, name
             labels = [i.findtext('label') for i in dock.find('content')]
             assert labels == ['Inicio', 'Favoritos', 'Series estrenos', 'Series', 'Cine',
-                              'Novedades cine', 'TV', 'Ajustes', 'Apagar'], labels
+                              'Estrenos cine', 'TV', 'Ajustes', 'Apagar'], labels
     home = ET.parse(directory / WINDOWS[1191]).getroot()
     assert len([c for c in home.iter('control') if c.get('type') == 'list' and c.get('id', '').startswith('50')]) == 6
     for script in ('medianoche_ficha.py', 'medianoche_explore.py', 'medianoche_trailer.py',
-                   'medianoche_favourites.py', 'medianoche_info.py'):
+                   'medianoche_misfavoritos.py', 'medianoche_info.py'):
         assert (base / 'extras' / script).is_file(), script
     print('PASS: 8 pantallas premium, barra inferior, saltos del mando, fuentes y texturas')
 

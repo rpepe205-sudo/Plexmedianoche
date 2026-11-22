@@ -288,6 +288,20 @@ class Scene:
                     self.paste(canvas, self.texture(tex.text, bw, bh, tex.get('border')), cx, y, tex.get('colordiffuse'))
                     self.draw_text(canvas, cx + 12, y, bw, bh, label, b.findtext('font'), 'FFFFFFFF')
                     cx += bw + int(c.findtext('itemgap', '0'))
+            elif kind == 'panel':
+                items = self.items.get(c.get('id'), [])
+                cx = cy = 0
+                for index, item in enumerate(items):
+                    layout = c.find('focusedlayout' if index == 0 else 'itemlayout')
+                    lw, lh = int(layout.get('width')), int(layout.get('height'))
+                    if cx + lw > w:
+                        cx, cy = 0, cy + lh
+                    if cy + lh > h + lh // 2:
+                        break
+                    self.item = item
+                    self.render_controls(canvas, layout, x + cx, y + cy)
+                    self.item = None
+                    cx += lw
             elif kind == 'list':
                 ident = c.get('id')
                 items = self.items.get(ident, [])
