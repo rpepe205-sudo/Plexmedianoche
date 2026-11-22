@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'skin/extras/**'
+      - 'skin/fonts/**'
+      - 'scripts/**'
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/shortcuts/**'
       - 'skin/1080i/Custom_SeriesEstrenos_1190.xml'
@@ -23,6 +26,9 @@ on:
     branches:
       - main
     paths:
+      - 'skin/extras/**'
+      - 'skin/fonts/**'
+      - 'scripts/**'
       - '.github/workflows/build-skin-omega.yml'
       - 'skin/1080i/Home.xml'
       - 'skin/shortcuts/**'
@@ -90,7 +96,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
+          python3 -m pip install --quiet pillow
           python3 scripts/prepare_skin.py work/skin.arctic.zephyr.mod --report dist/validacion-skin.json
+          python3 scripts/test_premium_design.py work/skin.arctic.zephyr.mod
 
       - name: Renombrar carpeta del addon y validar estructura de instalación
         run: |

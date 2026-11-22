@@ -54,6 +54,9 @@ def _make_room(listing, normal, focused):
 
 def _polish_list(listing):
     changed = False
+    focused_mark = listing.find('focusedlayout')
+    if focused_mark is not None and focused_mark.get('medianoche') == 'resaltado':
+        return False
     if listing.find('scrolltime') is None:
         _sub(listing, 'scrolltime', SCROLL_TIME, tween='cubic', easing='out')
         changed = True

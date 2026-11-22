@@ -12,11 +12,12 @@ TRAILER_ACTION = 'RunScript(special://skin/extras/medianoche_trailer.py,$ESCINFO
 
 from cinematic_design import build_design
 import fluidez_resaltado
+import premium_design
 
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-CUSTOM_VERSION = '3.0.4~beta6'
+CUSTOM_VERSION = '3.1.0~beta7'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
@@ -281,6 +282,7 @@ def prepare(base, project):
                     base / 'extras/medianoche_pkc.py')
     video_info = prepare_video_info(base)
     design = build_design(base, project)
+    design['premium'] = premium_design.apply(base, project)
     design['fluidez_resaltado'] = fluidez_resaltado.apply(base)
     final = ET.parse(addon_path).getroot()
     if [dict(node.attrib) for node in final.findall('requires/import')] != dependencies:
