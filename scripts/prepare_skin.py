@@ -8,6 +8,8 @@ import re
 import shutil
 import xml.etree.ElementTree as ET
 
+TRAILER_ACTION = 'RunScript(special://skin/extras/medianoche_trailer.py,$ESCINFO[ListItem.Trailer])'
+
 from cinematic_design import build_design
 
 
@@ -101,8 +103,8 @@ def prepare_video_info(base):
             ET.SubElement(control, 'visible').text = (
                 condition + ' + !String.IsEmpty(ListItem.Trailer)'
                 ' + !Skin.HasSetting(hidebutton.video.trailer)')
-            ET.SubElement(control, 'onclick').text = (
-                'PlayMedia($INFO[ListItem.Trailer],1)' if windowed else 'SendClick(11)')
+            # Tráiler a pantalla completa con salida segura (Atrás lo para).
+            ET.SubElement(control, 'onclick').text = TRAILER_ACTION
     # Static labels live on each button, independent of Control.HasFocus.
     for name, condition, selected, fallback in (
         ('MediaNochePlayLabel', 'ListItem.IsResumable', 'Continuar', 'Reproducir'),
@@ -151,8 +153,14 @@ def prepare_video_info(base):
         button.remove(node)
     ET.SubElement(button, 'onclick', {
         'condition': '!String.IsEmpty(ListItem.Trailer)',
-    }).text = 'PlayMedia($INFO[ListItem.Trailer],1)'
+    }).text = TRAILER_ACTION
     preview.write(preview_path, encoding='UTF-8', xml_declaration=True)
+    includes_path = base / '1080i/Includes.xml'
+    includes_text = includes_path.read_text(encoding='utf-8')
+    old_click = '<onclick>PlayMedia($INFO[ListItem.Trailer],1)</onclick>'
+    if old_click in includes_text:
+        includes_path.write_text(includes_text.replace(
+            old_click, '<onclick>' + TRAILER_ACTION + '</onclick>'), encoding='utf-8')
     return {'buttons_with_persistent_labels': len(controls) + 1,
             'trailer_requires_listitem_source': True,
             'favorites_button_implemented': True}
@@ -260,6 +268,8 @@ def prepare(base, project):
                     base / 'extras/medianoche_favourites.py')
     shutil.copyfile(project / 'skin/extras/medianoche_info.py',
                     base / 'extras/medianoche_info.py')
+    shutil.copyfile(project / 'skin/extras/medianoche_trailer.py',
+                    base / 'extras/medianoche_trailer.py')
     video_info = prepare_video_info(base)
     design = build_design(base, project)
     final = ET.parse(addon_path).getroot()
