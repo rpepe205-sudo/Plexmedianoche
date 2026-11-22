@@ -3,12 +3,27 @@
 - Si el tráiler es de YouTube y no está el addon, avisa en vez de colgarse.
 - Si no arranca en 20 s, cierra la espera y avisa.
 - Al pulsar Atrás, para el tráiler y vuelve a la ficha.
+- Si se pulsa Stop (o termina) y a los 3 s no ha vuelto, vuelve solo.
 """
 import sys
 import time
 
 START_TIMEOUT = 20
 POLL = 0.5
+RETURN_DELAY = 3
+
+
+def ensure_back(xbmc, monitor, dbtype, dbid, from_info):
+    """Tras parar, si a los 3 s sigue sin volver, forzar la vuelta a la ficha."""
+    if monitor.waitForAbort(RETURN_DELAY):
+        return
+    if xbmc.getCondVisibility('Window.IsActive(fullscreenvideo)'):
+        xbmc.executebuiltin('Action(Back)')
+        monitor.waitForAbort(0.5)
+    if (from_info and dbtype in ('movie', 'episode') and dbid.isdigit()
+            and not xbmc.getCondVisibility('Window.IsVisible(movieinformation)')):
+        xbmc.executebuiltin('RunScript(special://skin/extras/medianoche_info.py,'
+                            '{},{})'.format(dbtype, dbid))
 
 
 def needs_youtube(url):
@@ -31,6 +46,9 @@ def main():
         notify('Para ver tráilers instala el addon de YouTube.')
         return
 
+    from_info = xbmc.getCondVisibility('Window.IsVisible(movieinformation)')
+    dbtype = xbmc.getInfoLabel('ListItem.DBType')
+    dbid = xbmc.getInfoLabel('ListItem.DBID')
     player = xbmc.Player()
     monitor = xbmc.Monitor()
     player.play(url)
@@ -54,10 +72,12 @@ def main():
                 if player.isPlaying():
                     player.stop()
                 notify('No se pudo cargar el tráiler.')
+                ensure_back(xbmc, monitor, dbtype, dbid, from_info)
                 return
         else:
             if not playing:
-                return  # terminó solo
+                ensure_back(xbmc, monitor, dbtype, dbid, from_info)
+                return  # Stop o terminó solo
             try:
                 if playing_file and player.getPlayingFile() != playing_file:
                     return  # el usuario puso otra cosa: no tocar
@@ -68,6 +88,7 @@ def main():
                 saw_fullscreen = True
             elif saw_fullscreen:
                 player.stop()  # pulsó Atrás: parar y volver a la ficha
+                ensure_back(xbmc, monitor, dbtype, dbid, from_info)
                 return
             elif time.time() - start > 3:
                 xbmc.executebuiltin('ActivateWindow(fullscreenvideo)')
