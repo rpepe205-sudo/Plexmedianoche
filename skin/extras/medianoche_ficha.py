@@ -184,6 +184,7 @@ def show_props(detail, episodes, seasons, all_item=False):
         'PlayLabel': 'Reproducir',
         'NextInfo': '',
         'NextFile': '',
+        'NextDBID': '',
         'SeasonPos': '0',
     }
     if nxt:
@@ -196,6 +197,7 @@ def show_props(detail, episodes, seasons, all_item=False):
         left = runtime_text(total_time - position) if in_progress and total_time else ''
         props['NextInfo'] = 'T{} · E{}'.format(season, number) + (' · quedan ' + left if left else '')
         props['NextFile'] = nxt.get('file', '')
+        props['NextDBID'] = str(nxt.get('episodeid', ''))
         ordered = sorted(int(x.get('season', 0)) for x in seasons)
         if season in ordered:
             props['SeasonPos'] = str(ordered.index(season) + (1 if all_item else 0))
@@ -228,7 +230,7 @@ def main():
     def clear(prefix):
         keys = ['Title', 'Kicker', 'Rating', 'Meta', 'Plot', 'Credits', 'Details', 'File',
                 'Trailer', 'TrailerEsc', 'PlayLabel', 'EndTime', 'Poster', 'Fanart',
-                'SimilarPath', 'Watched', 'Bucket', 'NextInfo', 'NextFile', 'SeasonPos', 'DBID']
+                'SimilarPath', 'Watched', 'Bucket', 'NextInfo', 'NextFile', 'NextDBID', 'SeasonPos', 'DBID']
         keys += ['Badge{}'.format(i) for i in range(1, 4)]
         keys += ['Cast{}.{}'.format(i, part) for i in range(1, 9) for part in ('Name', 'Role', 'Thumb')]
         for key in keys:
@@ -241,10 +243,8 @@ def main():
             if media == 'tvshow':
                 action, sys.argv[2] = 'tvshow', str(dbid)
             else:
-                kind = 'Movie' if media == 'movie' else 'Episode'
-                detail = rpc('VideoLibrary.Get{}Details'.format(kind),
-                             {media + 'id': dbid, 'properties': ['file']})[media + 'details']
-                xbmc.executebuiltin('PlayMedia("{}",resume)'.format(detail['file']))
+                # Reproducir como elemento de la biblioteca (así lo espera PlexKodiConnect).
+                rpc('Player.Open', {'item': {media + 'id': dbid}, 'options': {'resume': True}})
                 return
         dbid = int(sys.argv[2])
         if action == 'movie':

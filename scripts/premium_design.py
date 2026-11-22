@@ -920,7 +920,7 @@ def build_ficha():
     textbox(controls, x, 310, 1150, 132, f'$INFO[{P}({f}.Plot)]')
     lbl(controls, x, 452, 1250, 34, f'$INFO[{P}({f}.Credits)]', 'MN_Small', MUTED)
     b = pill_button(controls, 1201, x, 510, 260, f'$INFO[{P}({f}.PlayLabel)]', 'play2.png',
-                    [f'PlayMedia("$INFO[{P}({f}.File)]",resume)'])
+                    [f'RunScript({FICHA_SCRIPT},play,movie,$INFO[{P}({f}.DBID)])'])
     nav(b, right=1202, down=1301)
     b = text_button(controls, 1202, x + 280, 512, 'Tráiler', 'film.png',
                     [f'RunScript({TRAILER_SCRIPT},$INFO[{P}({f}.TrailerEsc)])'])
@@ -979,7 +979,7 @@ def build_serie():
         img(controls, x, 532, int(640 * pct / 100), 4, 'common/white.png', GOLD,
             visible=f'String.IsEqual({P}({s}.Bucket),{pct})')
     b = pill_button(controls, 1201, x, 566, 300, f'$INFO[{P}({s}.PlayLabel)]', 'play2.png',
-                    [f'PlayMedia("$INFO[{P}({s}.NextFile)]",resume)'])
+                    [f'RunScript({FICHA_SCRIPT},play,episode,$INFO[{P}({s}.NextDBID)])'])
     nav(b, right=1202, up=300, down=1203)
     b = text_button(controls, 1202, x + 316, 566, 'Tráiler', 'film.png',
                     [f'RunScript({TRAILER_SCRIPT},$INFO[{P}({s}.TrailerEsc)])'])
@@ -1013,7 +1013,7 @@ def build_serie():
     add(episodes, 'orientation', 'vertical')
     add(episodes, 'scrolltime', '220', tween='cubic', easing='out')
     nav(episodes, left=1201, up=300)
-    add(episodes, 'onclick', 'PlayMedia($ESCINFO[ListItem.FileNameAndPath],resume)')
+    add(episodes, 'onclick', f'RunScript({FICHA_SCRIPT},play,episode,$INFO[ListItem.DBID])')
     for tag in ('itemlayout', 'focusedlayout'):
         big = tag == 'focusedlayout'
         layout = add(episodes, tag, width='1010', height='250' if big else '122')
