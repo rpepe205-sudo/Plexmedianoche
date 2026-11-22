@@ -58,8 +58,8 @@ def check(base):
             dock = root.find(".//control[@id='9100']")
             assert dock is not None, name
             labels = [i.findtext('label') for i in dock.find('content')]
-            assert labels == ['Inicio', 'Favoritos', 'Series estrenos', 'Series', 'Cine',
-                              'Estrenos cine', 'TV', 'Ajustes', 'Apagar'], labels
+            assert labels == ['Inicio', 'Mi lista', 'Series', 'Cine', 'Estrenos', 'TV',
+                              'Ajustes', 'Apagar'], labels
     home = ET.parse(directory / WINDOWS[1191]).getroot()
     assert len([c for c in home.iter('control') if c.get('type') == 'list' and c.get('id', '').startswith('50')]) == 6
     for script in ('medianoche_ficha.py', 'medianoche_explore.py', 'medianoche_trailer.py',
