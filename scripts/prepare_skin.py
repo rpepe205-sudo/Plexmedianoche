@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 TRAILER_ACTION = 'RunScript(special://skin/extras/medianoche_trailer.py,$ESCINFO[ListItem.Trailer])'
 
 from cinematic_design import build_design
+import fluidez_resaltado
 
 
 OLD_ID = 'skin.arctic.zephyr.mod'
@@ -272,6 +273,7 @@ def prepare(base, project):
                     base / 'extras/medianoche_trailer.py')
     video_info = prepare_video_info(base)
     design = build_design(base, project)
+    design['fluidez_resaltado'] = fluidez_resaltado.apply(base)
     final = ET.parse(addon_path).getroot()
     if [dict(node.attrib) for node in final.findall('requires/import')] != dependencies:
         raise ValueError('Dependency declarations changed')
