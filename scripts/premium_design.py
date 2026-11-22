@@ -322,21 +322,21 @@ def round_button(controls, identity, x, y, icon, actions, visible=None):
 
 
 def tab(controls, identity, x, y, w, text, selected, actions=(), focus=()):
+    """Pestaña de texto: el botón es invisible y el texto lo pintan etiquetas."""
     node = ctrl(controls, 'button', x, y, w, 50, identity)
     add(node, 'texturefocus', '')
     add(node, 'texturenofocus', '')
     add(node, 'font', 'MN_Tab')
-    add(node, 'textcolor', FAINT)
-    add(node, 'focusedcolor', WHITE)
-    add(node, 'textoffsetx', '0')
-    add(node, 'aligny', 'center')
+    add(node, 'textcolor', '00FFFFFF')
+    add(node, 'focusedcolor', '00FFFFFF')
     add(node, 'label', text)
     for action in actions:
         add(node, 'onclick', action)
     for action in focus:
         add(node, 'onfocus', action)
-    lbl(controls, x, y, w, 50, text, 'MN_Tab', WHITE,
-        visible=f'{selected} + !Control.HasFocus({identity})')
+    active = f'[{selected} | Control.HasFocus({identity})]'
+    lbl(controls, x, y, w, 50, text, 'MN_Tab', WHITE, visible=active)
+    lbl(controls, x, y, w, 50, text, 'MN_Tab', FAINT, visible=f'!{active}')
     img(controls, x, y + 50, w - 20, 3, 'common/white.png', GOLD, visible=selected)
     img(controls, x, y + 50, w - 20, 3, 'common/white.png', '80FFFFFF',
         visible=f'Control.HasFocus({identity}) + !{selected}')
@@ -438,6 +438,11 @@ def build_home():
         add(group, 'visible', f'String.IsEqual({row},{identity})')
         hero_texts(group, f'Container({identity}).ListItem', 150, name.upper(), plot=True,
                    plot_hidden=hidden_episode_plot(identity))
+        empty = add(group, 'control', type='group')
+        add(empty, 'visible', f'!Container({identity}).IsUpdating + Integer.IsEqual(Container({identity}).NumItems,0)')
+        lbl(empty, 80, 180, 1150, 140, 'BUENAS HISTORIAS, SIEMPRE', 'MN_Hero', WHITE)
+        lbl(empty, 80, 325, 1150, 34, 'Cuando PlexKodiConnect sincronice tu biblioteca, tus títulos aparecerán aquí.',
+            'MN_Meta', MUTED)
     # Botones del destacado.
     play = []
     more = []
@@ -547,7 +552,7 @@ def build_preferences():
     header(controls)
     lbl(controls, 80, 150, 1000, 30, 'AJUSTES', 'MN_Kicker', GOLD)
     lbl(controls, 80, 180, 1400, 140, 'TU FORMA DE VER LA NOCHE', 'MN_HeroM', WHITE)
-    lbl(controls, 80, 320, 1400, 34, '$VAR[MediaNoche.HomeMode]', 'MN_Meta', MUTED)
+    lbl(controls, 80, 320, 1400, 34, 'Elige tu inicio y entra en los ajustes de Kodi o del skin.', 'MN_Meta', MUTED)
     entries = [
         ('Ajustes de Kodi', ['ActivateWindow(Settings)']),
         ('Ajustes del skin', ['ActivateWindow(SkinSettings)']),
