@@ -212,6 +212,15 @@ def install_fonts(base, project):
         shutil.copyfile(path, base / 'fonts' / path.name)
     font_xml = base / '1080i/Font.xml'
     tree = ET.parse(font_xml)
+    # ZIP ligero: fuera el juego de letras chino-coreano (51 MB) que no se usa;
+    # en algunos Android TV un ZIP tan pesado cierra Kodi al instalarlo.
+    for fontset in list(tree.getroot().findall('fontset')):
+        if fontset.get('id', '').startswith('CJK'):
+            tree.getroot().remove(fontset)
+    used = {n.text for n in tree.getroot().iter('filename')}
+    for path in (base / 'fonts').glob('InterCJK*'):
+        if path.name not in used:
+            path.unlink()
     for fontset in tree.getroot().findall('fontset'):
         for name, filename, size in FONTS:
             font = add(fontset, 'font')

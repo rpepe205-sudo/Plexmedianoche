@@ -17,7 +17,7 @@ import premium_design
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-CUSTOM_VERSION = '3.1.0~beta8'
+CUSTOM_VERSION = '3.1.0~beta9'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
