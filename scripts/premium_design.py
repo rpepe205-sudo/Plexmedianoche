@@ -558,7 +558,8 @@ def wide_list(controls, identity, x, y, w, content, visible=None):
 def build_home():
     """Inicio: destacado arriba y filas de arriba abajo; cada fila avanza a izquierda y derecha."""
     root = ET.Element('window', type='window', id='1191')
-    add(root, 'defaultcontrol', '400', always='true')
+    # Empieza en el menú de abajo: siempre se puede usar aunque las filas sigan cargando.
+    add(root, 'defaultcontrol', '9100', always='true')
     add(root, 'onload', 'SetProperty(MediaNoche.Page,1191)')
     add(root, 'onload', 'SetFocus($INFO[Window.Property(MediaNoche.Row)])',
         condition='!String.IsEmpty(Window.Property(MediaNoche.Row))')
@@ -767,7 +768,7 @@ def build_library(window_id, title, media, tabs):
         add(bar, 'midtexture', 'common/white.png', colordiffuse=GOLD)
         add(bar, 'info', 'ListItem.PercentPlayed')
         add(bar, 'visible', 'ListItem.IsResumable')
-    add(grid, 'content', f'$INFO[{path}]', target='videos')
+    add(grid, 'content', f'$INFO[{path}]', target='videos', limit='400')
     item_click(grid)
     add(grid, 'onclick', f'SetProperty(MediaNoche.Path,$INFO[{prefix}.FolderPath])',
         condition=f'String.IsEqual({prefix}.DBType,genre)')
