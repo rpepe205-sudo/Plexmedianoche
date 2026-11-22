@@ -61,7 +61,7 @@ def check(base):
             assert labels == ['Inicio', 'Mi lista', 'Series', 'Cine', 'Estrenos', 'TV',
                               'Ajustes', 'Apagar'], labels
     home = ET.parse(directory / WINDOWS[1191]).getroot()
-    assert len([c for c in home.iter('control') if c.get('type') == 'list' and c.get('id', '').startswith('50')]) == 6
+    assert len([c for c in home.iter('control') if c.get('type') == 'list' and c.get('id', '').startswith('50')]) == 4
     for script in ('medianoche_ficha.py', 'medianoche_explore.py', 'medianoche_trailer.py',
                    'medianoche_misfavoritos.py', 'medianoche_info.py'):
         assert (base / 'extras' / script).is_file(), script

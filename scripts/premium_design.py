@@ -64,6 +64,7 @@ _R = 'Integer.IsGreater(Container(521).NumItems,0)'
 CONT_DOWN = [('520', _C), ('521', f'!{_C} + {_R}'), ('9100', f'!{_C} + !{_R}')]
 
 FAVS = 'special://profile/addon_data/skin.plexmedianoche/'
+LISTAS = 'plugin://plugin.video.medianoche/'
 GRIDS = {  # ventana: (título, tipo, [(pestaña, contenido)])
     1190: ('Mi lista', 'movie', [
         ('Todo', 'plugin://plugin.video.medianoche/?lista=milista'),
@@ -91,16 +92,41 @@ GRIDS = {  # ventana: (título, tipo, [(pestaña, contenido)])
     ]),
 }
 
-LISTAS = 'plugin://plugin.video.medianoche/'
-HOME_ROWS = [  # id, fila, contenido, forma
+HOME_ROWS = [  # id, fila, contenido, forma  (solo novedades: carga rápida)
     (520, 'Continuar viendo', LISTAS + '?lista=continuar', 'wide'),
+    (504, 'Novedades series', PLAYLISTS + 'series.xsp', 'poster'),
+    (503, 'Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp', 'poster'),
     (501, 'Novedades cine', PLAYLISTS + 'cine-reciente.xsp', 'poster'),
     (502, 'Estrenos', PLAYLISTS + 'cine-estrenos.xsp', 'poster'),
-    (503, 'Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp', 'poster'),
-    (504, 'Novedades series', PLAYLISTS + 'series.xsp', 'poster'),
-    (505, 'Mi lista', LISTAS + '?lista=milista', 'poster'),
-    (506, 'Recomendadas', PLAYLISTS + 'cine-recomendadas.xsp', 'poster'),
 ]
+
+# Cada sección: filas de arriba abajo que se deslizan a izquierda y derecha.
+SECTION_ROWS = {
+    1192: ('Series', [
+        (620, 'Continuar viendo', PLAYLISTS + 'episodios-continuar.xsp', 'wide'),
+        (621, 'Novedades', PLAYLISTS + 'series.xsp', 'poster'),
+        (622, 'Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp', 'poster'),
+        (623, 'Mi lista', FAVS + 'favoritos-tvshow.xsp', 'poster'),
+    ]),
+    1193: ('Cine', [
+        (630, 'Continuar viendo', PLAYLISTS + 'cine-continuar.xsp', 'wide'),
+        (631, 'Novedades', PLAYLISTS + 'cine-reciente.xsp', 'poster'),
+        (632, 'Recomendadas', PLAYLISTS + 'cine-recomendadas.xsp', 'poster'),
+        (633, 'Estrenos', PLAYLISTS + 'cine-estrenos.xsp', 'poster'),
+        (634, 'Mi lista', FAVS + 'favoritos-movie.xsp', 'poster'),
+    ]),
+    1194: ('Estrenos', [
+        (640, 'Estrenos', PLAYLISTS + 'cine-estrenos.xsp', 'poster'),
+        (641, 'Últimas añadidas', PLAYLISTS + 'cine-reciente.xsp', 'poster'),
+        (642, 'Sin ver', PLAYLISTS + 'cine-sin-ver.xsp', 'poster'),
+    ]),
+    1190: ('Mi lista', [
+        (650, 'Todo', LISTAS + '?lista=milista', 'poster'),
+        (651, 'Películas', FAVS + 'favoritos-movie.xsp', 'poster'),
+        (652, 'Series', FAVS + 'favoritos-tvshow.xsp', 'poster'),
+    ]),
+}
+ALL_ROWS = HOME_ROWS + [r for _, rows in SECTION_ROWS.values() for r in rows]
 
 
 # ---------------------------------------------------------------- utilidades
@@ -447,7 +473,7 @@ def poster_list(controls, identity, x, y, w, content, visible=None, small=False)
         add(bar, 'midtexture', 'common/white.png', colordiffuse=GOLD)
         add(bar, 'info', 'ListItem.PercentPlayed')
         add(bar, 'visible', 'ListItem.IsResumable')
-    add(listing, 'content', content, target='videos', limit='15')
+    add(listing, 'content', content, target='videos', limit='20')
     if visible:
         add(listing, 'visible', visible)
     return listing
@@ -549,25 +575,26 @@ def wide_list(controls, identity, x, y, w, content, visible=None):
         add(bar, 'midtexture', 'common/white.png', colordiffuse=GOLD)
         add(bar, 'info', 'ListItem.PercentPlayed')
         add(bar, 'visible', 'ListItem.IsResumable')
-    add(listing, 'content', content, target='videos', limit='15')
+    add(listing, 'content', content, target='videos', limit='20')
     if visible:
         add(listing, 'visible', visible)
     return listing
 
 
-def build_home():
+def build_home(window_id='1191', rows_cfg=None, section=None):
     """Inicio: destacado arriba y filas de arriba abajo; cada fila avanza a izquierda y derecha."""
-    root = ET.Element('window', type='window', id='1191')
+    rows_cfg = rows_cfg or HOME_ROWS
+    root = ET.Element('window', type='window', id=str(window_id))
     # Empieza en el menú de abajo: siempre se puede usar aunque las filas sigan cargando.
     add(root, 'defaultcontrol', '9100', always='true')
-    add(root, 'onload', 'SetProperty(MediaNoche.Page,1191)')
+    add(root, 'onload', f'SetProperty(MediaNoche.Page,{window_id})')
     add(root, 'onload', 'SetFocus($INFO[Window.Property(MediaNoche.Row)])',
         condition='!String.IsEmpty(Window.Property(MediaNoche.Row))')
     controls = add(root, 'controls')
     background(controls, '$VAR[MediaNoche.HeroArt]')
     header(controls)
     row = 'Window.Property(MediaNoche.Row)'
-    for identity, name, _, _ in HOME_ROWS:
+    for identity, name, _, _ in rows_cfg:
         prefix = f'Container({identity}).ListItem'
         group = add(controls, 'control', type='group')
         add(group, 'visible', f'String.IsEqual({row},{identity}) + Integer.IsGreater(Container({identity}).NumItems,0)')
@@ -591,15 +618,15 @@ def build_home():
         add(box, 'visible', f'![{hidden_episode_plot(identity)}]')
     welcome = add(controls, 'control', type='group')
     add(welcome, 'visible', 'String.IsEmpty(Window.Property(MediaNoche.Row))')
-    lbl(welcome, 80, 124, 1200, 124, 'BUENAS HISTORIAS, SIEMPRE', 'MN_HeroM', WHITE)
-    lbl(welcome, 80, 256, 1300, 32, 'Baja con el mando para recorrer tus filas.', 'MN_Meta', MUTED)
+    lbl(welcome, 80, 124, 1200, 124, (section or 'Buenas historias, siempre').upper(), 'MN_HeroM', WHITE)
+    lbl(welcome, 80, 256, 1300, 32, 'Sube con el mando para recorrer las filas.', 'MN_Meta', MUTED)
     # Filas en una columna que se desplaza sola al bajar.
     rows = ctrl(controls, 'grouplist', 0, 420, 1920, 556, 400)
     add(rows, 'orientation', 'vertical')
     add(rows, 'itemgap', '6')
     add(rows, 'scrolltime', '260', tween='cubic', easing='out')
     add(rows, 'ondown', '9100')
-    for identity, name, source, kind in HOME_ROWS:
+    for identity, name, source, kind in rows_cfg:
         wide = kind == 'wide'
         height = 186 if wide else 316
         block = add(rows, 'control', type='group')
@@ -613,7 +640,7 @@ def build_home():
         else:
             listing = poster_list(block, identity, 70, 30, 1780, source, small=True)
         add(listing, 'onfocus', f'SetProperty(MediaNoche.Row,{identity})')
-        ids = [r[0] for r in HOME_ROWS]
+        ids = [r[0] for r in rows_cfg]
         here = ids.index(identity)
         for tag, others, fallback in (('ondown', ids[here + 1:], '9100'), ('onup', ids[:here][::-1], None)):
             skipped = []
@@ -640,7 +667,7 @@ def build_home():
         if source.startswith('plugin://'):
             hint = lbl(block, 90, 100, 1400, 40, 'Necesita el complemento «Media Noche · Listas».', 'MN_Tiny', FAINT)
             add(hint, 'visible', '!System.HasAddon(plugin.video.medianoche)')
-    listing = dock(controls, '1191', 400)
+    listing = dock(controls, str(window_id), 400)
     for node in list(listing.findall('onup')):
         listing.remove(node)
     add(listing, 'onup', 'SetFocus($INFO[Window.Property(MediaNoche.Row)])',
@@ -1033,13 +1060,13 @@ def variables(root):
     add(fav, 'value', 'En mi lista', condition='String.IsEqual(Window(home).Property(MediaNoche.FavouriteState),added)')
     add(fav, 'value', 'Mi lista')
     hero = add(root, 'variable', name='MediaNoche.HeroArt')
-    for identity, *_ in HOME_ROWS:
+    for identity, *_ in ALL_ROWS:
         on = f'String.IsEqual(Window.Property(MediaNoche.Row),{identity})'
         for field in ('Art(fanart)', 'Art(tvshow.fanart)'):
             add(hero, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
                 condition=f'{on} + !String.IsEmpty(Container({identity}).ListItem.{field})')
     add(hero, 'value', '')
-    for identity, *_ in HOME_ROWS:
+    for identity, *_ in ALL_ROWS:
         logo = add(root, 'variable', name=f'MediaNoche.Logo{identity}')
         for field in ('Art(clearlogo)', 'Art(tvshow.clearlogo)'):
             add(logo, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
@@ -1089,7 +1116,8 @@ def apply(base, project):
     for window_id, (title, media, tabs) in GRIDS.items():
         filename = ('Custom_SeriesEstrenos_1190.xml' if window_id == 1190
                     else f'Custom_MediaNoche_{window_id}.xml')
-        save(directory / filename, build_library(window_id, title, media, tabs))
+        title_rows, rows = SECTION_ROWS[window_id]
+        save(directory / filename, build_home(str(window_id), rows, title_rows))
     save(directory / 'Custom_MediaNoche_1191.xml', build_home())
     save(directory / 'Custom_MediaNoche_1195.xml', build_preferences())
     save(directory / 'Custom_MediaNoche_1196.xml', build_ficha())

@@ -17,7 +17,7 @@ import premium_design
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-CUSTOM_VERSION = '3.3.0~beta15'
+CUSTOM_VERSION = '3.3.0~beta16'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
@@ -303,6 +303,27 @@ def prepare(base, project):
             'runtime_tested': False}
 
 
+def slim_assets(base):
+    """ZIP más ligero: algunas cajas Android se cierran al abrir ZIP grandes.
+
+    Quita idiomas que no se usan y cambia imágenes grandes de Arctic que este
+    diseño no enseña por una imagen mínima (mismo nombre, nada se rompe).
+    """
+    import shutil
+    from PIL import Image
+    for folder in (base / 'language').iterdir():
+        if folder.name not in ('resource.language.en_gb', 'resource.language.es_es'):
+            shutil.rmtree(folder)
+    tiny = [base / 'media/common/floor.png', base / 'media/common/trailerwindow.png',
+            base / 'media/pvr/background.jpg']
+    tiny += list((base / 'extras/views').rglob('*.jpg')) + list((base / 'extras/views').rglob('*.png'))
+    tiny += list((base / 'resources').glob('screenshot*'))
+    for path in tiny:
+        if path.is_file():
+            Image.new('RGBA' if path.suffix == '.png' else 'RGB', (4, 4), (0, 0, 0, 0) if path.suffix == '.png' else (4, 7, 12)).save(path)
+    return len(tiny)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('base', type=Path)
@@ -310,6 +331,7 @@ if __name__ == '__main__':
     parser.add_argument('--report', type=Path, required=True)
     args = parser.parse_args()
     result = prepare(args.base, args.project)
+    result['slimmed_images'] = slim_assets(args.base)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print(f'{NEW_ID}: palette, lightweight defaults, menu and {result["validated_xml_files"]} XML files checked')
