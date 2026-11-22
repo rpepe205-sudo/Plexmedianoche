@@ -264,7 +264,7 @@ def prepare(base, project):
     if found != set(replacements):
         raise ValueError(f'Upstream startup settings changed: {set(replacements) - found}')
     # Ajuste único de PlexKodiConnect (arranque rápido), antes de abrir Inicio.
-    pkc_tune = ET.Element('onload', {'condition': '!Skin.HasSetting(medianoche.pkc.ajustado)'})
+    pkc_tune = ET.Element('onload', {'condition': '!Skin.HasSetting(medianoche.pkc.ajustado2)'})
     pkc_tune.text = 'RunScript(special://skin/extras/medianoche_pkc.py)'
     onloads = list(window.findall('onload'))
     first_jump = next(i for i, n in enumerate(onloads) if (n.text or '').startswith('ReplaceWindow('))

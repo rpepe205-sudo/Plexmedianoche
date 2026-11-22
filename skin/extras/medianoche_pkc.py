@@ -3,13 +3,14 @@
 - Sincronización completa: una vez al día (1440 min) en vez de cada hora,
   solo si el usuario no había puesto ya otro valor.
 - No descargar todas las carátulas de golpe al iniciar.
+- Sincronizar en segundo plano, sin mostrar la barra de progreso ni avisos.
 - Kodi: no rastrear la biblioteca al iniciar (PKC ya la mantiene).
 Las carpetas a sincronizar las elige el usuario dentro de PKC.
 """
 import json
 
 PKC_ID = 'plugin.video.plexkodiconnect'
-DONE_FLAG = 'medianoche.pkc.ajustado'
+DONE_FLAG = 'medianoche.pkc.ajustado2'
 
 
 def tune(pkc):
@@ -21,6 +22,10 @@ def tune(pkc):
     if pkc.getSetting('enableTextureCache') != 'false':
         pkc.setSetting('enableTextureCache', 'false')
         changes.append('enableTextureCache=false')
+    for setting in ('dbSyncIndicator', 'playstate_sync_indicator', 'imageSyncNotifications'):
+        if pkc.getSetting(setting) != 'false':
+            pkc.setSetting(setting, 'false')
+            changes.append(setting + '=false')
     return changes
 
 
