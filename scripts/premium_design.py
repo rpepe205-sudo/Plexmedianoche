@@ -1070,7 +1070,7 @@ def fix_focus_colours(base):
     variable = defs.getroot().find("variable[@name='ColorHighlight']")
     for value in list(variable):
         variable.remove(value)
-    add(variable, 'value', 'Highlight')
+    add(variable, 'value', 'FFE5BC70')  # hex: también vale dentro de [COLOR]
     defs.write(defs_path, encoding='UTF-8', xml_declaration=True)
     for palette in ('defaults.xml', 'Media Noche.xml'):
         path = base / 'colors' / palette

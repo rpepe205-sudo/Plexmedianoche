@@ -2,6 +2,6 @@
 <smartplaylist type="movies">
   <name>Estrenos</name>
   <match>all</match>
-  <rule field="tag" operator="contains"><value>Estreno</value></rule>
-  <order direction="descending">dateadded</order>
+  <rule field="year" operator="greaterthan"><value>2023</value></rule>
+  <order direction="descending">year</order>
 </smartplaylist>
