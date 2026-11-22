@@ -16,7 +16,7 @@ import fluidez_resaltado
 
 OLD_ID = 'skin.arctic.zephyr.mod'
 NEW_ID = 'skin.plexmedianoche'
-CUSTOM_VERSION = '3.0.4~beta5'
+CUSTOM_VERSION = '3.0.4~beta6'
 LABELS = ['Inicio', 'Favoritos', 'Series estrenos', 'Series',
           'Cine', 'Novedades cine', 'TV', 'Ajustes', 'Apagar']
 
