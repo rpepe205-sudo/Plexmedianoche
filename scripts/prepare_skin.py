@@ -263,6 +263,12 @@ def prepare(base, project):
             node.text = replacements[node.text]
     if found != set(replacements):
         raise ValueError(f'Upstream startup settings changed: {set(replacements) - found}')
+    # Ajuste único de PlexKodiConnect (arranque rápido), antes de abrir Inicio.
+    pkc_tune = ET.Element('onload', {'condition': '!Skin.HasSetting(medianoche.pkc.ajustado)'})
+    pkc_tune.text = 'RunScript(special://skin/extras/medianoche_pkc.py)'
+    onloads = list(window.findall('onload'))
+    first_jump = next(i for i, n in enumerate(onloads) if (n.text or '').startswith('ReplaceWindow('))
+    window.insert(list(window).index(onloads[first_jump]), pkc_tune)
     startup.write(startup_path, encoding='UTF-8', xml_declaration=True)
     (base / 'extras').mkdir(exist_ok=True)
     shutil.copyfile(project / 'skin/extras/medianoche_favourites.py',
@@ -271,6 +277,8 @@ def prepare(base, project):
                     base / 'extras/medianoche_info.py')
     shutil.copyfile(project / 'skin/extras/medianoche_trailer.py',
                     base / 'extras/medianoche_trailer.py')
+    shutil.copyfile(project / 'skin/extras/medianoche_pkc.py',
+                    base / 'extras/medianoche_pkc.py')
     video_info = prepare_video_info(base)
     design = build_design(base, project)
     design['fluidez_resaltado'] = fluidez_resaltado.apply(base)
