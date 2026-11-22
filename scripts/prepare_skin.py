@@ -167,6 +167,13 @@ def prepare(base, project):
     home_path = base / '1080i/Home.xml'
     home_hash = digest(home_path)
     expected_home = home_path.read_text().replace(OLD_ID, NEW_ID)
+    # Solo estos son imprescindibles; el resto (extras de Arctic que no están en
+    # el repositorio oficial de Kodi) pasan a opcionales para que el skin se
+    # instale igual en cualquier dispositivo.
+    required = {'xbmc.gui', 'script.skinshortcuts'}
+    for node in root.findall('requires/import'):
+        if node.get('addon') not in required:
+            node.set('optional', 'true')
     dependencies = [dict(node.attrib) for node in root.findall('requires/import')]
     provenance = root.findtext("extension[@point='xbmc.addon.metadata']/source")
     root.set('id', NEW_ID)
