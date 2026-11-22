@@ -92,13 +92,14 @@ GRIDS = {  # ventana: (título, tipo, [(pestaña, contenido)])
     ]),
 }
 
-HOME_ROWS = [  # id, pestaña, lista
-    (501, 'Novedades cine', 'cine-reciente.xsp'),
-    (502, 'Series estrenos', 'series-completas.xsp'),
-    (503, 'Continuar series', 'episodios-continuar.xsp'),
-    (504, 'Continuar cine', 'cine-continuar.xsp'),
-    (505, 'Cine', 'cine.xsp'),
-    (506, 'Series', 'series.xsp'),
+LISTAS = 'plugin://plugin.video.medianoche/'
+HOME_ROWS = [  # id, pestaña, contenido
+    (501, 'Mi lista', LISTAS + '?lista=milista'),
+    (502, 'Estrenos cine', PLAYLISTS + 'cine-estrenos.xsp'),
+    (503, 'Temporadas nuevas', PLAYLISTS + 'series-temporadas-nuevas.xsp'),
+    (504, 'Recomendadas', PLAYLISTS + 'cine-recomendadas.xsp'),
+    (505, 'Cine', PLAYLISTS + 'cine-reciente.xsp'),
+    (506, 'Series', PLAYLISTS + 'series.xsp'),
 ]
 
 
@@ -608,24 +609,29 @@ def build_home():
                           (CONT_DOWN, f'!Integer.IsGreater(Container({identity}).NumItems,0)')])
         x += width + 18
     for index, (identity, name, playlist) in enumerate(HOME_ROWS):
-        listing = poster_list(controls, identity, 70, 530, 1780, PLAYLISTS + playlist,
+        listing = poster_list(controls, identity, 70, 530, 1780, playlist,
                               visible=f'String.IsEqual({row},{identity})', small=True)
         nav(listing, up=tab_focus, down=CONT_DOWN)
         add(listing, 'onfocus', f'SetProperty(MediaNoche.RowTab,{701 + index})')
         item_click(listing)
-        empty = lbl(controls, 90, 620, 1400, 60, 'Todavía no hay títulos en esta fila.', 'MN_Body', FAINT)
+        message = ('Pulsa el corazón en una película o serie para añadirla a Mi lista.'
+                   if identity == 501 else 'Todavía no hay títulos en esta fila.')
+        empty = lbl(controls, 90, 620, 1400, 60, message, 'MN_Body', FAINT)
         add(empty, 'visible', f'String.IsEqual({row},{identity}) + !Container({identity}).IsUpdating'
                               f' + Integer.IsEqual(Container({identity}).NumItems,0)')
     # Segunda fila: seguir viendo (si no hay nada a medias, últimos episodios).
     continuing = 'Integer.IsGreater(Container(520).NumItems,0)'
-    lbl(controls, 80, 810, 600, 30, 'SEGUIR VIENDO', 'MN_Kicker', GOLD, visible=continuing)
+    lbl(controls, 80, 810, 600, 30, 'CONTINUAR VIENDO', 'MN_Kicker', GOLD, visible=continuing)
     lbl(controls, 80, 810, 600, 30, 'ÚLTIMOS EPISODIOS', 'MN_Kicker', GOLD,
         visible=f'!{continuing} + Integer.IsGreater(Container(521).NumItems,0)')
-    for identity, playlist, visible in ((520, 'episodios-continuar.xsp', continuing),
-                                        (521, 'episodios-recientes.xsp', f'!{continuing}')):
-        listing = wide_list(controls, identity, 68, 840, 1784, PLAYLISTS + playlist, visible=visible)
+    for identity, source, visible in ((520, LISTAS + '?lista=continuar', continuing),
+                                      (521, PLAYLISTS + 'episodios-recientes.xsp', f'!{continuing}')):
+        listing = wide_list(controls, identity, 68, 840, 1784, source, visible=visible)
         nav(listing, up=f'SetFocus($INFO[Window.Property(MediaNoche.Row)])', down=9100)
-        add(listing, 'onclick', f'RunScript({FICHA_SCRIPT},play,episode,$INFO[ListItem.DBID])')
+        add(listing, 'onclick', f'RunScript({FICHA_SCRIPT},play,$INFO[ListItem.DBType],$INFO[ListItem.DBID])')
+    hint = lbl(controls, 700, 810, 1140, 30,
+               'Instala «Media Noche · Listas» para ver Mi lista y Continuar viendo.', 'MN_Small', FAINT)
+    add(hint, 'visible', '!System.HasAddon(plugin.video.medianoche)')
     listing = dock(controls, '1191', '520')
     for node in listing.findall('onup'):
         listing.remove(node)

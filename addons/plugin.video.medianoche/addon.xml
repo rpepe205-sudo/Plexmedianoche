@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.medianoche" name="Media Noche · Listas" version="1.0.0" provider-name="Plex Media Noche">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="es_ES">Mi lista y Continuar viendo (pelis y series juntas) para el Inicio de Plex Media Noche.</summary>
+    <description lang="es_ES">Junta en una sola fila tus favoritos de cine y series, y lo que tienes a medias. Lee solo tu biblioteca de Kodi (la que llena PlexKodiConnect).</description>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
