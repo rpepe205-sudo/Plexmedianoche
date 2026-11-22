@@ -14,8 +14,8 @@ from cinematic_design import LIBRARIES, PLAYLISTS, hidden_episode_plot
 GOLD = 'FFE5BC70'
 DARK = 'FF08121F'
 WHITE = 'FFFFFFFF'
-MUTED = 'B3DDE6EF'
-FAINT = '80DDE6EF'
+MUTED = 'E6DDE6EF'
+FAINT = 'A6DDE6EF'
 MEDIA = 'special://skin/extras/medianoche/'
 ICONS = 'special://skin/extras/icons/'
 INFO_SCRIPT = 'special://skin/extras/medianoche_info.py'
@@ -33,14 +33,15 @@ FONTS = [  # nombre, archivo, tamaño
     ('MN_Rating', 'MN-Outfit-SemiBold.ttf', 40),
     ('MN_Head', 'MN-Outfit-SemiBold.ttf', 26),
     ('MN_Button', 'MN-Outfit-SemiBold.ttf', 22),
-    ('MN_Ep', 'MN-Outfit-Medium.ttf', 23),
-    ('MN_Tab', 'MN-Inter-Medium.ttf', 20),
-    ('MN_Body', 'MN-Inter-Regular.ttf', 22),
-    ('MN_Meta', 'MN-Inter-Regular.ttf', 20),
-    ('MN_Small', 'MN-Inter-Regular.ttf', 18),
-    ('MN_Kicker', 'MN-Inter-Medium.ttf', 17),
-    ('MN_Tiny', 'MN-Inter-Regular.ttf', 15),
-    ('MN_Dock', 'MN-Inter-Medium.ttf', 16),
+    ('MN_Ep', 'MN-Outfit-Medium.ttf', 25),
+    ('MN_Tab', 'MN-Inter-Medium.ttf', 23),
+    ('MN_Body', 'MN-Inter-Medium.ttf', 23),
+    ('MN_Meta', 'MN-Inter-Medium.ttf', 22),
+    ('MN_Small', 'MN-Inter-Medium.ttf', 20),
+    ('MN_Kicker', 'MN-Inter-Medium.ttf', 19),
+    ('MN_Tiny', 'MN-Inter-Medium.ttf', 17),
+    ('MN_Dock', 'MN-Inter-Medium.ttf', 17),
+    ('MN_Card', 'MN-Outfit-SemiBold.ttf', 21),
 ]
 
 DOCK = [  # etiqueta, icono, acción, ventana de la sección
@@ -57,6 +58,10 @@ DOCK = [  # etiqueta, icono, acción, ventana de la sección
 
 LIB_DOWN = [('50', 'Integer.IsGreater(Container(50).NumItems,0)'),
             ('9100', '!Integer.IsGreater(Container(50).NumItems,0)')]
+
+_C = 'Integer.IsGreater(Container(520).NumItems,0)'
+_R = 'Integer.IsGreater(Container(521).NumItems,0)'
+CONT_DOWN = [('520', _C), ('521', f'!{_C} + {_R}'), ('9100', f'!{_C} + !{_R}')]
 
 HOME_ROWS = [  # id, pestaña, lista
     (501, 'Novedades cine', 'cine-reciente.xsp'),
@@ -189,7 +194,7 @@ def make_textures(target):
     glow = Image.new('RGBA', (200, 200), (255, 255, 255, 0))
     ImageDraw.Draw(glow).rounded_rectangle((40, 40, 160, 160), 20, fill=(255, 255, 255, 200))
     glow.filter(ImageFilter.GaussianBlur(16)).save(target / 'glow.png')
-    night = (5, 10, 18)
+    night = (4, 7, 12)
     left = Image.new('RGBA', (256, 4))
     for x in range(256):
         a = int(250 * max(0.0, 1 - (x / 255) ** 1.6))
@@ -233,7 +238,7 @@ def install_fonts(base, project):
 
 # -------------------------------------------------------- piezas comunes
 def background(controls, art):
-    img(controls, 0, 0, 1920, 1080, 'common/white.png', 'FF050A12')
+    img(controls, 0, 0, 1920, 1080, 'common/white.png', 'FF04070C')
     img(controls, 0, 0, 1920, 1080, art, aspect='scale', background=True, fade='400')
     img(controls, 0, 0, 1500, 1080, MEDIA + 'grad_left.png')
     img(controls, 0, 440, 1920, 640, MEDIA + 'grad_bottom.png')
@@ -248,32 +253,32 @@ def header(controls):
 
 def dock(controls, page, up):
     """Barra inferior de cristal: icono + nombre; la sección elegida, en dorado."""
-    img(controls, 80, 972, 1760, 84, MEDIA + 'pill.png', '1CFFFFFF', border='32')
-    img(controls, 112, 972, 1696, 1, 'common/white.png', '40FFFFFF')
-    listing = ctrl(controls, 'list', 85, 972, 1750, 84, 9100)
+    img(controls, 80, 994, 1760, 74, MEDIA + 'pill.png', '24FFFFFF', border='32')
+    img(controls, 112, 994, 1696, 1, 'common/white.png', '4DFFFFFF')
+    listing = ctrl(controls, 'list', 85, 994, 1750, 74, 9100)
     add(listing, 'orientation', 'horizontal')
     add(listing, 'scrolltime', '0')
     add(listing, 'onup', up)
     if page != '1191':
         add(listing, 'onback', 'ReplaceWindow(1191)')
     for tag in ('itemlayout', 'focusedlayout'):
-        layout = add(listing, tag, width='194', height='84')
+        layout = add(listing, tag, width='194', height='74')
         focused = tag == 'focusedlayout'
         if focused:
             on = 'Control.HasFocus(9100)'
-            img(layout, 2, 4, 190, 76, MEDIA + 'glow.png', '73E5BC70', border='60', visible=on)
-            img(layout, 6, 10, 182, 64, MEDIA + 'pill.png', GOLD, border='32', visible=on)
-            icon = img(layout, 16, 27, 30, 30, '$INFO[ListItem.Icon]', DARK, aspect='keep', visible=on)
-            lbl(layout, 52, 10, 138, 64, '$INFO[ListItem.Label]', 'MN_Dock', DARK, visible=on, scroll=True)
+            img(layout, 2, 0, 190, 74, MEDIA + 'glow.png', '73E5BC70', border='60', visible=on)
+            img(layout, 6, 8, 182, 58, MEDIA + 'pill.png', GOLD, border='32', visible=on)
+            icon = img(layout, 16, 22, 30, 30, '$INFO[ListItem.Icon]', DARK, aspect='keep', visible=on)
+            lbl(layout, 52, 8, 138, 58, '$INFO[ListItem.Label]', 'MN_Dock', DARK, visible=on, scroll=True)
             off = '!Control.HasFocus(9100)'
-            img(layout, 16, 27, 30, 30, '$INFO[ListItem.Icon]', MUTED, aspect='keep', visible=off)
-            lbl(layout, 52, 10, 138, 64, '$INFO[ListItem.Label]', 'MN_Dock', MUTED, visible=off)
+            img(layout, 16, 22, 30, 30, '$INFO[ListItem.Icon]', MUTED, aspect='keep', visible=off)
+            lbl(layout, 52, 8, 138, 58, '$INFO[ListItem.Label]', 'MN_Dock', MUTED, visible=off)
         else:
-            img(layout, 16, 27, 30, 30, '$INFO[ListItem.Icon]', MUTED, aspect='keep')
-            lbl(layout, 52, 10, 138, 64, '$INFO[ListItem.Label]', 'MN_Dock', MUTED)
+            img(layout, 16, 22, 30, 30, '$INFO[ListItem.Icon]', MUTED, aspect='keep')
+            lbl(layout, 52, 8, 138, 58, '$INFO[ListItem.Label]', 'MN_Dock', MUTED)
         # Sección actual: punto dorado bajo el icono.
-        img(layout, 26, 66, 10, 10, MEDIA + 'circle.png', GOLD,
-            visible='String.IsEqual(ListItem.Property(page),Window.Property(MediaNoche.Page))'
+        img(layout, 26, 58, 10, 10, MEDIA + 'circle.png', GOLD,
+            visible='String.IsEqual(ListItem.Property(current),1)'
                     + (' + !Control.HasFocus(9100)' if focused else ''))
     content = add(listing, 'content')
     for label, icon, action, window in DOCK:
@@ -281,7 +286,7 @@ def dock(controls, page, up):
         add(item, 'label', label)
         add(item, 'icon', ICONS + icon)
         add(item, 'onclick', action)
-        add(item, 'property', window, name='page')
+        add(item, 'property', '1' if window == page else '0', name='current')
     return listing
 
 
@@ -428,6 +433,73 @@ def hero_texts(controls, prefix, y=170, kicker=None, plot=True, plot_hidden=None
 
 
 # ------------------------------------------------------------------ Inicio
+def hero_badges(parent, prefix, x, y):
+    """Etiquetas 4K/1080p, HDR y canales de audio del elemento enfocado."""
+    group = ctrl(parent, 'grouplist', x, y, 900, 36)
+    add(group, 'orientation', 'horizontal')
+    add(group, 'itemgap', '8')
+    entries = [
+        ('4K', f'String.IsEqual({prefix}.VideoResolution,4K)'),
+        (f'$INFO[{prefix}.VideoResolution]p', f'!String.IsEmpty({prefix}.VideoResolution) + !String.IsEqual({prefix}.VideoResolution,4K)'),
+        ('DOLBY VISION', f'String.IsEqual({prefix}.HdrType,dolbyvision)'),
+        ('HDR', f'!String.IsEmpty({prefix}.HdrType) + !String.IsEqual({prefix}.HdrType,dolbyvision)'),
+        ('7.1', f'String.IsEqual({prefix}.AudioChannels,8)'),
+        ('5.1', f'String.IsEqual({prefix}.AudioChannels,6)'),
+        ('ESTÉREO', f'String.IsEqual({prefix}.AudioChannels,2)'),
+        (f'$INFO[{prefix}.MPAA]', f'!String.IsEmpty({prefix}.MPAA)'),
+    ]
+    for text, visible in entries:
+        node = add(group, 'control', type='button')
+        add(node, 'width', 'auto')
+        add(node, 'height', '34')
+        add(node, 'texturenofocus', MEDIA + 'outline10.png', colordiffuse='B3FFFFFF', border='12')
+        add(node, 'texturefocus', MEDIA + 'outline10.png', colordiffuse='B3FFFFFF', border='12')
+        add(node, 'font', 'MN_Tiny')
+        add(node, 'textcolor', WHITE)
+        add(node, 'disabledcolor', WHITE)
+        add(node, 'textoffsetx', '12')
+        add(node, 'aligny', 'center')
+        add(node, 'label', text)
+        add(node, 'enable', 'false')
+        add(node, 'visible', visible)
+
+
+def wide_list(controls, identity, x, y, w, content, visible=None):
+    """Fila «Seguir viendo»: imágenes horizontales con serie, episodio y progreso."""
+    cw, ch = 224, 126
+    listing = ctrl(controls, 'list', x, y, w, ch + 16, identity)
+    add(listing, 'orientation', 'horizontal')
+    add(listing, 'scrolltime', '220', tween='cubic', easing='out')
+    add(listing, 'preloaditems', '2')
+    for tag in ('itemlayout', 'focusedlayout'):
+        layout = add(listing, tag, width=str(cw + 24), height=str(ch + 16))
+        focused = tag == 'focusedlayout'
+        if focused:
+            img(layout, 6, 2, cw + 12, ch + 12, MEDIA + 'round14.png', GOLD, border='14',
+                visible=f'Control.HasFocus({identity})')
+        art = img(layout, 12, 8, cw, ch, '$INFO[ListItem.Art(thumb)]', None if focused else 'CCFFFFFF',
+                  diffuse=MEDIA + 'mask_wide.png', aspect='scale', background=True)
+        art.find('texture').set('fallback', 'DefaultTVShows.png')
+        img(layout, 12, 8 + ch - 70, cw, 70, MEDIA + 'grad_bottom.png', diffuse=MEDIA + 'mask_wide.png')
+        lbl(layout, 24, 8 + ch - 54, cw - 24, 26,
+            '$INFO[ListItem.TVShowTitle]', 'MN_Card', WHITE,
+            visible='!String.IsEmpty(ListItem.TVShowTitle)')
+        lbl(layout, 24, 8 + ch - 54, cw - 24, 26, '$INFO[ListItem.Label]', 'MN_Card', WHITE,
+            visible='String.IsEmpty(ListItem.TVShowTitle)')
+        lbl(layout, 24, 8 + ch - 30, cw - 24, 22,
+            'T$INFO[ListItem.Season] · E$INFO[ListItem.Episode]', 'MN_Tiny', MUTED,
+            visible='!String.IsEmpty(ListItem.TVShowTitle)')
+        bar = ctrl(layout, 'progress', 12, 8 + ch - 6, cw, 6)
+        add(bar, 'texturebg', 'common/white.png', colordiffuse='40FFFFFF')
+        add(bar, 'midtexture', 'common/white.png', colordiffuse=GOLD)
+        add(bar, 'info', 'ListItem.PercentPlayed')
+        add(bar, 'visible', 'ListItem.IsResumable')
+    add(listing, 'content', content, target='videos', limit='25')
+    if visible:
+        add(listing, 'visible', visible)
+    return listing
+
+
 def build_home():
     root = ET.Element('window', type='window', id='1191')
     add(root, 'defaultcontrol', '701', always='true')
@@ -441,21 +513,40 @@ def build_home():
     background(controls, '$VAR[MediaNoche.HeroArt]')
     header(controls)
     row = 'Window.Property(MediaNoche.Row)'
-    # Textos del elemento enfocado de la fila activa.
     for identity, name, _ in HOME_ROWS:
+        prefix = f'Container({identity}).ListItem'
         group = add(controls, 'control', type='group')
         add(group, 'visible', f'String.IsEqual({row},{identity})')
-        hero_texts(group, f'Container({identity}).ListItem', 150, name.upper(), plot=True,
-                   plot_hidden=hidden_episode_plot(identity))
+        full = add(group, 'control', type='group')
+        add(full, 'visible', f'Integer.IsGreater(Container({identity}).NumItems,0)')
+        lbl(full, 80, 96, 1000, 30, name.upper(), 'MN_Kicker', GOLD)
+        logo = f'$VAR[MediaNoche.Logo{identity}]'
+        img(full, 80, 130, 640, 120, logo, aspect='keep', fade='300',
+            visible=f'!String.IsEmpty({prefix}.Art(clearlogo)) | !String.IsEmpty({prefix}.Art(tvshow.clearlogo))')
+        no_logo = f'String.IsEmpty({prefix}.Art(clearlogo)) + String.IsEmpty({prefix}.Art(tvshow.clearlogo))'
+        episode = f'String.IsEqual({prefix}.DBType,episode)'
+        lbl(full, 80, 126, 1150, 124, f'$INFO[{prefix}.TVShowTitle]', 'MN_HeroM', WHITE,
+            visible=f'{no_logo} + {episode}')
+        lbl(full, 80, 126, 1150, 124, f'$INFO[{prefix}.Label]', 'MN_HeroM', WHITE,
+            visible=f'{no_logo} + !{episode}')
+        meta = (f'$INFO[{prefix}.Year]$INFO[{prefix}.Genre,  ·  ]'
+                f'$INFO[{prefix}.Duration(mins),  ·  , min]$INFO[{prefix}.Rating,  ·  ★ ]')
+        lbl(full, 80, 258, 1150, 32, meta, 'MN_Meta', MUTED, visible=f'!{episode}')
+        lbl(full, 80, 258, 1150, 32,
+            f'T$INFO[{prefix}.Season]  ·  E$INFO[{prefix}.Episode]  ·  $INFO[{prefix}.Label]',
+            'MN_Meta', MUTED, visible=episode)
+        hero_badges(full, prefix, 80, 298)
+        box = textbox(full, 80, 338, 1000, 58, f'$INFO[{prefix}.Plot]', 'MN_Small')
+        add(box, 'visible', f'![{hidden_episode_plot(identity)}]')
+        lbl(full, 80, 338, 960, 32, 'Sinopsis oculta para evitar spoilers.', 'MN_Body', FAINT,
+            visible=hidden_episode_plot(identity))
         empty = add(group, 'control', type='group')
         add(empty, 'visible', f'!Container({identity}).IsUpdating + Integer.IsEqual(Container({identity}).NumItems,0)')
-        lbl(empty, 80, 180, 1150, 140, 'BUENAS HISTORIAS, SIEMPRE', 'MN_Hero', WHITE)
-        lbl(empty, 80, 325, 1150, 34, 'Cuando PlexKodiConnect sincronice tu biblioteca, tus títulos aparecerán aquí.',
+        lbl(empty, 80, 126, 1150, 124, 'BUENAS HISTORIAS, SIEMPRE', 'MN_HeroM', WHITE)
+        lbl(empty, 80, 258, 1300, 32,
+            'Cuando PlexKodiConnect sincronice tu biblioteca, tus títulos aparecerán aquí.',
             'MN_Meta', MUTED)
-    # Botones del destacado.
-    play = []
-    more = []
-    trailer = []
+    play, more, trailer = [], [], []
     for identity, _, _ in HOME_ROWS:
         on = f'String.IsEqual({row},{identity})'
         prefix = f'Container({identity}).ListItem'
@@ -468,35 +559,48 @@ def build_home():
         more.append((f'RunScript({INFO_SCRIPT},episode,$INFO[{prefix}.DBID])',
                      f'{on} + String.IsEqual({prefix}.DBType,episode)'))
         trailer.append((f'RunScript({TRAILER_SCRIPT},$ESCINFO[{prefix}.Trailer])', on))
-    b = pill_button(controls, 801, 80, 470, 250, 'Reproducir', 'play2.png', play)
-    nav(b, right=802, down='SetFocus($INFO[Window.Property(MediaNoche.RowTab)])')
-    b = round_button(controls, 802, 350, 470, 'film.png', trailer)
-    nav(b, left=801, right=803, down='SetFocus($INFO[Window.Property(MediaNoche.RowTab)])')
-    b = round_button(controls, 803, 434, 470, 'info.png', more)
-    nav(b, left=802, down='SetFocus($INFO[Window.Property(MediaNoche.RowTab)])')
-    # Pestañas de filas.
+    tab_focus = 'SetFocus($INFO[Window.Property(MediaNoche.RowTab)])'
+    b = pill_button(controls, 801, 80, 410, 250, 'Reproducir', 'play2.png', play)
+    nav(b, right=802, down=tab_focus)
+    b = round_button(controls, 802, 350, 410, 'film.png', trailer)
+    nav(b, left=801, right=803, down=tab_focus)
+    b = round_button(controls, 803, 434, 410, 'info.png', more)
+    nav(b, left=802, down=tab_focus)
     x = 80
     for index, (identity, name, _) in enumerate(HOME_ROWS):
-        width = 40 + len(name) * 11
+        width = 44 + len(name) * 12
         selected = f'String.IsEqual({row},{identity})'
-        node = tab(controls, 701 + index, x, 568, width, name, selected,
+        node = tab(controls, 701 + index, x, 492, width, name, selected,
                    focus=[f'SetProperty(MediaNoche.Row,{identity})',
                           f'SetProperty(MediaNoche.RowTab,{701 + index})'])
         nav(node, left=701 + (index - 1) % len(HOME_ROWS), right=701 + (index + 1) % len(HOME_ROWS),
             up=801, down=[(f'SetFocus({identity})', f'Integer.IsGreater(Container({identity}).NumItems,0)'),
-                          ('9100', f'!Integer.IsGreater(Container({identity}).NumItems,0)')])
-        x += width + 20
-    for identity, name, playlist in HOME_ROWS:
-        listing = poster_list(controls, identity, 70, 625, 1780, PLAYLISTS + playlist,
-                              visible=f'String.IsEqual({row},{identity})')
-        nav(listing, up='SetFocus($INFO[Window.Property(MediaNoche.RowTab)])', down=9100)
-        add(listing, 'onfocus', f'SetProperty(MediaNoche.RowTab,{701 + [r[0] for r in HOME_ROWS].index(identity)})')
+                          (CONT_DOWN, f'!Integer.IsGreater(Container({identity}).NumItems,0)')])
+        x += width + 18
+    for index, (identity, name, playlist) in enumerate(HOME_ROWS):
+        listing = poster_list(controls, identity, 70, 530, 1780, PLAYLISTS + playlist,
+                              visible=f'String.IsEqual({row},{identity})', small=True)
+        nav(listing, up=tab_focus, down=CONT_DOWN)
+        add(listing, 'onfocus', f'SetProperty(MediaNoche.RowTab,{701 + index})')
         item_click(listing)
-        empty = lbl(controls, 90, 700, 1400, 60, 'Todavía no hay títulos en esta fila.',
-                    'MN_Body', FAINT)
+        empty = lbl(controls, 90, 620, 1400, 60, 'Todavía no hay títulos en esta fila.', 'MN_Body', FAINT)
         add(empty, 'visible', f'String.IsEqual({row},{identity}) + !Container({identity}).IsUpdating'
                               f' + Integer.IsEqual(Container({identity}).NumItems,0)')
-    dock(controls, '1191', 'SetFocus($INFO[Window.Property(MediaNoche.Row)])')
+    # Segunda fila: seguir viendo (si no hay nada a medias, últimos episodios).
+    continuing = 'Integer.IsGreater(Container(520).NumItems,0)'
+    lbl(controls, 80, 810, 600, 30, 'SEGUIR VIENDO', 'MN_Kicker', GOLD, visible=continuing)
+    lbl(controls, 80, 810, 600, 30, 'ÚLTIMOS EPISODIOS', 'MN_Kicker', GOLD,
+        visible=f'!{continuing} + Integer.IsGreater(Container(521).NumItems,0)')
+    for identity, playlist, visible in ((520, 'episodios-continuar.xsp', continuing),
+                                        (521, 'episodios-recientes.xsp', f'!{continuing}')):
+        listing = wide_list(controls, identity, 68, 840, 1784, PLAYLISTS + playlist, visible=visible)
+        nav(listing, up=f'SetFocus($INFO[Window.Property(MediaNoche.Row)])', down=9100)
+        add(listing, 'onclick', f'RunScript({FICHA_SCRIPT},play,episode,$INFO[ListItem.DBID])')
+    listing = dock(controls, '1191', '520')
+    for node in listing.findall('onup'):
+        listing.remove(node)
+    nav(listing, up=[('520', _C), ('521', f'!{_C} + {_R}'),
+                     ('SetFocus($INFO[Window.Property(MediaNoche.Row)])', f'!{_C} + !{_R}')])
     return root
 
 
@@ -799,6 +903,12 @@ def variables(root):
             add(hero, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
                 condition=f'{on} + !String.IsEmpty(Container({identity}).ListItem.{field})')
     add(hero, 'value', '')
+    for identity, _, _ in HOME_ROWS:
+        logo = add(root, 'variable', name=f'MediaNoche.Logo{identity}')
+        for field in ('Art(clearlogo)', 'Art(tvshow.clearlogo)'):
+            add(logo, 'value', f'$INFO[Container({identity}).ListItem.{field}]',
+                condition=f'!String.IsEmpty(Container({identity}).ListItem.{field})')
+        add(logo, 'value', '')
 
 
 # ------------------------------------------------------------------ montaje
@@ -812,6 +922,28 @@ def save(path, root):
                     layout.set('medianoche', mark)
     ET.indent(root, space='    ')
     ET.ElementTree(root).write(path, encoding='UTF-8', xml_declaration=True)
+
+
+def fix_focus_colours(base):
+    """Barra de selección dorada con texto oscuro en todas las ventanas de Kodi.
+
+    Un preajuste de color de Arctic podía dejar la barra en blanco con el texto
+    blanco (no se leía la opción seleccionada, p. ej. al elegir bibliotecas en PKC).
+    """
+    defs_path = base / '1080i/Includes_Defs.xml'
+    defs = ET.parse(defs_path)
+    variable = defs.getroot().find("variable[@name='ColorHighlight']")
+    for value in list(variable):
+        variable.remove(value)
+    add(variable, 'value', 'Highlight')
+    defs.write(defs_path, encoding='UTF-8', xml_declaration=True)
+    for palette in ('defaults.xml', 'Media Noche.xml'):
+        path = base / 'colors' / palette
+        tree = ET.parse(path)
+        for color in tree.getroot().findall('color'):
+            if color.get('name') == 'Selected':
+                color.text = 'FF0B1320'
+        tree.write(path, encoding='UTF-8', xml_declaration=True)
 
 
 def apply(base, project):
@@ -830,6 +962,7 @@ def apply(base, project):
     includes = ET.parse(includes_path).getroot()
     variables(includes)
     save(includes_path, includes)
+    fix_focus_colours(base)
     for name in ('medianoche_ficha.py', 'medianoche_explore.py'):
         shutil.copyfile(project / 'skin/extras' / name, base / 'extras' / name)
     return {'premium_windows': [1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197],
